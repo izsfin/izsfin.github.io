@@ -1,126 +1,100 @@
 import { Octokit } from "@octokit/rest";
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-const OWNER = "nettoxi"; 
+const OWNER = "nettoxi";
 const REPO = "winxs";
 
 export default async function handler(req, res) {
-    const host = req.headers.host || "";
-    const userAgent = req.headers['user-agent'] || "";
-    
-    let rawPath = req.url.split('?')[0].replace(/^\/+/g, '');
-    
-    const secretSuffix = "=NextExec/Dev";
-    const isDev = rawPath.endsWith(secretSuffix);
-    const fullPath = isDev ? rawPath.slice(0, -secretSuffix.length) : rawPath;
+    const host = req.headers.host;
+    const url = new URL(req.url, `http://${host}`);
+    let fullPath = url.pathname.replace(/^\/+/, ""); // Убираем слэш в начале
+    const selectedLang = req.query.lang || "RU";
+    const isDev = req.query.dev === "true";
 
-    // 1. КАРТА БРАНЧЕЙ
+    // 1. ОПРЕДЕЛЯЕМ ВЕТКУ (Branch)
     let codeBranch = "main";
-    if (host === "test-winxs.vercel.app") codeBranch = "testing";
-    else if (host === "raw-winxs.vercel.app") codeBranch = "raw";
-    else if (host === "api-winxs.vercel.app") codeBranch = "api";
-    else if (host === "cdn-winxs.vercel.app") codeBranch = "cdn";
-    else if (host === "offwinxs.vercel.app") codeBranch = "off";
-    // Можно добавить ветку для статуса, если она отдельная, 
-    // но если всё в main, оставляем как есть.
+    if (host === "cdn-winxs.vercel.app") codeBranch = "cdn";
+    if (host === "test-winxs.vercel.app") codeBranch = "test";
 
-    // 2. ВЫБОР ФАЙЛА ИНТЕРФЕЙСА
-    let interfaceFile = "site/html/main.html"; // По умолчанию
-    if (host === "test-winxs.vercel.app") {
-        interfaceFile = "site/html/test.html";
-    } else if (host === "status-winxs.vercel.app") {
-        interfaceFile = "site/html/status.html";
+    // --- ЛОГИКА СЕКРЕТНЫХ ПУТЕЙ (СУФФИКСОВ) ---
+    // Если путь пустой (главная), ставим main.html по умолчанию
+    if (fullPath === "" || fullPath === "/") {
+        fullPath = "site/html/main.html";
     }
 
-    if (fullPath === "favicon.ico" || fullPath.startsWith("api/")) return res.status(404).end();
-    // 2. СТАТИКА ДЛЯ САЙТА (Авто-подгрузка ресурсов интерфейса)
-    const isStatic = /\.(svg|png|jpg|jpeg|css|ico|gif)$/.test(fullPath);
-    if (isStatic && !isDev) {
-        try {
+    try {
+        const { data: secretData } = await octokit.repos.getContent({
+            owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main"
+        });
+        const secrets = JSON.parse(Buffer.from(secretData.content, 'base64').toString('utf-8'));
+        
+        // Ищем символ (~ или @) в пути
+        const usedSymbol = secrets.symbols.find(s => fullPath.includes(s));
+        
+        if (usedSymbol) {
+            const parts = fullPath.split(usedSymbol);
+            const fileName = parts[0]; 
+            const secretPart = parts[1];
+
+            if (secretPart === secrets.secret_word) {
+                // Если секрет совпал, перенаправляем на файл в папке html
+                fullPath = `site/html/${fileName}.html`;
+            }
+        }
+    } catch (e) {
+        // Если конфиг секретов не найден, идем дальше по обычному пути
+    }
+
+    try {
+        // 2. СТАТИКА (Картинки, CSS и т.д.)
+        const isStatic = /\.(svg|png|jpg|jpeg|css|ico|gif)$/i.test(fullPath);
+        
+        if (isStatic) {
             const { data: fileData } = await octokit.repos.getContent({
-                owner: OWNER, repo: REPO, path: fullPath, ref: "main"
-            });
-            const ext = fullPath.split('.').pop().toLowerCase();
-            const types = { 
-                svg: 'image/svg+xml', png: 'image/png', jpg: 'image/jpeg', 
-                ico: 'image/x-icon', gif: 'image/gif', css: 'text/css' 
-            };
-            res.setHeader('Content-Type', types[ext] || 'application/octet-stream');
-            return res.status(200).send(Buffer.from(fileData.content, 'base64'));
-        } catch (e) { return res.status(404).end(); }
-    }
-
-    // 3. ПОИСК ФАЙЛА В НУЖНОМ БРАНЧЕ
-    let targetFile = null;
-    if (fullPath !== "") {
-        try {
-            const pathParts = fullPath.split('/');
-            const fileName = pathParts.pop(); 
-            const folderPath = pathParts.join('/'); 
-            const { data: repoContent } = await octokit.repos.getContent({
-                owner: OWNER, repo: REPO, path: folderPath, ref: codeBranch
-            });
-            targetFile = repoContent.find(f => 
-                f.type === "file" && (f.name === fileName || f.name.startsWith(fileName + "."))
-            );
-        } catch (e) {}
-    }
-
-    // 4. ЛОГГЕР (С фильтром root и дев-режима)
-    if (fullPath !== "" && targetFile && !isDev) {
-        fetch(`https://${host}/api/logger`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+                owner: OWNER,
+                repo: REPO,
                 path: fullPath,
-                domain: host,
-                userAgent: userAgent
-            })
-        }).catch(() => {});
-    }
-
-    const isRoblox = userAgent.includes("Roblox");
-
-    // 5. ВЫДАЧА КОНТЕНТА (ROBLOX ИЛИ СЕКРЕТКА)
-    if ((isRoblox || isDev) && targetFile) {
-        try {
-            const { data: blob } = await octokit.git.getBlob({
-                owner: OWNER, repo: REPO, file_sha: targetFile.sha
+                ref: codeBranch
             });
-            
-            const content = Buffer.from(blob.content, 'base64');
-            const ext = targetFile.name.split('.').pop().toLowerCase();
-            
+
+            const content = Buffer.from(fileData.content, 'base64');
+            const ext = fullPath.split('.').pop().toLowerCase();
             const mimeTypes = {
-                lua: 'text/plain; charset=utf-8',
-                txt: 'text/plain; charset=utf-8',
-                jpg: 'image/jpeg', png: 'image/png',
-                gif: 'image/gif', svg: 'image/svg+xml'
+                'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
+                'svg': 'image/svg+xml', 'css': 'text/css', 'ico': 'image/x-icon', 'gif': 'image/gif'
             };
 
-            res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            // Убираем лишние заголовки, чтобы браузер меньше "умничал" в названии вкладки
-            res.setHeader('Content-Disposition', 'inline'); 
-            
-            return res.status(200).send(content);
-        } catch (e) { return res.status(500).send("Error fetching file"); }
-    }
+            return res.status(200)
+                .setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream')
+                .setHeader('Cache-Control', 'public, max-age=3600')
+                .send(content);
+        }
 
-    // 6. ВЫДАЧА HTML (ОБЫЧНЫЙ ЮЗЕР)
-    if (!isRoblox && !isDev) {
-        try {
-            const { data: fileData } = await octokit.repos.getContent({
-                owner: OWNER, repo: REPO, path: interfaceFile, ref: "main"
-            });
-            let html = Buffer.from(fileData.content, 'base64').toString('utf-8');
-            const selectedLang = req.query.lang || "RU";
-            html = html.replace(/{{LANG}}/g, selectedLang).replace(/{{BG_PATH}}/g, "/site/html/bg.svg");
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            return res.status(200).send(html);
-        } catch (err) { return res.status(500).send("Interface missing in main branch"); }
-    }
+        // 3. ОБРАБОТКА HTML (с подстановкой языка)
+        // Если путь не содержит .html и это не статика, пробуем добавить .html
+        let githubPath = fullPath;
+        if (!githubPath.includes('.') && !githubPath.startsWith('site/html/')) {
+            githubPath = `site/html/${fullPath}.html`;
+        }
 
-    return res.status(404).send("Not Found");
+        const { data: fileData } = await octokit.repos.getContent({
+            owner: OWNER,
+            repo: REPO,
+            path: githubPath,
+            ref: codeBranch
+        });
+
+        let html = Buffer.from(fileData.content, 'base64').toString('utf-8');
+        
+        // Магия замены переменной языка
+        html = html.replace(/{{LANG}}/g, selectedLang);
+
+        return res.status(200)
+            .setHeader('Content-Type', 'text/html')
+            .send(html);
+
+    } catch (error) {
+        console.error("Error fetching file:", error.message);
+        return res.status(404).send(`File not found: ${fullPath} (Branch: ${codeBranch})`);
+    }
 }
