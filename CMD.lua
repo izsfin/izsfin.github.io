@@ -192,11 +192,11 @@ local Library = {
 -- [ ПЕРЕМЕННЫЕ ]
 local lp = game:GetService("Players").LocalPlayer
 local HttpService, RunService, UIS = game:GetService("HttpService"), game:GetService("RunService"), game:GetService("UserInputService")
-local folderPath, activeAutoRespawns, ActiveAnimations, _G_CurrentMode = "DxBreak/CMD", {}, {}, "once"
+local folderPath, activeAutoRespawns, ActiveAnimations, _G_CurrentMode = "NightExec/CMD", {}, {}, "once"
 
 -- [ СЕРВИСЫ ]
 local function SaveConfig(name, data)
-    if not isfolder("DxBreak") then makefolder("DxBreak") end
+    if not isfolder("NightExec") then makefolder("NightExec") end
     if not isfolder(folderPath) then makefolder(folderPath) end
     writefile(folderPath .. "/" .. name .. ".json", HttpService:JSONEncode(data))
 end
@@ -353,7 +353,7 @@ local function MainHandler(name, mode, key)
 
     if n == "cmd" then
         local version = GetVersion()
-        local text = "--[[\n    DxBreak Command Bar " .. version .. "\n\nClass        Name               Function\n"
+        local text = "--[[\n    NightExec CMD " .. version .. "\n\nClass        Name               Function\n"
         for _, item in pairs(Library) do
             -- В CMD показываем только те вещи, которые доступны здесь
             if IsPlaceAllowed(item) then
@@ -395,4 +395,4 @@ lp.CharacterAdded:Connect(function()
         if IsPlaceAllowed(d) then Apply(d) end 
     end 
 end)
-print(" DxBreak Command load ! | v1.0.4 [v5.2 patch] ")
+print(" NightExec CMD load ! | v1.0.4 [v5.2 patch] ")
