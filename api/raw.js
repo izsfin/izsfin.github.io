@@ -14,51 +14,60 @@ export default async function handler(req, res) {
     if (host === "cdn-winxs.vercel.app") codeBranch = "cdn";
     if (host === "test-winxs.vercel.app") codeBranch = "test";
 
-    // 1. ЗАГРУЗКА СЕКРЕТОВ ИЗ РЕПОЗИТОРИЯ
+    // 1. ЗАГРУЗКА СЕКРЕТОВ И ПРОВЕРКА ЗАЩИТЫ
+    let isAccessGranted = false;
     try {
         const { data: sData } = await octokit.repos.getContent({
-            owner: OWNER, 
-            repo: REPO, 
-            path: "api/core/secrets.json", 
-            ref: "main" 
+            owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main" 
         });
         const secrets = JSON.parse(Buffer.from(sData.content, 'base64').toString('utf-8'));
         
-        // Ищем символ (@ или ~)
         const symbol = secrets.symbols.find(s => rawPath.includes(s));
 
         if (symbol) {
             const [name, secret] = rawPath.split(symbol);
-            // Проверка секретного слова (регистронезависимо)
             if (secret && secret.toLowerCase() === secrets.secret_word.toLowerCase()) {
                 rawPath = name; 
-            } else {
-                return res.status(403).send("Forbidden: Invalid Secret");
+                isAccessGranted = true; // Секрет верный
             }
         }
     } catch (e) {
-        console.error("Secrets config not found or invalid");
+        console.error("Secrets error");
     }
 
-    // Если путь пустой, по умолчанию отдаем main
+    // ЕСЛИ ТЫ ХОЧЕШЬ ПОЛНУЮ ЗАЩИТУ:
+    // Раскомментируй строку ниже, чтобы БЕЗ секрета вообще ничего не отдавалось:
+    // if (!isAccessGranted && codeBranch === "main") return res.status(403).send("Access Denied: Secret required");
+
     if (rawPath === "" || rawPath === "/") rawPath = "main";
 
     try {
-        // 2. ПОИСК ФАЙЛА (БЕЗ РЕГИСТРА И РАСШИРЕНИЯ)
-        const searchDir = codeBranch === "main" ? "site/html" : "";
-        
+        // 2. РАЗБИВАЕМ ПУТЬ НА ПАПКУ И ФАЙЛ
+        // Если вход icons/Drift, то dir = "icons", fileName = "Drift"
+        const pathParts = rawPath.split('/');
+        const fileNameToSearch = pathParts.pop().toLowerCase(); 
+        const subDir = pathParts.join('/'); 
+
+        // Определяем базовую папку поиска
+        let searchDir = codeBranch === "main" ? "site/html" : "";
+        if (subDir) {
+            searchDir = searchDir ? `${searchDir}/${subDir}` : subDir;
+        }
+
+        // Получаем список файлов в нужной папке
         const { data: files } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: searchDir, ref: codeBranch
         });
 
+        // Ищем файл без учета расширения и регистра
         const targetFile = files.find(f => {
             const nameWithoutExt = f.name.split('.')[0].toLowerCase();
-            return nameWithoutExt === rawPath.toLowerCase();
+            return nameWithoutExt === fileNameToSearch;
         });
 
         if (!targetFile) throw new Error("File not found");
 
-        // 3. ЗАГРУЗКА КОНТЕНТА
+        // 3. ЗАГРУЗКА И ОТДАЧА
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: targetFile.path, ref: codeBranch
         });
@@ -66,56 +75,23 @@ export default async function handler(req, res) {
         const content = Buffer.from(fileData.content, 'base64');
         const ext = targetFile.name.split('.').pop().toLowerCase();
 
-        // ОГРОМНЫЙ СПИСОК РАСШИРЕНИЙ
         const mimeTypes = {
-            // Текст и код
-            'html': 'text/html',
-            'css': 'text/css',
-            'js': 'application/javascript',
-            'json': 'application/json',
-            'lua': 'text/plain',
-            'txt': 'text/plain',
-            'md': 'text/markdown',
-            'xml': 'application/xml',
-            // Изображения
-            'png': 'image/png',
-            'jpg': 'image/jpeg',
-            'jpeg': 'image/jpeg',
-            'svg': 'image/svg+xml',
-            'gif': 'image/gif',
-            'ico': 'image/x-icon',
-            'webp': 'image/webp',
-            // Шрифты
-            'woff': 'font/woff',
-            'woff2': 'font/woff2',
-            'ttf': 'font/ttf',
-            'otf': 'font/otf',
-            // Видео/Аудио
-            'mp4': 'video/mp4',
-            'mp3': 'audio/mpeg',
-            'wav': 'audio/wav',
-            'ogg': 'audio/ogg'
+            'html': 'text/html', 'css': 'text/css', 'js': 'application/javascript',
+            'json': 'application/json', 'lua': 'text/plain', 'txt': 'text/plain',
+            'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
+            'svg': 'image/svg+xml', 'gif': 'image/gif', 'ico': 'image/x-icon'
         };
 
         const contentType = mimeTypes[ext] || 'application/octet-stream';
 
-        // Если это картинка, шрифт или видео — отдаем как есть (бинарно)
-        const isBinary = /image|font|video|audio/.test(contentType) || contentType === 'application/octet-stream';
-
-        if (isBinary) {
-            return res.status(200)
-                .setHeader('Content-Type', contentType)
-                .setHeader('Cache-Control', 'public, max-age=3600')
-                .send(content);
+        if (/image|font|video/.test(contentType)) {
+            return res.status(200).setHeader('Content-Type', contentType).send(content);
         } else {
-            // Если текст, применяем замену {{LANG}}
             let text = content.toString('utf-8');
-            return res.status(200)
-                .setHeader('Content-Type', `${contentType}; charset=utf-8`)
-                .send(text.replace(/{{LANG}}/g, selectedLang));
+            return res.status(200).setHeader('Content-Type', `${contentType}; charset=utf-8`).send(text.replace(/{{LANG}}/g, selectedLang));
         }
 
     } catch (error) {
-        return res.status(404).send(`Error 404: File "${rawPath}" not found in branch "${codeBranch}"`);
+        return res.status(404).send(`Error 404: File "${rawPath}" not found in ${codeBranch}`);
     }
 }
