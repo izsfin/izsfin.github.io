@@ -11,32 +11,41 @@ export default async function handler(req, res) {
     let rawPath = url.pathname.replace(/^\/+/, ""); 
     const selectedLang = req.query.lang || "RU";
 
-    // --- 1. ЛОГИКА ДОМЕНОВ ---
+    // --- 1. КАРТА: ДОМЕН -> ВЕТКА ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
-    let isRootOnly = false;
+    let searchDir = ""; // По умолчанию ищем в корне ветки
 
-    if (host.includes("test-winxs")) {
+    if (host.includes("auth-winxs")) {
+        codeBranch = "auth";
+        fallbackFile = "getkey.html";
+    } else if (host.includes("test-winxs")) {
         codeBranch = "test";
         fallbackFile = "test.html";
-        isRootOnly = true;
-    } else if (host.includes("auth-winxs")) {
-        codeBranch = "auth";
-        fallbackFile = "getkey.html"; 
-        isRootOnly = true; 
     } else if (host.includes("cdn-winxs")) {
         codeBranch = "cdn";
-        isRootOnly = true;
+    } else if (host.includes("off-winxs")) {
+        codeBranch = "off"; // Если есть ветка off, иначе ставь main
+        fallbackFile = "main.html";
+        searchDir = "site/html"; // Для off-домена приоритет папке сайта
+    } else if (host.includes("api-winxs")) {
+        codeBranch = "api";
+    } else if (host.includes("raw-winxs")) {
+        codeBranch = "raw";
+    } else {
+        // Дефолт для основного домена или если зашли по прямой ссылке верселя
+        codeBranch = "main";
+        searchDir = "site/html";
     }
 
-    // --- 2. СЕКРЕТЫ ---
+    // --- 2. СЕКРЕТЫ (Всегда берем из main для синхронизации) ---
     let secrets = { secret_word: "night", symbols: ["@", "~"] };
     try {
         const { data: sData } = await octokit.repos.getContent({ 
             owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main" 
         });
         secrets = JSON.parse(Buffer.from(sData.content, 'base64').toString('utf-8'));
-    } catch (e) { console.error("!!! Secrets.json not found in main branch"); }
+    } catch (e) { console.error("Secrets.json missing"); }
 
     // --- 3. ПРОВЕРКА СЕКРЕТА ---
     let isSecretValid = false;
@@ -49,90 +58,75 @@ export default async function handler(req, res) {
         }
     }
 
-    // Корень домена
+    // Корень (заглушка)
     if (rawPath === "" || rawPath === "/" || rawPath.toLowerCase() === "index") {
         rawPath = fallbackFile.split('.')[0];
         isSecretValid = true; 
     }
 
     try {
-        // --- 4. УЛУЧШЕННЫЙ ПОИСК ---
+        // --- 4. ПОИСК ФАЙЛА (РЕГИСТРОНЕЗАВИСИМЫЙ) ---
         const parts = rawPath.split('/');
         const fileNameToSearch = parts.pop().toLowerCase();
-        const subDirPath = parts.join('/');
+        const currentSubDir = parts.join('/');
 
-        async function findFile(dir) {
+        async function findInGitHub(targetDir) {
             try {
-                // Если dir пустой, getContent берет корень репозитория
                 const { data: items } = await octokit.repos.getContent({ 
-                    owner: OWNER, repo: REPO, path: dir || "", ref: codeBranch 
+                    owner: OWNER, repo: REPO, path: targetDir || "", ref: codeBranch 
                 });
-                
-                if (!Array.isArray(items)) return null; // Если вернулся один файл, а не список
-
+                if (!Array.isArray(items)) return null;
                 return items.find(i => {
-                    const nameParts = i.name.split('.');
-                    const nameNoExt = (nameParts.length > 1 ? nameParts.slice(0, -1).join('.') : i.name).toLowerCase();
-                    return nameNoExt === fileNameToSearch;
+                    const nameNoExt = i.name.split('.').slice(0, -1).join('.') || i.name;
+                    return nameNoExt.toLowerCase() === fileNameToSearch;
                 });
-            } catch (err) {
-                console.log(`Searching in [${dir || "root"}] failed or empty.`);
-                return null;
-            }
+            } catch { return null; }
         }
 
         let target = null;
-        if (isRootOnly) {
-            target = await findFile(subDirPath);
-        } else {
-            // Сначала site/html, потом корень
-            target = await findFile(subDirPath ? `site/html/${subDirPath}` : "site/html");
-            if (!target) {
-                console.log(`File not found in site/html, trying root for path: ${subDirPath}`);
-                target = await findFile(subDirPath);
-            }
+        
+        // Сначала ищем по стратегии домена
+        if (searchDir) {
+            const pathWithSearchDir = currentSubDir ? `${searchDir}/${currentSubDir}` : searchDir;
+            target = await findInGitHub(pathWithSearchDir);
         }
 
-        // --- 5. ОТВЕТ ---
+        // Если не нашли в спец. папке или домен "складской" — ищем в корне ветки
+        if (!target) {
+            target = await findInGitHub(currentSubDir);
+        }
+
+        // --- 5. ВЫДАЧА ---
         if (!target || !isSecretValid) {
-            console.log(`Access Denied: target=${!!target}, secret=${isSecretValid}`);
             const { data: fb } = await octokit.repos.getContent({ 
                 owner: OWNER, repo: REPO, path: `site/html/${fallbackFile}`, ref: "main" 
             });
-            return res.status(200)
-                .setHeader('Content-Type', 'text/html')
-                .send(Buffer.from(fb.content, 'base64').toString('utf-8').replace(/{{LANG}}/g, selectedLang));
+            return res.status(200).setHeader('Content-Type', 'text/html').send(Buffer.from(fb.content, 'base64').toString('utf-8').replace(/{{LANG}}/g, selectedLang));
         }
 
-        // Если нашли файл
-        const { data: fileData } = await octokit.repos.getContent({ 
-            owner: OWNER, repo: REPO, path: target.path, ref: codeBranch 
-        });
-        
+        const { data: fileData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: target.path, ref: codeBranch });
         const content = Buffer.from(fileData.content, 'base64');
         const ext = target.name.split('.').pop().toLowerCase();
 
         const mimes = {
             "html": "text/html",
             "lua": "text/plain; charset=utf-8",
-            "txt": "text/plain; charset=utf-8",
             "js": "application/javascript",
             "png": "image/png",
-            "jpg": "image/jpeg"
+            "jpg": "image/jpeg",
+            "txt": "text/plain; charset=utf-8"
         };
 
         res.setHeader('Content-Type', mimes[ext] || "text/plain; charset=utf-8");
-        res.setHeader('Access-Control-Allow-Origin', '*'); 
+        res.setHeader('Access-Control-Allow-Origin', '*');
 
-        // Бинарники или текст
-        if (/png|jpg|jpeg|gif|ico|pdf/.test(ext)) {
+        if (/png|jpg|jpeg|gif|ico/.test(ext)) {
             return res.status(200).send(content);
         } else {
             return res.status(200).send(content.toString('utf-8').replace(/{{LANG}}/g, selectedLang));
         }
 
     } catch (error) {
-        console.error("CRITICAL ERROR:", error);
         return res.status(500).send("API Error");
     }
 }
