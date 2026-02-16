@@ -3,75 +3,124 @@ import { Octokit } from "@octokit/rest";
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const OWNER = "nettoxi";
 const REPO = "winxs";
-
-// Хелпер для обновления файлов на GitHub
-async function updateRepoFile(path, data, message) {
-    const { data: currentFile } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path, ref: "main" });
-    await octokit.repos.createOrUpdateFileContents({
-        owner: OWNER, repo: REPO, path, message,
-        content: Buffer.from(JSON.stringify(data, null, 2)).toString('base64'),
-        sha: currentFile.sha,
-        branch: "main"
-    });
-}
+const MY_IP = "77.52.212.190";
 
 export default async function handler(req, res) {
-    const { key, hwid, playerid } = req.query;
+    const host = req.headers.host;
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'] || "Unknown";
+    const url = new URL(req.url, `http://${host}`);
+    let rawPath = url.pathname.replace(/^\/+/, ""); 
+    const selectedLang = req.query.lang || "RU";
 
-    if (!key || !hwid) return res.status(400).json({ error: "Missing key or hwid" });
+    // 1. ОПРЕДЕЛЯЕМ ВЕТКУ И ФАЙЛ-ЗАГЛУШКУ
+    let codeBranch = "main";
+    let fallbackFile = "main.html";
+
+    if (host.includes("test-winxs")) {
+        codeBranch = "test";
+        fallbackFile = "test.html";
+    } else if (host.includes("status-winxs")) {
+        fallbackFile = "status.html";
+    } else if (host.startsWith("auth-") || host.startsWith("authentication-")) {
+        fallbackFile = "auth.html";
+    } else if (host.includes("cdn-winxs")) {
+        codeBranch = "cdn";
+    }
+
+    // Вспомогательная функция для логирования
+    const logAttempt = async (path, status) => {
+        if (ip === MY_IP) return;
+        try {
+            await fetch(`https://${host}/api/logger`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ip,
+                    path: path || "root",
+                    domain: host,
+                    userAgent,
+                    status // Доп. инфо: зашел с секретом или без
+                })
+            });
+        } catch (e) { console.error("Logger error"); }
+    };
+
+    // 2. ЗАГРУЗКА СЕКРЕТОВ
+    let secrets = { secret_word: "night", symbols: ["@", "~"] };
+    try {
+        const { data: sData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main" });
+        secrets = JSON.parse(Buffer.from(sData.content, 'base64').toString('utf-8'));
+    } catch (e) {}
+
+    // 3. ПРОВЕРКА СЕКРЕТА
+    let isSecretValid = false;
+    const symbol = secrets.symbols.find(s => rawPath.includes(s));
+    if (symbol) {
+        const [name, secret] = rawPath.split(symbol);
+        if (secret && secret.toLowerCase() === secrets.secret_word.toLowerCase()) {
+            rawPath = name; 
+            isSecretValid = true;
+        }
+    }
+
+    // Если это корень сайта
+    if (rawPath === "" || rawPath === "/") {
+        rawPath = fallbackFile.split('.')[0];
+        isSecretValid = true; // Корень всегда доступен
+    }
 
     try {
-        // 1. Читаем базы
-        const kFile = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: "api/keys/keys.json", ref: "main" });
-        const bFile = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: "api/keys/blacklist.json", ref: "main" });
+        // 4. ПОИСК ФАЙЛА
+        const parts = rawPath.split('/');
+        const fileNameToSearch = parts.pop().toLowerCase();
+        const subDir = parts.join('/');
+
+        let searchDir = codeBranch === "main" ? "site/html" : "";
+        if (subDir) searchDir = searchDir ? `${searchDir}/${subDir}` : subDir;
+
+        const { data: files } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: searchDir, ref: codeBranch });
+        const target = files.find(f => f.name.split('.')[0].toLowerCase() === fileNameToSearch);
+
+        // --- ЛОГИКА ЗАЩИТЫ И ОТДАЧИ ---
         
-        let keysData = JSON.parse(Buffer.from(kFile.data.content, 'base64').toString('utf-8'));
-        let blacklist = JSON.parse(Buffer.from(bFile.data.content, 'base64').toString('utf-8'));
+        // Если файла нет ИЛИ секрет неверный — отдаем заглушку
+        if (!target || !isSecretValid) {
+            if (target && !isSecretValid) await logAttempt(rawPath, "BLOCKED_NO_SECRET");
 
-        // 2. Проверка бана
-        const userBan = blacklist.banned[hwid];
-        if (userBan && Date.now() < userBan.unbanAt) {
-            return res.status(403).json({ status: "BANNED", until: new Date(userBan.unbanAt).toLocaleString() });
+            const { data: fallbackData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: `site/html/${fallbackFile}`, ref: "main" });
+            let html = Buffer.from(fallbackData.content, 'base64').toString('utf-8');
+            return res.status(200).setHeader('Content-Type', 'text/html').send(html.replace(/{{LANG}}/g, selectedLang));
         }
 
-        // 3. Валидация ключа
-        const keyInfo = keysData.active_keys[key];
-        if (!keyInfo) return res.status(404).json({ status: "INVALID" });
+        // Если все ок — логируем успех и отдаем реальный файл
+        await logAttempt(target.path, "SUCCESS_ACCESS");
 
-        // Проверка времени
-        if (Date.now() > keyInfo.expiresAt) {
-            delete keysData.active_keys[key];
-            await updateRepoFile("api/keys/keys.json", keysData, `Key ${key} expired`);
-            return res.status(401).json({ status: "EXPIRED" });
+        const { data: fileData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: target.path, ref: codeBranch });
+        const content = Buffer.from(fileData.content, 'base64');
+        const ext = target.name.split('.').pop().toLowerCase();
+
+        // --- ТВОИ MIMES ---
+        const mimeTypes = {
+            'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
+            'svg': 'image/svg+xml', 'gif': 'image/gif', 'ico': 'image/x-icon',
+            'html': 'text/html', 'css': 'text/css', 'js': 'application/javascript',
+            'json': 'application/json', 'lua': 'text/plain', 'txt': 'text/plain'
+        };
+
+        const contentType = mimeTypes[ext] || 'application/octet-stream';
+        res.setHeader('Content-Type', contentType);
+
+        if (/image|font|video|audio/.test(contentType) || contentType === 'application/octet-stream') {
+            return res.status(200).send(content);
+        } else {
+            let text = content.toString('utf-8');
+            return res.status(200).send(text.replace(/{{LANG}}/g, selectedLang));
         }
-
-        // 4. HWID логика
-        if (!keyInfo.hwid) {
-            // Первая привязка
-            keyInfo.hwid = hwid;
-            keyInfo.playerid = playerid;
-            await updateRepoFile("api/keys/keys.json", keysData, `Linked key ${key} to HWID ${hwid}`);
-            return res.status(200).json({ status: "OK", message: "Key linked" });
-        } else if (keyInfo.hwid !== hwid) {
-            // ПОПЫТКА КРАЖИ КЛЮЧА - Система банов
-            const banLevel = (blacklist.banned[hwid]?.level || 0) + 1;
-            const banDurations = [0, 900000, 3600000, 86400000, 259200000]; // 15м, 1ч, 1д, 3д в мс
-            const unbanAt = Date.now() + (banDurations[banLevel] || 315360000000); // 5+ раз = пермач
-
-            blacklist.banned[hwid] = {
-                ip, playerid, level: banLevel, unbanAt, 
-                reason: `HWID Mismatch (Key: ${key})`
-            };
-            
-            await updateRepoFile("api/keys/blacklist.json", blacklist, `Banned HWID ${hwid} - Level ${banLevel}`);
-            return res.status(403).json({ status: "BANNED", level: banLevel });
-        }
-
-        // Все успешно
-        return res.status(200).json({ status: "OK", expires: keyInfo.expiresAt });
 
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        // В случае любой ошибки — просто отдаем заглушку, чтобы не палиться
+        const { data: fallbackData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: `site/html/${fallbackFile}`, ref: "main" });
+        return res.status(200).send(Buffer.from(fallbackData.content, 'base64').toString('utf-8'));
     }
 }
