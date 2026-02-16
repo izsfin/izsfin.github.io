@@ -56,7 +56,7 @@ export default async function handler(req, res) {
     };
 
     // --- 2. ЗАГРУЗКА СЕКРЕТОВ ---
-    let secrets = { secret_word: "night", symbols: ["@", "~"] };
+    let secrets = { secret_word: "night", symbols: ["@"] };
     try {
         const { data: sData } = await octokit.repos.getContent({ 
             owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main" 
