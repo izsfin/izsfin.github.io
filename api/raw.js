@@ -3,124 +3,114 @@ import { Octokit } from "@octokit/rest";
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const OWNER = "nettoxi";
 const REPO = "winxs";
-const MY_IP = "77.52.212.190";
 
 export default async function handler(req, res) {
-    const host = req.headers.host;
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const userAgent = req.headers['user-agent'] || "Unknown";
-    const url = new URL(req.url, `http://${host}`);
+    const host = req.headers.host || "";
+    const url = new URL(req.url, `https://${host}`);
+    
+    // Очищаем путь от лишних слешей в начале
     let rawPath = url.pathname.replace(/^\/+/, ""); 
     const selectedLang = req.query.lang || "RU";
+    const userAgent = req.headers['user-agent'] || "Unknown";
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    // 1. ОПРЕДЕЛЯЕМ ВЕТКУ И ФАЙЛ-ЗАГЛУШКУ
+    // --- 1. ОПРЕДЕЛЕНИЕ ВЕТКИ ПО ДОМЕНУ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
 
-    if (host.includes("test-winxs")) {
-        codeBranch = "test";
-        fallbackFile = "test.html";
-    } else if (host.includes("status-winxs")) {
-        fallbackFile = "status.html";
-    } else if (host.startsWith("auth-") || host.startsWith("authentication-")) {
-        fallbackFile = "auth.html";
-    } else if (host.includes("cdn-winxs")) {
-        codeBranch = "cdn";
-    }
+    if (host.includes("auth-winxs")) { codeBranch = "auth"; fallbackFile = "getkey.html"; }
+    else if (host.includes("test-winxs")) { codeBranch = "test"; fallbackFile = "test.html"; }
+    else if (host.includes("api-winxs")) { codeBranch = "api"; }
+    else if (host.includes("raw-winxs")) { codeBranch = "raw"; }
+    else if (host.includes("cdn-winxs")) { codeBranch = "cdn"; }
 
-    // Вспомогательная функция для логирования
-    const logAttempt = async (path, status) => {
-        if (ip === MY_IP) return;
-        try {
-            await fetch(`https://${host}/api/logger`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ip,
-                    path: path || "root",
-                    domain: host,
-                    userAgent,
-                    status // Доп. инфо: зашел с секретом или без
-                })
-            });
-        } catch (e) { console.error("Logger error"); }
-    };
-
-    // 2. ЗАГРУЗКА СЕКРЕТОВ
-    let secrets = { secret_word: "night", symbols: ["@", "~"] };
+    // --- 2. ПОЛУЧЕНИЕ СЕКРЕТКИ ИЗ GITHUB (BRANCH: MAIN) ---
+    let secretWord = "night"; 
     try {
-        const { data: sData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main" });
-        secrets = JSON.parse(Buffer.from(sData.content, 'base64').toString('utf-8'));
-    } catch (e) {}
+        const { data: sData } = await octokit.repos.getContent({ 
+            owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main" 
+        });
+        const secrets = JSON.parse(Buffer.from(sData.content, 'base64').toString('utf-8'));
+        secretWord = secrets.secret_word.toLowerCase();
+    } catch (e) { console.error("Error fetching secrets.json, using default 'night'"); }
 
-    // 3. ПРОВЕРКА СЕКРЕТА
+    // --- 3. ПРОВЕРКА КЛЮЧА @SECRET ---
     let isSecretValid = false;
-    const symbol = secrets.symbols.find(s => rawPath.includes(s));
-    if (symbol) {
-        const [name, secret] = rawPath.split(symbol);
-        if (secret && secret.toLowerCase() === secrets.secret_word.toLowerCase()) {
-            rawPath = name; 
-            isSecretValid = true;
-        }
+    if (rawPath.includes("@")) {
+        const parts = rawPath.split("@");
+        const providedSecret = parts.pop().toLowerCase().trim();
+        rawPath = parts.join("@"); // Возвращаем путь без секрета
+        if (providedSecret === secretWord) isSecretValid = true;
     }
 
-    // Если это корень сайта
-    if (rawPath === "" || rawPath === "/") {
-        rawPath = fallbackFile.split('.')[0];
-        isSecretValid = true; // Корень всегда доступен
-    }
+    if (!rawPath || rawPath === "index") return serveFallback(res, fallbackFile, selectedLang);
 
     try {
-        // 4. ПОИСК ФАЙЛА
-        const parts = rawPath.split('/');
-        const fileNameToSearch = parts.pop().toLowerCase();
-        const subDir = parts.join('/');
-
-        let searchDir = codeBranch === "main" ? "site/html" : "";
-        if (subDir) searchDir = searchDir ? `${searchDir}/${subDir}` : subDir;
-
-        const { data: files } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: searchDir, ref: codeBranch });
-        const target = files.find(f => f.name.split('.')[0].toLowerCase() === fileNameToSearch);
-
-        // --- ЛОГИКА ЗАЩИТЫ И ОТДАЧИ ---
+        // --- 4. УМНЫЙ ПОИСК (РЕГИСТР И ПУТИ) ---
+        // Если путь заканчивается на /, значит ищем "индексный" файл в этой папке
+        const isFolderSearch = url.pathname.endsWith('/');
         
-        // Если файла нет ИЛИ секрет неверный — отдаем заглушку
-        if (!target || !isSecretValid) {
-            if (target && !isSecretValid) await logAttempt(rawPath, "BLOCKED_NO_SECRET");
+        const pathParts = rawPath.split('/').filter(p => p);
+        const searchFileName = pathParts.pop().toLowerCase();
+        const searchDir = pathParts.join('/');
 
-            const { data: fallbackData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: `site/html/${fallbackFile}`, ref: "main" });
-            let html = Buffer.from(fallbackData.content, 'base64').toString('utf-8');
-            return res.status(200).setHeader('Content-Type', 'text/html').send(html.replace(/{{LANG}}/g, selectedLang));
+        const { data: items } = await octokit.repos.getContent({ 
+            owner: OWNER, repo: REPO, path: searchDir, ref: codeBranch 
+        });
+
+        if (!Array.isArray(items)) throw new Error("Not a directory");
+
+        const target = items.find(i => {
+            const n = i.name.toLowerCase();
+            const nNoExt = n.split('.')[0];
+            return i.type === 'file' && (n === searchFileName || nNoExt === searchFileName);
+        });
+
+        // --- 5. ЛОГИКА ВЫДАЧИ ---
+        if (target && !isSecretValid) {
+            await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked (No Secret)");
+            return serveFallback(res, fallbackFile, selectedLang);
         }
 
-        // Если все ок — логируем успех и отдаем реальный файл
-        await logAttempt(target.path, "SUCCESS_ACCESS");
+        if (!target) return serveFallback(res, fallbackFile, selectedLang);
 
-        const { data: fileData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: target.path, ref: codeBranch });
+        // Успех
+        await sendToLogger(ip, target.name, host, userAgent, "✅ Script Loaded");
+
+        const { data: fileData } = await octokit.repos.getContent({ 
+            owner: OWNER, repo: REPO, path: target.path, ref: codeBranch 
+        });
+        
         const content = Buffer.from(fileData.content, 'base64');
         const ext = target.name.split('.').pop().toLowerCase();
+        const mimes = { "lua": "text/plain", "js": "application/javascript", "png": "image/png", "jpg": "image/jpeg" };
+        
+        res.setHeader('Content-Type', mimes[ext] || "text/plain; charset=utf-8");
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        return res.status(200).send(ext === 'png' || ext === 'jpg' ? content : content.toString('utf-8'));
 
-        // --- ТВОИ MIMES ---
-        const mimeTypes = {
-            'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
-            'svg': 'image/svg+xml', 'gif': 'image/gif', 'ico': 'image/x-icon',
-            'html': 'text/html', 'css': 'text/css', 'js': 'application/javascript',
-            'json': 'application/json', 'lua': 'text/plain', 'txt': 'text/plain'
-        };
-
-        const contentType = mimeTypes[ext] || 'application/octet-stream';
-        res.setHeader('Content-Type', contentType);
-
-        if (/image|font|video|audio/.test(contentType) || contentType === 'application/octet-stream') {
-            return res.status(200).send(content);
-        } else {
-            let text = content.toString('utf-8');
-            return res.status(200).send(text.replace(/{{LANG}}/g, selectedLang));
-        }
-
-    } catch (error) {
-        // В случае любой ошибки — просто отдаем заглушку, чтобы не палиться
-        const { data: fallbackData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: `site/html/${fallbackFile}`, ref: "main" });
-        return res.status(200).send(Buffer.from(fallbackData.content, 'base64').toString('utf-8'));
+    } catch (e) {
+        return serveFallback(res, fallbackFile, selectedLang);
     }
+}
+
+async function serveFallback(res, file, lang) {
+    try {
+        const { data: fb } = await octokit.repos.getContent({ 
+            owner: "nettoxi", repo: "winxs", path: `site/html/${file}`, ref: "main" 
+        });
+        const html = Buffer.from(fb.content, 'base64').toString('utf-8');
+        res.setHeader('Content-Type', 'text/html');
+        return res.status(200).send(html.replace(/{{LANG}}/g, lang));
+    } catch { return res.status(404).send("Not Found"); }
+}
+
+async function sendToLogger(ip, path, domain, userAgent, status) {
+    try {
+        await fetch(`https://${domain}/api/logger`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ip, path, domain, userAgent, status })
+        });
+    } catch (e) {}
 }
