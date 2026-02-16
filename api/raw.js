@@ -14,84 +14,79 @@ export default async function handler(req, res) {
     if (host === "cdn-winxs.vercel.app") codeBranch = "cdn";
     if (host === "test-winxs.vercel.app") codeBranch = "test";
 
-    // 1. ЗАГРУЗКА СЕКРЕТОВ И ПРОВЕРКА ЗАЩИТЫ
-    let isAccessGranted = false;
+    // 1. ПОЛУЧАЕМ СЕКРЕТЫ (Берем из main всегда)
+    let secrets = { secret_word: "night", symbols: ["@", "~"] }; // Дефолт на случай ошибки
     try {
         const { data: sData } = await octokit.repos.getContent({
-            owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main" 
+            owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main"
         });
-        const secrets = JSON.parse(Buffer.from(sData.content, 'base64').toString('utf-8'));
-        
-        const symbol = secrets.symbols.find(s => rawPath.includes(s));
+        secrets = JSON.parse(Buffer.from(sData.content, 'base64').toString('utf-8'));
+    } catch (e) {}
 
-        if (symbol) {
-            const [name, secret] = rawPath.split(symbol);
-            if (secret && secret.toLowerCase() === secrets.secret_word.toLowerCase()) {
-                rawPath = name; 
-                isAccessGranted = true; // Секрет верный
-            }
+    // 2. ПРОВЕРКА СЕКРЕТА
+    const symbol = secrets.symbols.find(s => rawPath.includes(s));
+    if (symbol) {
+        const [name, secret] = rawPath.split(symbol);
+        if (secret && secret.toLowerCase() === secrets.secret_word.toLowerCase()) {
+            rawPath = name; 
+        } else {
+            return res.status(403).send("Wrong secret");
         }
-    } catch (e) {
-        console.error("Secrets error");
+    } else {
+        // Если символа секрета нет в ссылке — СУКА, НЕ ДАЕМ ФАЙЛ (если нужна защита)
+        // Если хочешь чтобы БЕЗ секрета пускало — закомментируй строку ниже
+        return res.status(403).send("Secret required (e.g. filename@night)");
     }
-
-    // ЕСЛИ ТЫ ХОЧЕШЬ ПОЛНУЮ ЗАЩИТУ:
-    // Раскомментируй строку ниже, чтобы БЕЗ секрета вообще ничего не отдавалось:
-    // if (!isAccessGranted && codeBranch === "main") return res.status(403).send("Access Denied: Secret required");
 
     if (rawPath === "" || rawPath === "/") rawPath = "main";
 
     try {
-        // 2. РАЗБИВАЕМ ПУТЬ НА ПАПКУ И ФАЙЛ
-        // Если вход icons/Drift, то dir = "icons", fileName = "Drift"
-        const pathParts = rawPath.split('/');
-        const fileNameToSearch = pathParts.pop().toLowerCase(); 
-        const subDir = pathParts.join('/'); 
+        // 3. ПОИСК ФАЙЛА
+        // Разбиваем путь, например: icons/Drift -> папка "icons", файл "Drift"
+        const parts = rawPath.split('/');
+        const fileName = parts.pop().toLowerCase();
+        const subDir = parts.join('/');
 
-        // Определяем базовую папку поиска
-        let searchDir = codeBranch === "main" ? "site/html" : "";
-        if (subDir) {
-            searchDir = searchDir ? `${searchDir}/${subDir}` : subDir;
-        }
+        // Где ищем? В main это site/html, в cdn — корень
+        let searchPath = codeBranch === "main" ? "site/html" : "";
+        if (subDir) searchPath = searchPath ? `${searchPath}/${subDir}` : subDir;
 
-        // Получаем список файлов в нужной папке
-        const { data: files } = await octokit.repos.getContent({
-            owner: OWNER, repo: REPO, path: searchDir, ref: codeBranch
+        const { data: folderContent } = await octokit.repos.getContent({
+            owner: OWNER, repo: REPO, path: searchPath, ref: codeBranch
         });
 
-        // Ищем файл без учета расширения и регистра
-        const targetFile = files.find(f => {
-            const nameWithoutExt = f.name.split('.')[0].toLowerCase();
-            return nameWithoutExt === fileNameToSearch;
-        });
+        // Ищем файл в списке
+        const target = folderContent.find(f => f.name.split('.')[0].toLowerCase() === fileName);
 
-        if (!targetFile) throw new Error("File not found");
+        if (!target) return res.status(404).send(`File ${fileName} not found in ${searchPath}`);
 
-        // 3. ЗАГРУЗКА И ОТДАЧА
+        // 4. ГРУЗИМ КОНТЕНТ ФАЙЛА
         const { data: fileData } = await octokit.repos.getContent({
-            owner: OWNER, repo: REPO, path: targetFile.path, ref: codeBranch
+            owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
 
-        const content = Buffer.from(fileData.content, 'base64');
-        const ext = targetFile.name.split('.').pop().toLowerCase();
+        const buffer = Buffer.from(fileData.content, 'base64');
+        const ext = target.name.split('.').pop().toLowerCase();
 
-        const mimeTypes = {
-            'html': 'text/html', 'css': 'text/css', 'js': 'application/javascript',
-            'json': 'application/json', 'lua': 'text/plain', 'txt': 'text/plain',
+        const mimes = {
             'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
-            'svg': 'image/svg+xml', 'gif': 'image/gif', 'ico': 'image/x-icon'
+            'svg': 'image/svg+xml', 'gif': 'image/gif', 'html': 'text/html',
+            'css': 'text/css', 'js': 'application/javascript', 'json': 'application/json',
+            'lua': 'text/plain', 'txt': 'text/plain'
         };
 
-        const contentType = mimeTypes[ext] || 'application/octet-stream';
+        const type = mimes[ext] || 'application/octet-stream';
 
-        if (/image|font|video/.test(contentType)) {
-            return res.status(200).setHeader('Content-Type', contentType).send(content);
+        res.setHeader('Content-Type', type);
+        
+        if (type.includes('image') || type.includes('octet')) {
+            return res.status(200).send(buffer);
         } else {
-            let text = content.toString('utf-8');
-            return res.status(200).setHeader('Content-Type', `${contentType}; charset=utf-8`).send(text.replace(/{{LANG}}/g, selectedLang));
+            let text = buffer.toString('utf-8');
+            return res.status(200).send(text.replace(/{{LANG}}/g, selectedLang));
         }
 
-    } catch (error) {
-        return res.status(404).send(`Error 404: File "${rawPath}" not found in ${codeBranch}`);
+    } catch (err) {
+        return res.status(404).send("Error: " + err.message);
     }
 }
