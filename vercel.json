@@ -1,8 +1,9 @@
 {
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api/raw"
-    }
+    { "source": "/api/check", "destination": "/api/check" },
+    { "source": "/api/gen", "destination": "/api/gen" },
+    { "source": "/api/stats", "destination": "/api/stats" },
+    { "source": "/api/logger", "destination": "/api/logger" },
+    { "source": "/(.*)", "destination": "/api/raw" }
   ]
 }
