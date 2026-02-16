@@ -5,17 +5,17 @@ export default async function handler(req, res) {
     const isRoblox = userAgent.includes("Roblox");
     
     const discordPayload = {
-        username: "vexpass security center",
+        username: "winxs",
         embeds: [{
             title: isRoblox ? "✅ Script Loaded" : "🛡️ Access Blocked",
-            color: isRoblox ? 0x00ff00 : 0x3498db, // Зеленый для кода, синий как на скрине для блока
+            color: isRoblox ? 0xd68efa : 0xd68efa, // Зеленый для кода, синий как на скрине для блока
             fields: [
                 { name: "🌐 Domain", value: `\`${domain}\``, inline: true },
                 { name: "📁 File", value: `\`${path || "root"}\``, inline: true },
                 { name: "👤 User-Agent", value: `\`\`\`${userAgent}\`\`\``, inline: false },
                 { name: "📍 IP Info", value: `**IP:** ${ip}`, inline: false }
             ],
-            footer: { text: `vexpass security center - ${new Date().toLocaleString('ru-RU')}` }
+            footer: { text: `winxs security center - ${new Date().toLocaleString('ru-RU')}` }
         }]
     };
 
