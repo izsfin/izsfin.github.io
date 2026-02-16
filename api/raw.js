@@ -23,6 +23,7 @@ export default async function handler(req, res) {
     else if (host.includes("api-winxs")) { codeBranch = "api"; }
     else if (host.includes("raw-winxs")) { codeBranch = "raw"; }
     else if (host.includes("cdn-winxs")) { codeBranch = "cdn"; }
+    else if (host.includes("offwinxs")) { codeBranch = "off"; }
 
     // --- 2. ПОЛУЧЕНИЕ СЕКРЕТКИ ИЗ GITHUB (BRANCH: MAIN) ---
     let secretWord = "night"; 
