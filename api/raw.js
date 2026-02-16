@@ -3,14 +3,10 @@ import { Octokit } from "@octokit/rest";
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const OWNER = "nettoxi";
 const REPO = "winxs";
-const MY_IP = "77.52.212.190";
 
 export default async function handler(req, res) {
     const host = req.headers.host || "";
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const userAgent = req.headers['user-agent'] || "Unknown";
     const protocol = req.headers['x-forwarded-proto'] || 'https';
-    
     const url = new URL(req.url, `${protocol}://${host}`);
     let rawPath = url.pathname.replace(/^\/+/, ""); 
     const selectedLang = req.query.lang || "RU";
@@ -18,7 +14,7 @@ export default async function handler(req, res) {
     // --- 1. ЛОГИКА ДОМЕНОВ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
-    let isRootOnly = false; // Для этих доменов НЕ ищем в site/html
+    let isRootOnly = false;
 
     if (host.includes("test-winxs")) {
         codeBranch = "test";
@@ -40,7 +36,7 @@ export default async function handler(req, res) {
             owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main" 
         });
         secrets = JSON.parse(Buffer.from(sData.content, 'base64').toString('utf-8'));
-    } catch (e) { console.log("Secrets error"); }
+    } catch (e) { console.error("!!! Secrets.json not found in main branch"); }
 
     // --- 3. ПРОВЕРКА СЕКРЕТА ---
     let isSecretValid = false;
@@ -52,47 +48,70 @@ export default async function handler(req, res) {
             isSecretValid = true;
         }
     }
+
+    // Корень домена
     if (rawPath === "" || rawPath === "/" || rawPath.toLowerCase() === "index") {
         rawPath = fallbackFile.split('.')[0];
         isSecretValid = true; 
     }
 
     try {
-        // --- 4. ПОИСК ФАЙЛА ---
+        // --- 4. УЛУЧШЕННЫЙ ПОИСК ---
         const parts = rawPath.split('/');
         const fileNameToSearch = parts.pop().toLowerCase();
         const subDirPath = parts.join('/');
 
         async function findFile(dir) {
             try {
+                // Если dir пустой, getContent берет корень репозитория
                 const { data: items } = await octokit.repos.getContent({ 
-                    owner: OWNER, repo: REPO, path: dir, ref: codeBranch 
+                    owner: OWNER, repo: REPO, path: dir || "", ref: codeBranch 
                 });
-                return items.find(i => i.name.split('.')[0].toLowerCase() === fileNameToSearch);
-            } catch { return null; }
+                
+                if (!Array.isArray(items)) return null; // Если вернулся один файл, а не список
+
+                return items.find(i => {
+                    const nameParts = i.name.split('.');
+                    const nameNoExt = (nameParts.length > 1 ? nameParts.slice(0, -1).join('.') : i.name).toLowerCase();
+                    return nameNoExt === fileNameToSearch;
+                });
+            } catch (err) {
+                console.log(`Searching in [${dir || "root"}] failed or empty.`);
+                return null;
+            }
         }
 
         let target = null;
         if (isRootOnly) {
-            // Для спец-доменов ищем только по указанному пути (от корня)
             target = await findFile(subDirPath);
         } else {
-            // Для обычного домена: сначала site/html, потом корень
+            // Сначала site/html, потом корень
             target = await findFile(subDirPath ? `site/html/${subDirPath}` : "site/html");
-            if (!target) target = await findFile(subDirPath);
+            if (!target) {
+                console.log(`File not found in site/html, trying root for path: ${subDirPath}`);
+                target = await findFile(subDirPath);
+            }
         }
 
         // --- 5. ОТВЕТ ---
         if (!target || !isSecretValid) {
-            const { data: fb } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: `site/html/${fallbackFile}`, ref: "main" });
-            return res.status(200).setHeader('Content-Type', 'text/html').send(Buffer.from(fb.content, 'base64').toString('utf-8').replace(/{{LANG}}/g, selectedLang));
+            console.log(`Access Denied: target=${!!target}, secret=${isSecretValid}`);
+            const { data: fb } = await octokit.repos.getContent({ 
+                owner: OWNER, repo: REPO, path: `site/html/${fallbackFile}`, ref: "main" 
+            });
+            return res.status(200)
+                .setHeader('Content-Type', 'text/html')
+                .send(Buffer.from(fb.content, 'base64').toString('utf-8').replace(/{{LANG}}/g, selectedLang));
         }
 
-        const { data: fileData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: target.path, ref: codeBranch });
+        // Если нашли файл
+        const { data: fileData } = await octokit.repos.getContent({ 
+            owner: OWNER, repo: REPO, path: target.path, ref: codeBranch 
+        });
+        
         const content = Buffer.from(fileData.content, 'base64');
         const ext = target.name.split('.').pop().toLowerCase();
 
-        // СУПЕР-ФИКС: MIME-типы, чтобы Lua НЕ СКАЧИВАЛСЯ
         const mimes = {
             "html": "text/html",
             "lua": "text/plain; charset=utf-8",
@@ -102,23 +121,18 @@ export default async function handler(req, res) {
             "jpg": "image/jpeg"
         };
 
-        const contentType = mimes[ext] || "text/plain"; // По дефолту текст, чтобы видеть код
-        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Type', mimes[ext] || "text/plain; charset=utf-8");
         res.setHeader('Access-Control-Allow-Origin', '*'); 
 
-        // Логируем успех (без ожидания, чтобы не тормозить)
-        fetch(`${protocol}://${host}/api/logger`, {
-            method: 'POST',
-            body: JSON.stringify({ ip, path: target.path, domain: host, status: "SUCCESS" })
-        }).catch(() => {});
-
-        if (/image|font|video/.test(contentType)) {
+        // Бинарники или текст
+        if (/png|jpg|jpeg|gif|ico|pdf/.test(ext)) {
             return res.status(200).send(content);
         } else {
             return res.status(200).send(content.toString('utf-8').replace(/{{LANG}}/g, selectedLang));
         }
 
     } catch (error) {
-        return res.status(500).send("Critical error");
+        console.error("CRITICAL ERROR:", error);
+        return res.status(500).send("API Error");
     }
 }
