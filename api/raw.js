@@ -27,9 +27,15 @@ export default async function handler(req, res) {
     else if (host.includes("cdn-winxs")) { codeBranch = "cdn"; }
     else if (host.includes("offwinxs")) { codeBranch = "off"; }
 
+    // status домен — сразу отдаём страницу
+    if (host.includes("status-winxs")) {
+        return serveFallback(res, "status.html", selectedLang);
+    }
+
     // --- ЗАГРУЗКА СЕКРЕТОВ ---
     let secretWord = "night";
-    let secretRules = []; // [{ symbol, type, extensions }]
+    let secretRules = [];
+    let aliases = {};
     try {
         const { data: sData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: "api/core/secrets.json", ref: "main"
@@ -37,11 +43,12 @@ export default async function handler(req, res) {
         const secrets = JSON.parse(Buffer.from(sData.content, 'base64').toString('utf-8'));
         secretWord = secrets.secret_word.toLowerCase();
         secretRules = secrets.secrets || [];
+        aliases = secrets.aliases || {};
     } catch (e) {}
 
-    // --- ПАРСИНГ ПУТИ И СЕКРЕТА ---
+    // --- ПАРСИНГ СЕКРЕТА ---
     let isSecretValid = false;
-    let matchedRule = null; // правило из JSON которое совпало с символом
+    let matchedRule = null;
 
     if (isRoblox) isSecretValid = true;
 
@@ -53,9 +60,14 @@ export default async function handler(req, res) {
         if (providedSecret === secretWord) {
             isSecretValid = true;
         } else {
-            // ищем правило по символу
             matchedRule = secretRules.find(r => r.symbol.toLowerCase() === providedSecret) || null;
         }
+    }
+
+    // --- АЛИАСЫ ---
+    const cleanPath = rawPath.toLowerCase().trim();
+    if (aliases[cleanPath]) {
+        rawPath = aliases[cleanPath];
     }
 
     if (!rawPath || rawPath === "index") return serveFallback(res, fallbackFile, selectedLang);
@@ -71,7 +83,6 @@ export default async function handler(req, res) {
         "default": "application/octet-stream"
     };
 
-    // расширения архивов и приложений берём из JSON если есть, иначе fallback
     const archiveRule = secretRules.find(r => r.type === "Archive");
     const archiveExts = archiveRule ? archiveRule.extensions : ["zip", "rar", "7z", "tar", "gz"];
     const appExts = ["exe", "msi", "dmg", "apk"];
@@ -99,21 +110,18 @@ export default async function handler(req, res) {
         const isArchive = archiveExts.includes(ext);
         const isApp = appExts.includes(ext);
 
-        // --- Архивы и приложения — Roblox не получает ---
+        // Архивы и приложения — Roblox не получает
         if ((isArchive || isApp) && isRoblox) {
             return res.status(403).send("-- Winxs Error: Access Denied");
         }
 
-        // --- Проверка секретного символа ---
+        // Проверка секретного символа
         if (matchedRule) {
-            // символ найден — проверяем подходит ли расширение файла под правило
             if (!matchedRule.extensions.includes(ext)) {
                 if (isRoblox) return res.status(403).send("-- Winxs Error: Wrong file type for this secret");
                 return serveFallback(res, fallbackFile, selectedLang);
             }
-            // всё ок, даём доступ
         } else if (!isSecretValid) {
-            // нет ни секретного слова ни правила
             if (!isOwner) {
                 await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked");
                 if (isRoblox) return res.status(403).send("-- Winxs Error: Access Denied");
@@ -121,19 +129,26 @@ export default async function handler(req, res) {
             }
         }
 
-        // --- ЛОГГИРОВАНИЕ ---
         if (!isOwner && !isRoblox) {
             await sendToLogger(ip, target.name, host, userAgent, "✅ File Loaded");
         }
 
+        // --- ПОЛУЧЕНИЕ ФАЙЛА (фикс больших файлов) ---
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
 
-        const content = Buffer.from(fileData.content, 'base64');
+        let content;
+        if (fileData.content) {
+            content = Buffer.from(fileData.content, 'base64');
+        } else if (fileData.download_url) {
+            const response = await fetch(fileData.download_url);
+            const arrayBuffer = await response.arrayBuffer();
+            content = Buffer.from(arrayBuffer);
+        }
+
         const mime = mimeTypes[ext] || mimeTypes["default"];
 
-        // --- Архивы/приложения — принудительное скачивание для людей ---
         if ((isArchive || isApp) && !isRoblox) {
             res.setHeader('Content-Disposition', `attachment; filename="${target.name}"`);
         }
@@ -141,7 +156,7 @@ export default async function handler(req, res) {
         res.setHeader('Content-Type', mime);
         res.setHeader('Access-Control-Allow-Origin', '*');
 
-        const textTypes = ["text/plain", "application/javascript", "text/css", "text/html", "application/json", "text/yaml", "text/markdown", "application/xml"];
+        const textTypes = ["text/plain", "application/javascript", "text/css", "text/html", "application/json"];
 
         return res.status(200).send(
             textTypes.includes(mime) ? content.toString('utf-8') : content
