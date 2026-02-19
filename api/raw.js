@@ -17,11 +17,8 @@ export default async function handler(req, res) {
     
     // --- 1. ЛОГИКА ОПРЕДЕЛЕНИЯ КЛИЕНТА ---
     const ua = userAgent.toLowerCase();
-    // Считаем за Roblox, если: есть слово roblox, UA пустой, или есть спец-заголовок
     const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || req.headers['winxs-access'] === 'true';
     const isOwner = ip === MY_IP;
-    // Если в Accept есть html - это точно браузер
-    const isBrowser = acceptHeader.includes("text/html");
 
     // --- 2. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
@@ -47,7 +44,6 @@ export default async function handler(req, res) {
     let isSecretValid = false;
     let isMediaSecret = false;
 
-    // Авто-доступ для Roblox
     if (isRoblox) isSecretValid = true;
 
     if (rawPath.includes("@")) {
@@ -59,8 +55,61 @@ export default async function handler(req, res) {
         else if (providedSecret === "bg") isMediaSecret = true;
     }
 
-    // Если корень или индекс — отдаем сайт
     if (!rawPath || rawPath === "index") return serveFallback(res, fallbackFile, selectedLang);
+
+    // --- 5. СПИСОК MIME-ТИПОВ ---
+    const mimeTypes = {
+        // IMAGES
+        "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "jpe": "image/jpeg",
+        "gif": "image/gif", "bmp": "image/bmp", "webp": "image/webp", "avif": "image/avif",
+        "apng": "image/apng", "svg": "image/svg+xml", "svgz": "image/svg+xml", "ico": "image/x-icon",
+        "tif": "image/tiff", "tiff": "image/tiff", "psd": "image/vnd.adobe.photoshop",
+        "heic": "image/heic", "heif": "image/heif",
+        // WEB
+        "html": "text/html", "htm": "text/html", "shtml": "text/html", "xhtml": "application/xhtml+xml",
+        "css": "text/css", "js": "application/javascript", "mjs": "application/javascript",
+        "cjs": "application/javascript", "ts": "application/typescript", "tsx": "application/typescript",
+        // TEXT
+        "txt": "text/plain", "log": "text/plain", "ini": "text/plain", "cfg": "text/plain",
+        "conf": "text/plain", "md": "text/markdown", "markdown": "text/markdown", "csv": "text/csv",
+        "tsv": "text/tab-separated-values",
+        // DATA
+        "json": "application/json", "map": "application/json", "xml": "application/xml",
+        "xsl": "application/xml", "yaml": "text/yaml", "yml": "text/yaml",
+        // PROGRAMMING
+        "lua": "text/plain", "py": "text/x-python", "java": "text/x-java-source", "c": "text/x-c",
+        "cpp": "text/x-c++", "h": "text/x-c", "hpp": "text/x-c++", "cs": "text/plain",
+        "go": "text/plain", "rs": "text/plain", "php": "application/x-httpd-php", "rb": "text/plain",
+        "swift": "text/plain", "kt": "text/plain", "kts": "text/plain", "sh": "application/x-sh",
+        "bash": "application/x-sh", "zsh": "application/x-sh", "bat": "application/x-msdownload", "ps1": "text/plain",
+        // AUDIO
+        "mp3": "audio/mpeg", "wav": "audio/wav", "ogg": "audio/ogg", "oga": "audio/ogg",
+        "opus": "audio/opus", "aac": "audio/aac", "m4a": "audio/mp4", "flac": "audio/flac",
+        "mid": "audio/midi", "midi": "audio/midi",
+        // VIDEO
+        "mp4": "video/mp4", "m4v": "video/mp4", "webm": "video/webm", "mov": "video/quicktime",
+        "avi": "video/x-msvideo", "wmv": "video/x-ms-wmv", "mkv": "video/x-matroska", "flv": "video/x-flv",
+        "3gp": "video/3gpp", "3g2": "video/3gpp2",
+        // FONTS
+        "ttf": "font/ttf", "otf": "font/otf", "woff": "font/woff", "woff2": "font/woff2", "eot": "application/vnd.ms-fontobject",
+        // ARCHIVES
+        "zip": "application/zip", "rar": "application/vnd.rar", "7z": "application/x-7z-compressed",
+        "tar": "application/x-tar", "gz": "application/gzip", "bz2": "application/x-bzip2",
+        "xz": "application/x-xz", "iso": "application/x-iso9660-image",
+        // DOCUMENTS
+        "pdf": "application/pdf", "doc": "application/msword", "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "xls": "application/vnd.ms-excel", "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "ppt": "application/vnd.ms-powerpoint", "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "odt": "application/vnd.oasis.opendocument.text", "ods": "application/vnd.oasis.opendocument.spreadsheet", "odp": "application/vnd.oasis.opendocument.presentation",
+        // BINARY
+        "exe": "application/octet-stream", "msi": "application/octet-stream", "dll": "application/octet-stream",
+        "bin": "application/octet-stream", "apk": "application/vnd.android.package-archive",
+        "deb": "application/vnd.debian.binary-package", "rpm": "application/x-rpm",
+        // OTHER
+        "wasm": "application/wasm", "torrent": "application/x-bittorrent", "pem": "application/x-pem-file",
+        "crt": "application/x-x509-ca-cert", "cer": "application/pkix-cert", "key": "application/octet-stream",
+        "default": "application/octet-stream"
+    };
 
     try {
         const pathParts = rawPath.split('/').filter(p => p);
@@ -76,7 +125,6 @@ export default async function handler(req, res) {
             return i.type === 'file' && (n === searchFileName || n.split('.')[0] === searchFileName);
         });
 
-        // Если файл не найден
         if (!target) {
             if (isRoblox) return res.status(404).send("-- Winxs Error: File not found");
             return serveFallback(res, fallbackFile, selectedLang);
@@ -85,9 +133,9 @@ export default async function handler(req, res) {
         const ext = target.name.split('.').pop().toLowerCase();
         const isImage = ['png', 'jpg', 'jpeg', 'ico', 'svg', 'webp', 'gif'].includes(ext);
 
-        // --- 5. УСЛОВИЯ ДОСТУПА ---
+        // --- 6. УСЛОВИЯ ДОСТУПА ---
         if (isMediaSecret && !isImage) {
-            if (isRoblox) return res.status(403).send("-- Winxs Error: Not a media file");
+            if (isRoblox) return res.status(403).send("-- Winxs Error: Media Only Secret");
             return serveFallback(res, fallbackFile, selectedLang);
         }
 
@@ -95,12 +143,11 @@ export default async function handler(req, res) {
             if (!isOwner && !isRoblox) {
                 await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked");
             }
-            // ВАЖНО: Если это Roblox, мы НЕ шлем HTML-заглушку (чтобы не крашило)
             if (isRoblox) return res.status(403).send("-- Winxs Error: Access Denied. Use @secret");
             return serveFallback(res, fallbackFile, selectedLang);
         }
 
-        // --- 6. ВЫДАЧА ФАЙЛА ---
+        // --- 7. ВЫДАЧА ФАЙЛА ---
         if (!isOwner && !isRoblox) {
             await sendToLogger(ip, target.name, host, userAgent, "✅ Script Loaded");
         }
@@ -110,14 +157,22 @@ export default async function handler(req, res) {
         });
 
         const content = Buffer.from(fileData.content, 'base64');
-        const mimeTypes = { "lua": "text/plain", "js": "application/javascript", "png": "image/png", "jpg": "image/jpeg", "svg": "image/svg+xml", "ico": "image/x-icon" };
+        const mime = mimeTypes[ext] || mimeTypes["default"];
 
-        res.setHeader('Content-Type', mimeTypes[ext] || "application/octet-stream");
+        // Если это ZIP/EXE и запрос с ключом из браузера - включаем скачивание
+        const forceDownload = ['zip', 'rar', '7z', 'exe', 'msi', 'bin', 'apk'].includes(ext);
+        if (forceDownload && !isRoblox && isSecretValid) {
+            res.setHeader('Content-Disposition', `attachment; filename="${target.name}"`);
+        }
+
+        res.setHeader('Content-Type', mime);
         res.setHeader('Access-Control-Allow-Origin', '*');
-        
+
+        // Список текстовых типов для корректной кодировки
+        const textTypes = ["text/plain", "application/javascript", "text/css", "text/html", "application/json", "text/yaml", "text/markdown", "application/xml"];
+
         return res.status(200).send(
-            ['png', 'jpg', 'jpeg', 'gif', 'webp', 'ico', 'zip'].includes(ext) 
-            ? content : content.toString('utf-8')
+            textTypes.includes(mime) ? content.toString('utf-8') : content
         );
 
     } catch (e) { 
