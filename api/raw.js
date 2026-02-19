@@ -17,6 +17,8 @@ export default async function handler(req, res) {
     const ua = userAgent.toLowerCase();
     const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || req.headers['winxs-access'] === 'true';
     const isOwner = ip === MY_IP;
+    const isBotCrawler = ua.includes("discordbot") || ua.includes("telegrambot") || ua.includes("twitterbot") || ua.includes("facebookexternalhit") || ua.includes("linkedinbot");
+if (isBotCrawler) return res.status(200).send("OK");
 
     let codeBranch = "main";
     let fallbackFile = "main.html";
