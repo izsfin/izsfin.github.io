@@ -14,12 +14,16 @@ export default async function handler(req, res) {
 
     const MY_IP = "77.52.212.190";
 
+    // --- 1. ОПРЕДЕЛЕНИЕ КЛИЕНТА ---
     const ua = userAgent.toLowerCase();
     const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || req.headers['winxs-access'] === 'true';
     const isOwner = ip === MY_IP;
-    const isBotCrawler = ua.includes("discordbot") || ua.includes("telegrambot") || ua.includes("twitterbot") || ua.includes("facebookexternalhit") || ua.includes("linkedinbot");
-if (isBotCrawler) return res.status(200).send("OK");
 
+    // --- 2. ФИЛЬТР БОТОВ ---
+    const isBotCrawler = ua.includes("discordbot") || ua.includes("telegrambot") || ua.includes("twitterbot") || ua.includes("facebookexternalhit") || ua.includes("linkedinbot");
+    if (isBotCrawler) return res.status(200).send("OK");
+
+    // --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
     if (host.includes("auth-winxs")) { codeBranch = "auth"; fallbackFile = "getkey.html"; }
@@ -29,12 +33,12 @@ if (isBotCrawler) return res.status(200).send("OK");
     else if (host.includes("cdn-winxs")) { codeBranch = "cdn"; }
     else if (host.includes("offwinxs")) { codeBranch = "off"; }
 
-    // status домен — сразу отдаём страницу
+    // --- 4. STATUS ДОМЕН ---
     if (host.includes("status-winxs")) {
         return serveFallback(res, "status.html", selectedLang);
     }
 
-    // --- ЗАГРУЗКА СЕКРЕТОВ ---
+    // --- 5. ЗАГРУЗКА СЕКРЕТОВ ---
     let secretWord = "night";
     let secretRules = [];
     let aliases = {};
@@ -48,7 +52,7 @@ if (isBotCrawler) return res.status(200).send("OK");
         aliases = secrets.aliases || {};
     } catch (e) {}
 
-    // --- ПАРСИНГ СЕКРЕТА ---
+    // --- 6. ПАРСИНГ СЕКРЕТА ---
     let isSecretValid = false;
     let matchedRule = null;
 
@@ -66,7 +70,7 @@ if (isBotCrawler) return res.status(200).send("OK");
         }
     }
 
-    // --- АЛИАСЫ ---
+    // --- 7. АЛИАСЫ ---
     const cleanPath = rawPath.toLowerCase().trim();
     const domainKey = Object.keys(aliases).find(k => host.includes(k));
     if (domainKey && aliases[domainKey][cleanPath]) {
@@ -75,19 +79,41 @@ if (isBotCrawler) return res.status(200).send("OK");
 
     if (!rawPath || rawPath === "index") return serveFallback(res, fallbackFile, selectedLang);
 
+    // --- 8. MIME ТИПЫ ---
     const mimeTypes = {
-        "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "gif": "image/gif",
-        "webp": "image/webp", "svg": "image/svg+xml", "ico": "image/x-icon",
-        "lua": "text/plain", "js": "application/javascript", "json": "application/json",
-        "css": "text/css", "html": "text/html", "txt": "text/plain",
+        "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "jpe": "image/jpeg",
+        "gif": "image/gif", "bmp": "image/bmp", "webp": "image/webp", "avif": "image/avif",
+        "apng": "image/apng", "svg": "image/svg+xml", "svgz": "image/svg+xml", "ico": "image/x-icon",
+        "tif": "image/tiff", "tiff": "image/tiff", "heic": "image/heic", "heif": "image/heif",
+        "html": "text/html", "htm": "text/html", "css": "text/css", "js": "application/javascript",
+        "mjs": "application/javascript", "ts": "application/typescript",
+        "txt": "text/plain", "log": "text/plain", "ini": "text/plain", "cfg": "text/plain",
+        "md": "text/markdown", "csv": "text/csv", "json": "application/json", "xml": "application/xml",
+        "yaml": "text/yaml", "yml": "text/yaml",
+        "lua": "text/plain", "py": "text/x-python", "java": "text/x-java-source", "c": "text/x-c",
+        "cpp": "text/x-c++", "cs": "text/plain", "go": "text/plain", "rs": "text/plain",
+        "php": "application/x-httpd-php", "rb": "text/plain", "sh": "application/x-sh",
+        "bat": "application/x-msdownload", "ps1": "text/plain",
+        "mp3": "audio/mpeg", "wav": "audio/wav", "ogg": "audio/ogg", "aac": "audio/aac",
+        "m4a": "audio/mp4", "flac": "audio/flac",
+        "mp4": "video/mp4", "webm": "video/webm", "mov": "video/quicktime", "avi": "video/x-msvideo",
+        "mkv": "video/x-matroska",
+        "ttf": "font/ttf", "otf": "font/otf", "woff": "font/woff", "woff2": "font/woff2",
         "zip": "application/zip", "rar": "application/vnd.rar", "7z": "application/x-7z-compressed",
-        "tar": "application/x-tar", "gz": "application/gzip",
-        "exe": "application/octet-stream", "bin": "application/octet-stream",
+        "tar": "application/x-tar", "gz": "application/gzip", "bz2": "application/x-bzip2",
+        "xz": "application/x-xz", "iso": "application/x-iso9660-image",
+        "pdf": "application/pdf", "doc": "application/msword",
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "xls": "application/vnd.ms-excel",
+        "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "exe": "application/octet-stream", "msi": "application/octet-stream", "dll": "application/octet-stream",
+        "bin": "application/octet-stream", "apk": "application/vnd.android.package-archive",
+        "wasm": "application/wasm",
         "default": "application/octet-stream"
     };
 
     const archiveRule = secretRules.find(r => r.type === "Archive");
-    const archiveExts = archiveRule ? archiveRule.extensions : ["zip", "rar", "7z", "tar", "gz"];
+    const archiveExts = archiveRule ? archiveRule.extensions : ["zip", "rar", "7z", "tar", "gz", "bz2", "xz", "iso"];
     const appExts = ["exe", "msi", "dmg", "apk"];
 
     try {
@@ -118,7 +144,7 @@ if (isBotCrawler) return res.status(200).send("OK");
             return res.status(403).send("-- Winxs Error: Access Denied");
         }
 
-        // Проверка секретного символа
+        // --- 9. ПРОВЕРКА ДОСТУПА ---
         if (matchedRule) {
             if (!matchedRule.extensions.includes(ext)) {
                 if (isRoblox) return res.status(403).send("-- Winxs Error: Wrong file type for this secret");
@@ -127,16 +153,17 @@ if (isBotCrawler) return res.status(200).send("OK");
         } else if (!isSecretValid) {
             if (!isOwner) {
                 await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked");
-                if (isRoblox) return res.status(403).send("-- Winxs Error: Access Denied");
+                if (isRoblox) return res.status(403).send("-- Winxs Error: Access Denied. Use @secret");
                 return serveFallback(res, fallbackFile, selectedLang);
             }
         }
 
+        // --- 10. ЛОГГИРОВАНИЕ ---
         if (!isOwner && !isRoblox) {
             await sendToLogger(ip, target.name, host, userAgent, "✅ File Loaded");
         }
 
-        // --- ПОЛУЧЕНИЕ ФАЙЛА (фикс больших файлов) ---
+        // --- 11. ПОЛУЧЕНИЕ ФАЙЛА (фикс больших файлов) ---
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
@@ -152,6 +179,7 @@ if (isBotCrawler) return res.status(200).send("OK");
 
         const mime = mimeTypes[ext] || mimeTypes["default"];
 
+        // Архивы/приложения — принудительное скачивание для людей
         if ((isArchive || isApp) && !isRoblox) {
             res.setHeader('Content-Disposition', `attachment; filename="${target.name}"`);
         }
@@ -159,7 +187,7 @@ if (isBotCrawler) return res.status(200).send("OK");
         res.setHeader('Content-Type', mime);
         res.setHeader('Access-Control-Allow-Origin', '*');
 
-        const textTypes = ["text/plain", "application/javascript", "text/css", "text/html", "application/json"];
+        const textTypes = ["text/plain", "application/javascript", "text/css", "text/html", "application/json", "text/yaml", "text/markdown", "application/xml"];
 
         return res.status(200).send(
             textTypes.includes(mime) ? content.toString('utf-8') : content
