@@ -66,8 +66,9 @@ export default async function handler(req, res) {
 
     // --- АЛИАСЫ ---
     const cleanPath = rawPath.toLowerCase().trim();
-    if (aliases[cleanPath]) {
-        rawPath = aliases[cleanPath];
+    const domainKey = Object.keys(aliases).find(k => host.includes(k));
+    if (domainKey && aliases[domainKey][cleanPath]) {
+        rawPath = aliases[domainKey][cleanPath];
     }
 
     if (!rawPath || rawPath === "index") return serveFallback(res, fallbackFile, selectedLang);
