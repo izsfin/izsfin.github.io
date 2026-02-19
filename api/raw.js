@@ -9,14 +9,21 @@ export default async function handler(req, res) {
     const url = new URL(req.url, `https://${host}`);
     let rawPath = url.pathname.replace(/^\/+/, "");
     const selectedLang = req.query.lang || "RU";
-    const userAgent = req.headers['user-agent'] || "Unknown";
+    const userAgent = req.headers['user-agent'] || "";
+    const acceptHeader = req.headers['accept'] || "";
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     const MY_IP = "77.52.212.190";
-    const isRoblox = userAgent.toLowerCase().includes("roblox");
+    
+    // --- 1. ЛОГИКА ОПРЕДЕЛЕНИЯ КЛИЕНТА ---
+    const ua = userAgent.toLowerCase();
+    // Считаем за Roblox, если: есть слово roblox, UA пустой, или есть спец-заголовок
+    const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || req.headers['winxs-access'] === 'true';
     const isOwner = ip === MY_IP;
+    // Если в Accept есть html - это точно браузер
+    const isBrowser = acceptHeader.includes("text/html");
 
-    // --- 1. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
+    // --- 2. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
     if (host.includes("auth-winxs")) { codeBranch = "auth"; fallbackFile = "getkey.html"; }
@@ -24,8 +31,9 @@ export default async function handler(req, res) {
     else if (host.includes("api-winxs")) { codeBranch = "api"; }
     else if (host.includes("raw-winxs")) { codeBranch = "raw"; }
     else if (host.includes("cdn-winxs")) { codeBranch = "cdn"; }
+    else if (host.includes("offwinxs")) { codeBranch = "off"; }
 
-    // --- 2. ПОЛУЧЕНИЕ СЕКРЕТКИ ---
+    // --- 3. ПОЛУЧЕНИЕ СЕКРЕТКИ ---
     let secretWord = "night";
     try {
         const { data: sData } = await octokit.repos.getContent({
@@ -35,11 +43,11 @@ export default async function handler(req, res) {
         secretWord = secrets.secret_word.toLowerCase();
     } catch (e) {}
 
-    // --- 3. ПРОВЕРКА КЛЮЧЕЙ ---
+    // --- 4. ПРОВЕРКА КЛЮЧЕЙ ---
     let isSecretValid = false;
     let isMediaSecret = false;
 
-    // Roblox получает доступ автоматом
+    // Авто-доступ для Roblox
     if (isRoblox) isSecretValid = true;
 
     if (rawPath.includes("@")) {
@@ -51,6 +59,7 @@ export default async function handler(req, res) {
         else if (providedSecret === "bg") isMediaSecret = true;
     }
 
+    // Если корень или индекс — отдаем сайт
     if (!rawPath || rawPath === "index") return serveFallback(res, fallbackFile, selectedLang);
 
     try {
@@ -67,27 +76,31 @@ export default async function handler(req, res) {
             return i.type === 'file' && (n === searchFileName || n.split('.')[0] === searchFileName);
         });
 
-        if (!target) return serveFallback(res, fallbackFile, selectedLang);
+        // Если файл не найден
+        if (!target) {
+            if (isRoblox) return res.status(404).send("-- Winxs Error: File not found");
+            return serveFallback(res, fallbackFile, selectedLang);
+        }
 
         const ext = target.name.split('.').pop().toLowerCase();
         const isImage = ['png', 'jpg', 'jpeg', 'ico', 'svg', 'webp', 'gif'].includes(ext);
 
-        // --- 4. УСЛОВИЯ ДОСТУПА ---
-
-        // Проверка @bg: только для картинок
-        if (isMediaSecret && !isImage) return serveFallback(res, fallbackFile, selectedLang);
-
-        // Если нет валидного секрета (и это не Roblox)
-        if (!isSecretValid && !isMediaSecret) {
-            // Логируем только если это НЕ ты и НЕ Roblox
-            if (!isOwner && !isRoblox) {
-                await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked");
-            }
+        // --- 5. УСЛОВИЯ ДОСТУПА ---
+        if (isMediaSecret && !isImage) {
+            if (isRoblox) return res.status(403).send("-- Winxs Error: Not a media file");
             return serveFallback(res, fallbackFile, selectedLang);
         }
 
-        // --- 5. ВЫДАЧА ФАЙЛА ---
-        // Логируем успех только для ЧУЖИХ
+        if (!isSecretValid && !isMediaSecret) {
+            if (!isOwner && !isRoblox) {
+                await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked");
+            }
+            // ВАЖНО: Если это Roblox, мы НЕ шлем HTML-заглушку (чтобы не крашило)
+            if (isRoblox) return res.status(403).send("-- Winxs Error: Access Denied. Use @secret");
+            return serveFallback(res, fallbackFile, selectedLang);
+        }
+
+        // --- 6. ВЫДАЧА ФАЙЛА ---
         if (!isOwner && !isRoblox) {
             await sendToLogger(ip, target.name, host, userAgent, "✅ Script Loaded");
         }
@@ -107,7 +120,10 @@ export default async function handler(req, res) {
             ? content : content.toString('utf-8')
         );
 
-    } catch (e) { return serveFallback(res, fallbackFile, selectedLang); }
+    } catch (e) { 
+        if (isRoblox) return res.status(500).send("-- Winxs Error: Server Exception");
+        return serveFallback(res, fallbackFile, selectedLang); 
+    }
 }
 
 async function serveFallback(res, file, lang) {
