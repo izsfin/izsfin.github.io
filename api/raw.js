@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     const userAgent = req.headers['user-agent'] || "";
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    const MY_IP = "77.52.212.190";
+    const MY_IP = "77.52.212.120";
 
     // --- 1. ОПРЕДЕЛЕНИЕ КЛИЕНТА ---
     const ua = userAgent.toLowerCase();
