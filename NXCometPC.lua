@@ -11,12 +11,12 @@
 
 local storage = loadstring(game:HttpGet("https://api-winxs.vercel.app/storage"))()
 local Library = loadstring(game:HttpGet("https://cdn-winxs.vercel.app/library/cerberus/sourceR"))()
-local window = Library.new("wesxware")
+local window = Library.new("NXComet")
 window:LockScreenBoundaries(false)
 local mainTab = window:Tab("Main")
 local mainSection = mainTab:Section("Main")
 mainSection:Button("Site", function()
-    setclipboard("https://offwenxs.vercel.app")
+    setclipboard("https://offwinxs.vercel.app")
 end)
 mainSection:Label("v2.1.55#alpha")
 
