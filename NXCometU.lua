@@ -21,10 +21,10 @@ getgenv().Resolution = { [".gg/scripters"] = 1.00 }
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
 local UIS = game:GetService("UserInputService")
 local Window = WindUI:CreateWindow({
-    Title = "NightExec",
+    Title = "NXComet",
     Icon = "rbxassetid://105558355837082",
     Author = "02xTeam | v2.1.55A",
-    Folder = "NightExec",
+    Folder = "NXComet",
 
     Size = UDim2.fromOffset(900, 600),
     
