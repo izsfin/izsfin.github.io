@@ -192,11 +192,11 @@ local Library = {
 -- [ ПЕРЕМЕННЫЕ ]
 local lp = game:GetService("Players").LocalPlayer
 local HttpService, RunService, UIS = game:GetService("HttpService"), game:GetService("RunService"), game:GetService("UserInputService")
-local folderPath, activeAutoRespawns, ActiveAnimations, _G_CurrentMode = "NightExec/CMD", {}, {}, "once"
+local folderPath, activeAutoRespawns, ActiveAnimations, _G_CurrentMode = "Cometix/CMD", {}, {}, "once"
 
 -- [ СЕРВИСЫ ]
 local function SaveConfig(name, data)
-    if not isfolder("NXComet") then makefolder("NXComet") end
+    if not isfolder("Cometix") then makefolder("Cometix") end
     if not isfolder(folderPath) then makefolder(folderPath) end
     writefile(folderPath .. "/" .. name .. ".json", HttpService:JSONEncode(data))
 end
