@@ -1,8 +1,8 @@
 import { Octokit } from "@octokit/rest";
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-const OWNER = "nettoxi";
-const REPO = "winxs";
+const OWNER = "nojjiro";
+const REPO = "celius";
 
 export default async function handler(req, res) {
     const host = req.headers.host || "";
@@ -26,12 +26,12 @@ export default async function handler(req, res) {
     // --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
-    if (host.includes("auth-winxs")) { codeBranch = "auth"; fallbackFile = "getkey.html"; }
-    else if (host.includes("test-winxs")) { codeBranch = "test"; fallbackFile = "test.html"; }
-    else if (host.includes("api-winxs")) { codeBranch = "api"; }
-    else if (host.includes("raw-winxs")) { codeBranch = "raw"; }
-    else if (host.includes("cdn-winxs")) { codeBranch = "cdn"; }
-    else if (host.includes("offwinxs")) { codeBranch = "off"; }
+    if (host.includes("celius-auth")) { codeBranch = "auth"; fallbackFile = "getkey.html"; }
+    else if (host.includes("celius-testing")) { codeBranch = "test"; fallbackFile = "test.html"; }
+    else if (host.includes("api-celius")) { codeBranch = "api"; }
+    else if (host.includes("raw-celius")) { codeBranch = "raw"; }
+    else if (host.includes("cdn-celius")) { codeBranch = "cdn"; }
+    else if (host.includes("celius")) { codeBranch = "off"; }
 
     // --- 4. STATUS ДОМЕН ---
     if (host.includes("status-winxs")) {
