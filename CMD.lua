@@ -44,7 +44,7 @@ local Library = {
     {
         Class = "Accessory",
         Name = "BMask",
-        Weld = "Torso",
+        Weld = "Head",
         MeshID = "rbxassetid://138741421741528",
         TextureID = "rbxassetid://102873858608892",
         CFrame = CFrame.new(0, 0, 0.55) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
