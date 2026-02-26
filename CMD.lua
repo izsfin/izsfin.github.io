@@ -34,6 +34,24 @@ local Library = {
     },
     {
         Class = "Accessory",
+        Name = "WVest",
+        Weld = "Torso",
+        MeshID = "rbxassetid://85934571755429",
+        TextureID = "rbxassetid://85523839045578", 
+        CFrame = CFrame.new(0, -0.22, 0.1) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Accessory",
+        Name = "BMask",
+        Weld = "Torso",
+        MeshID = "rbxassetid://138741421741528",
+        TextureID = "rbxassetid://102873858608892",
+        CFrame = CFrame.new(0, 0, 0.55) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Accessory",
         Name = "Cap",
         Weld = "Head",
         MeshID = "rbxassetid://92976453142475",
