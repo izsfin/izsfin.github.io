@@ -46,5 +46,3 @@
 Bash
 
 git config --global alias.up '!git add . && git commit -m "update" && git push'
-
-После этого тебе достаточно будет написать просто git up, и VS Code сам сделает add, commit и push.
