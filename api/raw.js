@@ -1,7 +1,7 @@
 import { Octokit } from "@octokit/rest";
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-const OWNER = "nojjiro";
+const OWNER = "mewix1337";
 const REPO = "celius";
 
 export default async function handler(req, res) {
