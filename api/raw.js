@@ -201,7 +201,7 @@ export default async function handler(req, res) {
 
 async function serveFallback(res, file, lang) {
     try {
-        const { data: fb } = await octokit.repos.getContent({ owner: "nettoxi", repo: "winxs", path: `site/html/${file}`, ref: "main" });
+        const { data: fb } = await octokit.repos.getContent({ owner: "mewix1337", repo: "celius", path: `site/html/${file}`, ref: "main" });
         const html = Buffer.from(fb.content, 'base64').toString('utf-8');
         res.setHeader('Content-Type', 'text/html');
         return res.status(200).send(html.replace(/{{LANG}}/g, lang));
