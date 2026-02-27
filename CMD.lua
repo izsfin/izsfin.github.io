@@ -9,7 +9,7 @@ local Library = {
     },
     {
         Class = "Head",
-        Name = "SleekTiredG",
+        Name = "Sleek Tire G",
         MeshID = "rbxassetid://96040719638479",
         TextureID = "rbxassetid://108395821618310",
         Scale = Vector3.new(1.0, 1.0, 1.0),
@@ -17,7 +17,15 @@ local Library = {
     },
     {
         Class = "Head",
-        Name = "BoredMOE",
+        Name = "Pal Face",
+        MeshID = "rbxassetid://107425611375451"    
+        TextureID = "rbxassetid://73445145632944" 
+        Scale = Vector3.new(1.0, 1.0, 1.0),
+		ReqPlaceID = 0
+    },
+    {
+        Class = "Head",
+        Name = "Bored Moe",
         MeshID = "rbxassetid://82135150215758",
         TextureID = "rbxassetid://77885674031737",
         Scale = Vector3.new(1.0, 1.0, 1.0),
@@ -25,7 +33,7 @@ local Library = {
     },
     {
         Class = "Accessory",
-        Name = "FaceBlindFold",
+        Name = "Face Blind Fold",
         Weld = "Head",
         MeshID = "rbxassetid://120177601931635",
         Texture = "rbxassetid://111644589425325",
@@ -34,7 +42,7 @@ local Library = {
     },
     {
         Class = "Accessory",
-        Name = "WVest",
+        Name = "White Vest",
         Weld = "Torso",
         MeshID = "rbxassetid://85934571755429",
         TextureID = "rbxassetid://85523839045578", 
@@ -43,7 +51,7 @@ local Library = {
     },
     {
         Class = "Accessory",
-        Name = "BMask",
+        Name = "Black Mask",
         Weld = "Head",
         MeshID = "rbxassetid://138741421741528",
         TextureID = "rbxassetid://102873858608892",
@@ -79,7 +87,7 @@ local Library = {
     },
     {
         Class = "Accessory",
-        Name = "BackTail",
+        Name = "Back Tail",
         Weld = "Torso",
         MeshID = "rbxassetid://85052393126449",
         Texture = "rbxassetid://76742493960027",
@@ -88,7 +96,7 @@ local Library = {
     },
     {
         Class = "Accessory",
-        Name = "TTBack",
+        Name = "Two Time Back",
         Weld = "Torso",
         MeshID = "rbxassetid://102535235285318",
         Texture = "rbxassetid://132597092841215",
@@ -197,20 +205,20 @@ local Library = {
 	{
 		Class = "AnimR6",
 		Name = "GriddyDump",
-		URL = "https://raw.githubusercontent.com/lixeal/DxBreak/refs/heads/violence-district/Griddy.txt",
+		URL = "https://raw.githubusercontent.com/mewix1337/DxBreak/refs/heads/violence-district/Griddy.txt",
 		ReqPlaceID = 0
 	},
 	{
 		Class = "AnimR6",
 		Name = "RampageDump",
-		URL = "https://raw.githubusercontent.com/lixeal/DxBreak/refs/heads/violence-district/Rampage.txt",
+		URL = "https://raw.githubusercontent.com/mewix1337/DxBreak/refs/heads/violence-district/Rampage.txt",
 		ReqPlaceID = 0
 	}
 }
 -- [ ПЕРЕМЕННЫЕ ]
 local lp = game:GetService("Players").LocalPlayer
 local HttpService, RunService, UIS = game:GetService("HttpService"), game:GetService("RunService"), game:GetService("UserInputService")
-local folderPath, activeAutoRespawns, ActiveAnimations, _G_CurrentMode = "Cometix/CMD", {}, {}, "once"
+local folderPath, activeAutoRespawns, ActiveAnimations, _G_CurrentMode = "KayozNT/Cometix/CMD", {}, {}, "once"
 
 -- [ СЕРВИСЫ ]
 local function SaveConfig(name, data)
@@ -229,7 +237,7 @@ local function LoadConfig(name)
 end
 
 local function GetVersion()
-    local s, r = pcall(game.HttpGet, game, "https://raw.githubusercontent.com/lixeal/DxBreak/refs/heads/main/version.txt")
+    local s, r = pcall(game.HttpGet, game, "https://raw.githubusercontent.com/mewix1337/DxBreak/refs/heads/main/version.txt")
     return s and r:gsub("\n", "") or "v0.0.0 [Unknown]"
 end
 
@@ -371,7 +379,7 @@ local function MainHandler(name, mode, key)
 
     if n == "cmd" then
         local version = GetVersion()
-        local text = "--[[\n    NXComet CMD " .. version .. "\n\nClass        Name               Function\n"
+        local text = "--[[\n    Cometix CMD " .. version .. "\n\nClass        Name               Function\n"
         for _, item in pairs(Library) do
             -- В CMD показываем только те вещи, которые доступны здесь
             if IsPlaceAllowed(item) then
@@ -413,4 +421,4 @@ lp.CharacterAdded:Connect(function()
         if IsPlaceAllowed(d) then Apply(d) end 
     end 
 end)
-print(" NXComet CMD load ! | " .. GetVersion())
+print(" Cometix CMD load ! | " .. GetVersion())
