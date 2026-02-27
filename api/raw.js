@@ -131,8 +131,10 @@ export default async function handler(req, res) {
 
         const target = Array.isArray(items) && items.find(i => {
             const n = i.name.toLowerCase();
-            // Находит либо точное имя, либо имя без расширения
-            return i.type === 'file' && (n === searchFileName || n.split('.')[0] === searchFileName);
+            // Отделяем имя от расширения правильно
+            const nameWithoutExt = n.includes('.') ? n.split('.').slice(0, -1).join('.') : n;
+            
+            return i.type === 'file' && (n === searchFileName || nameWithoutExt === searchFileName);
         });
 
         if (!target) {
