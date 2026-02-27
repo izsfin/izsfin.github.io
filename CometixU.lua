@@ -21,10 +21,10 @@ getgenv().Resolution = { [".gg/scripters"] = 1.00 }
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
 local UIS = game:GetService("UserInputService")
 local Window = WindUI:CreateWindow({
-    Title = "NXComet",
+    Title = "Cometix YUMI",
     Icon = "rbxassetid://105558355837082",
-    Author = "02xTeam | v2.1.55A",
-    Folder = "NXComet",
+    Author = "Kayoz NT | 1.0.0",
+    Folder = "KayozNT/Cometix/YUMI",
 
     Size = UDim2.fromOffset(900, 600),
     
@@ -42,7 +42,7 @@ local Window = WindUI:CreateWindow({
     },
 })
 Window:EditOpenButton({
-    Title = "Winxs",
+    Title = "Celius",
     Icon = "rbxassetid://105558355837082",
     CornerRadius = UDim.new(0,16),
     StrokeThickness = 2,
@@ -62,7 +62,7 @@ MainTab:Button({
     Title = "Site",
     Icon = "solar:link-bold",
     Callback = function()
-        setclipboard("https://wehface.vercel.app")
+        setclipboard("https://celius.vercel.app")
         WindUI:Notify({ Title = "Success", Content = "Link copied!" })
     end
 })
