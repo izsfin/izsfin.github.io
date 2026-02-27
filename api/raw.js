@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     else if (host.includes("celius")) { codeBranch = "off"; }
 
     // --- 4. STATUS ДОМЕН ---
-    if (host.includes("status-winxs")) {
+    if (host.includes("celius-status")) {
         return serveFallback(res, "status.html", selectedLang);
     }
 
