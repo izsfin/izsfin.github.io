@@ -18,8 +18,8 @@ local Library = {
     {
         Class = "Head",
         Name = "Pal Face",
-        MeshID = "rbxassetid://107425611375451"    
-        TextureID = "rbxassetid://73445145632944" 
+        MeshID = "rbxassetid://107425611375451",  
+        TextureID = "rbxassetid://73445145632944", 
         Scale = Vector3.new(1.0, 1.0, 1.0),
 		ReqPlaceID = 0
     },
