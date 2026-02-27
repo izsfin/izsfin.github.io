@@ -119,7 +119,11 @@ export default async function handler(req, res) {
     try {
         const pathParts = rawPath.split('/').filter(p => p);
         const searchFileName = pathParts.pop().toLowerCase();
-        const searchDir = pathParts.join('/');
+        // Принудительно в нижний регистр для GitHub
+        const searchDir = pathParts.join('/').toLowerCase(); 
+
+        // ЛОГ ДЛЯ ОТЛАДКИ (появится в Vercel Logs)
+        console.log(`Trying: Branch=${codeBranch}, Dir=${searchDir}, File=${searchFileName}`);
 
         const { data: items } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: searchDir, ref: codeBranch
@@ -127,6 +131,7 @@ export default async function handler(req, res) {
 
         const target = Array.isArray(items) && items.find(i => {
             const n = i.name.toLowerCase();
+            // Находит либо точное имя, либо имя без расширения
             return i.type === 'file' && (n === searchFileName || n.split('.')[0] === searchFileName);
         });
 
@@ -194,7 +199,8 @@ export default async function handler(req, res) {
         );
 
     } catch (e) {
-        if (isRoblox) return res.status(500).send("-- Winxs Error: Server Exception");
+        console.error("Fetch Error:", e.message);
+        if (isRoblox) return res.status(500).send("-- Celius Error: " + e.message);
         return serveFallback(res, fallbackFile, selectedLang);
     }
 }
