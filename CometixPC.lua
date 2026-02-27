@@ -9,16 +9,16 @@
 ]]
 
 
-local storage = loadstring(game:HttpGet("https://api-winxs.vercel.app/storage"))()
-local Library = loadstring(game:HttpGet("https://cdn-winxs.vercel.app/library/cerberus/sourceR"))()
-local window = Library.new("NXComet")
+local storage = loadstring(game:HttpGet("https://api-celius.vercel.app/storage"))()
+local Library = loadstring(game:HttpGet("https://cdn-celius.vercel.app/library/cerberus/sourceR"))()
+local window = Library.new("Cometix | YUMI")
 window:LockScreenBoundaries(false)
 local mainTab = window:Tab("Main")
 local mainSection = mainTab:Section("Main")
 mainSection:Button("Site", function()
-    setclipboard("https://offwinxs.vercel.app")
+    setclipboard("https://celius.vercel.app")
 end)
-mainSection:Label("v2.1.55#alpha")
+mainSection:Label("0.0.1")
 
 local universalTab = window:Tab("Universal", "rbxassetid://105558355837082")
 
