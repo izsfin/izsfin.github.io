@@ -61,20 +61,20 @@ local Library = {
     },
     {
         Class = "Accessory",
-        Name = "",
-        Weld = "",
-        MeshID = "",
-        Texture = "",
-        CFrame = CFrame.new() * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
+        Name = "Black Cat Ears",
+        Weld = "Head",
+        MeshID = "rbxassetid://128534799696292",
+        TextureID = "rbxassetid://102873858608892",
+        CFrame = CFrame.new(0, -0.8, 0.1) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
         ReqPlaceID = 0
     },
     {
         Class = "Accessory",
-        Name = "",
-        Weld = "",
-        MeshID = "",
-        Texture = "",
-        CFrame = CFrame.new() * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
+        Name = "Emo Spiked Shades",
+        Weld = "Head",
+        MeshID = "rbxassetid://17154559796",
+        TextureID = "rbxassetid://17154478293",
+        CFrame = CFrame.new(0, -0.2, 0.2) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
         ReqPlaceID = 0
     },
     {
