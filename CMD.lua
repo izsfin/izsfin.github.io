@@ -138,7 +138,7 @@ local Library = {
     },
     {
         Class = "Outfit",
-        Name = "Maid",
+        Name = "Full White",
         ShirtID = "rbxassetid://85523839045578",
         PantsID = "rbxassetid://11822355274",
 		ReqPlaceID = 0
