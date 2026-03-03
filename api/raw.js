@@ -26,12 +26,12 @@ export default async function handler(req, res) {
     // --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
-    if (host.includes("celius-auth")) { codeBranch = "auth"; fallbackFile = "getkey.html"; }
+    if (host.includes("ethereos-auth")) { codeBranch = "auth"; fallbackFile = "getkey.html"; }
     else if (host.includes("celius-testing")) { codeBranch = "test"; fallbackFile = "test.html"; }
-    else if (host.includes("api-celius")) { codeBranch = "api"; }
-    else if (host.includes("raw-celius")) { codeBranch = "raw"; }
-    else if (host.includes("cdn-celius")) { codeBranch = "cdn"; }
-    else if (host.includes("celius")) { codeBranch = "off"; }
+    else if (host.includes("ethereos-api")) { codeBranch = "api"; }
+    else if (host.includes("ethereos-api")) { codeBranch = "raw"; }
+    else if (host.includes("ethereos-cdn")) { codeBranch = "cdn"; }
+    else if (host.includes("ethereos")) { codeBranch = "off"; }
 
     // --- 4. STATUS ДОМЕН ---
     if (host.includes("celius-status")) {
