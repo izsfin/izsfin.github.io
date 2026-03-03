@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     const isRoblox = userAgent.includes("Roblox");
     
     const discordPayload = {
-        username: "winxs",
+        username: "Ethereos Security",
         embeds: [{
             title: isRoblox ? "✅ Script Loaded" : "🛡️ Access Blocked",
             color: isRoblox ? 0xd68efa : 0xd68efa, // Зеленый для кода, синий как на скрине для блока
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
                 { name: "👤 User-Agent", value: `\`\`\`${userAgent}\`\`\``, inline: false },
                 { name: "📍 IP Info", value: `**IP:** ${ip}`, inline: false }
             ],
-            footer: { text: `winxs security center - ${new Date().toLocaleString('ru-RU')}` }
+            footer: { text: `Ethereos Security - ${new Date().toLocaleString('ru-RU')}` }
         }]
     };
 
