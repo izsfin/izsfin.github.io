@@ -25,6 +25,22 @@
       "preview": "site/catalog/GxA/preview.png",
       "command": "_G(\"Guns & Alien\", \"once\")",
       "category": "Body"
+    },
+    {
+      "id": "pal-face-static",
+      "name": "Pal Face [Static]",
+      "author": "nilletMS",
+      "preview": "site/catalog/PalFace/preview.png",
+      "command": "_G(\"Pal Face Static\", \"once\")",
+      "category": "Body"
+    },
+    {
+      "id": "pal-face",
+      "name": "Pal Face [Not Static]",
+      "author": "nilletMS",
+      "preview": "site/catalog/PalFace/NSpreview.png",
+      "command": "_G(\"Pal Face\", \"once\")",
+      "category": "Body"
     }
   ]
 }
