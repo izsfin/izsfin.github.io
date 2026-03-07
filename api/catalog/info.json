@@ -53,6 +53,15 @@
       "command": "_G(\"Pal Face\", \"once\")",
       "category": "Characters",
       "type": "dhead"
+    },
+    {
+      "id": "spectral",
+      "name": "Spectral [CMD]",
+      "author": "nilletMS",
+      "preview": "site/catalog/nilletMS/Spectral/preview.png",
+      "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/spectral\"))()",
+      "category": "Scripts",
+      "type": "Spectral"
     }
   ]
 }
