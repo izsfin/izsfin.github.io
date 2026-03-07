@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     else if (host.includes("ethereos-raw")) { codeBranch = "raw"; }
     else if (host.includes("ethereos-cdn")) { codeBranch = "cdn"; }
     else if (host.includes("ethereos")) { codeBranch = "off"; }
-    else if (host.includes("ethereos-status")) { codeBranch = "test"; fallbackFile = "status.html"; }
+    else if (host.includes("ethereos-status")) { fallbackFile = "status.html"; }
 // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     if (rawPath === "obfuscator") {
