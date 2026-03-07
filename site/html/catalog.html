@@ -9,11 +9,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: #02040a; color: #d1d1d1; font-family: 'Poppins', sans-serif; min-height: 100vh; overflow-x: hidden; }
+        body { background-color: #02040a; color: #d1d1d1; font-family: 'Poppins', sans-serif; height: 100vh; overflow: hidden; }
         .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -3; }
         .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%), rgba(255,255,255,0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
         .grid-layer { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px); background-size: 50px 50px; z-index: -1; }
-        .main { position: relative; z-index: 2; padding: 36px 36px 120px; }
+        .main { position: relative; z-index: 2; padding: 36px 36px 120px; height: 100vh; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .main::-webkit-scrollbar { display: none; }
         .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
         .page-title { font-size: 32px; font-weight: 800; color: white; letter-spacing: 1px; }
         .search-btn { font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700; padding: 10px 24px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(10,11,15,0.6); backdrop-filter: blur(20px); color: white; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
@@ -407,7 +408,7 @@
     loadData();
 </script>
 
-<div class="bottom-nav" style="position:fixed;bottom:25px;left:25px;z-index:99999;background:rgba(10,11,15,0.6);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:10px 20px;display:flex;gap:25px;align-items:center;">
+<div class="bottom-nav" style="position:fixed;top:25px;left:25px;z-index:99999;background:rgba(10,11,15,0.6);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:10px 20px;display:flex;gap:25px;align-items:center;">
     <span onclick="window.location.href='/'" class="nav-link">Home</span>
     <span onclick="window.location.href='/catalog'" class="nav-link active-page">Catalog</span>
     <span onclick="window.location.href='/obfuscator'" class="nav-link">Obfuscator</span>
