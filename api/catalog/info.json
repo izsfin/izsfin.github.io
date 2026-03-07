@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "id": "BlackCatEars",
+      "name": "Black Cat Ears",
+      "author": "nilletMS",
+      "preview": "site/catalog/BlackCatEars/preview.png",
+      "command": "_G(\"Black Cat Ears\", \"once\")",
+      "category": "Accessories",
+      "type": "Head"
+    },
+    {
+      "id": "EmoSpikedShades",
+      "name": "Emo Spiked Shades",
+      "author": "nilletMS",
+      "preview": "site/catalog/EmoSpikedShades/preview.png",
+      "command": "_G(\"Emo Spiked Shades\", \"once\")",
+      "category": "Accessories",
+      "type": "Face"
+    }
+  ]
+}
