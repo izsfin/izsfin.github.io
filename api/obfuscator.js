@@ -292,7 +292,7 @@ ${invBlock3}
 ${junkBottom}
 end)(...)`;
 
-    const header = '--[[ V6 ZuraMO | ethereos.vercel.app/obfuscator ]]';
+    const header = '--[[ v2.14.6 NixuMO | ethereos.vercel.app/obfuscator ]]';
     return header + ' ' + minifyLua(lua);
 }
 
