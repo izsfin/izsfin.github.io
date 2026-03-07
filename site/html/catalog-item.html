@@ -173,7 +173,7 @@
     async function loadItem() {
         try {
             const res = await fetch('/api/catalog/info');
-            const data = await res.json();
+            const data = JSON.parse(await res.text());
             const item = (data.items || []).find(i => i.id.toLowerCase() === itemId.toLowerCase());
 
             if (!item) {
