@@ -11,23 +11,19 @@
         body {
             margin: 0; padding: 0; background-color: #02040a;
             color: #d1d1d1; font-family: 'Poppins', sans-serif;
-            display: flex; justify-content: flex-start; align-items: center; 
+            display: flex; justify-content: flex-start; align-items: center;
             height: 100vh; overflow: hidden;
         }
-
-        /* ФОН */
         .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -3; }
         .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
         .grid-layer { position: fixed; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; }
-
-        /* КОНТЕНТ */
         .content { max-width: 650px; margin-left: 10%; z-index: 2; }
         h1 { color: white; font-size: 52px; font-weight: 800; letter-spacing: 2px; margin-bottom: 25px; }
         .text-container { line-height: 1.7; font-size: 15px; margin-bottom: 20px; color: rgba(255,255,255,0.7); }
         .signature { margin-top: 40px; font-size: 15px; color: white; }
         .footer-copy { margin-top: 10px; font-size: 11px; opacity: 0.3; text-transform: uppercase; letter-spacing: 1px; }
-        
-        /* НИЖНЯЯ ПАНЕЛЬ */
+
+        /* Bottom nav */
         .bottom-nav {
             position: fixed; bottom: 25px; left: 25px;
             background: rgba(10, 11, 15, 0.6);
@@ -38,11 +34,22 @@
         }
         .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
         .nav-link:hover { color: white; }
+        .nav-link.active-page { color: rgba(160,140,255,0.8); }
 
-        /* ЯЗЫКИ */
-        .lang-box { display: flex; gap: 10px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; margin-left: 5px; }
+        .nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
+
+        /* Lang */
+        .lang-box { display: flex; gap: 10px; }
         .lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); }
         .lang-btn.active { color: #6366f1; }
+
+        /* Center credit */
+        .bottom-credit {
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+            font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.15); text-transform: uppercase;
+            z-index: 10; white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -58,12 +65,18 @@
     </div>
 
     <div class="bottom-nav">
-        <span onclick="goTo('https://discord.gg/TRPZg4Xfkq')" class="nav-link">Discord</span>
+        <span onclick="window.location.href='/'" class="nav-link active-page">Home</span>
+        <span onclick="window.location.href='/catalog'" class="nav-link">Catalog</span>
+        <span onclick="window.location.href='/obfuscator'" class="nav-link">Obfuscator</span>
+        <span onclick="window.open('https://discord.gg/TRPZg4Xfkq','_blank')" class="nav-link">Discord</span>
+        <div class="nav-divider"></div>
         <div class="lang-box">
             <span onclick="setLang('RU')" id="lang-RU" class="lang-btn">RU</span>
             <span onclick="setLang('EN')" id="lang-EN" class="lang-btn">EN</span>
         </div>
     </div>
+
+    <div class="bottom-credit" id="bottomCredit"></div>
 
     <script>
         window.addEventListener('mousemove', (e) => {
@@ -82,18 +95,21 @@
         const translations = {
             RU: {
                 text: `<p><strong>Привет пользователь!</strong> Это файловый хостинг для проектов от nilletMS. Мы поддерживаем и патчим скрипты каждый день нашей командой ! </p><p>Ethereos настроен очень удобно настроен + понятен для поиска и использования наших проектов !</p>`,
-                sign: `Искренне,<br><strong>Команда NilletMS.</strong>`
+                sign: `Искренне,<br><strong>Команда NilletMS.</strong>`,
+                credit: `Написанно ellyMS`
             },
             EN: {
                 text: `<p><strong>Hii user !</strong> This is file hosting for nilletMS projects. Our team maintains and patches scripts daily ! </p><p>Ethereos is very user-friendly and easy to use, making it easy to find and use our projects ! </p>`,
-                sign: `Sincerely,<br><strong>NilletMS.</strong>`
+                sign: `Sincerely,<br><strong>NilletMS.</strong>`,
+                credit: `Writed by ellyMS`
             }
         };
 
         const data = translations[currentLang] || translations.RU;
         document.getElementById('text-container').innerHTML = data.text;
         document.getElementById('signature-container').innerHTML = data.sign;
-        
+        document.getElementById('bottomCredit').textContent = data.credit;
+
         const btn = document.getElementById('lang-' + (currentLang || 'RU'));
         if (btn) btn.classList.add('active');
     </script>
