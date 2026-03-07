@@ -58,6 +58,11 @@
         .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
         .nav-link:hover { color: white; }
         .nav-link.active-page { color: rgba(160,140,255,0.8); }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: rgba(10,11,15,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(99,102,241,0.35); color: rgba(160,140,255,0.9); font-size: 12px; font-weight: 600; padding: 10px 20px; border-radius: 10px; transform: translateY(14px); opacity: 0; transition: all 0.22s ease; z-index: 100; pointer-events: none; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .ctx-menu { position: fixed; z-index: 200; background: rgba(10,11,15,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 6px; min-width: 160px; }
+        .ctx-item { font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700; padding: 9px 14px; border-radius: 7px; cursor: pointer; color: rgba(255,255,255,0.6); transition: all 0.15s; display: flex; align-items: center; gap: 8px; }
+        .ctx-item:hover { background: rgba(99,102,241,0.12); color: white; }
     </style>
 </head>
 <body>
@@ -103,6 +108,18 @@
             <input class="script-search-input" id="scriptSearchInput" type="text" placeholder="e.g. Fav, Place, Roleplay...">
         </div>
         <button class="modal-search-btn" onclick="applyFilter()">Search</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="ctx-menu" id="ctxMenu" style="display:none;">
+    <div class="ctx-item" onclick="ctxCopy()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Command
+    </div>
+    <div class="ctx-item" onclick="ctxOpen()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Open Item
     </div>
 </div>
 
@@ -250,10 +267,11 @@
         var id = item.id;
         var name = item.name || '';
         var preview = item.preview || '';
+        var cmd = (item.command || '').replace(/"/g, '&quot;');
         var prevHtml = preview
             ? '<img src="/' + preview + '" alt="" onerror="this.parentElement.innerHTML=\'<span class=no-preview>No preview</span>\'">'
             : '<span class="no-preview">No preview</span>';
-        return '<div class="item-card" onclick="goToItem(\'' + id + '\')">'
+        return '<div class="item-card" data-id="' + id + '" data-cmd="' + cmd + '" onclick="goToItem(\'' + id + '\')">'
             + '<div class="item-preview">' + prevHtml + '</div>'
             + '<div class="item-info">'
             + '<div class="item-name">' + name + '</div>'
@@ -262,6 +280,49 @@
     }
 
     function goToItem(id) { window.location.href = '/catalog/' + id; }
+
+    function showToast(msg) {
+        var t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(function() { t.classList.remove('show'); }, 2200);
+    }
+
+    // Context menu
+    var ctxItemId = null;
+    var ctxItemCmd = null;
+
+    document.addEventListener('contextmenu', function(e) {
+        var card = e.target.closest('.item-card');
+        if (!card) { hideCtx(); return; }
+        e.preventDefault();
+        ctxItemId = card.dataset.id;
+        ctxItemCmd = card.dataset.cmd;
+        var menu = document.getElementById('ctxMenu');
+        menu.style.display = 'block';
+        var x = e.clientX, y = e.clientY;
+        if (x + 170 > window.innerWidth) x = window.innerWidth - 175;
+        if (y + 100 > window.innerHeight) y = window.innerHeight - 105;
+        menu.style.left = x + 'px';
+        menu.style.top = y + 'px';
+    });
+
+    document.addEventListener('click', function() { hideCtx(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') hideCtx(); });
+
+    function hideCtx() {
+        document.getElementById('ctxMenu').style.display = 'none';
+    }
+
+    function ctxCopy() {
+        hideCtx();
+        if (!ctxItemCmd) return;
+        navigator.clipboard.writeText(ctxItemCmd).then(function() { showToast('Command copied \u2713'); });
+    }
+
+    function ctxOpen() {
+        hideCtx();
+        if (ctxItemId) window.location.href = '/catalog/' + ctxItemId;
+    }
 
     function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
     function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
