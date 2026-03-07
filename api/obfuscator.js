@@ -293,9 +293,10 @@ ${junkBottom}
 end)(...)`;
 
     const header = '--[[ V6 ZuraMO | ethereos.vercel.app/obfuscator ]]';
-     return header + '\n' + (minify ? minifyLua(lua) : lua);
+     return header + ' ' + minifyLua(lua);
 }
 //     return header + ' ' + minifyLua(lua);
+//     return header + '\n' + (minify ? minifyLua(lua) : lua);
 // ── Vercel handler ────────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
@@ -320,16 +321,17 @@ export default async function handler(req, res) {
     }
 
     if (code.length > 50000) {
-      return res.status(400).json({ error: 'Code too large (max 50KB)' });
+        return res.status(400).json({ error: 'Code too large (max 50KB)' });
     }
+
     try {
-      const result = obfuscate(code.trim(), req.body?.minify === false);
+        const result = obfuscate(code.trim());
         return res.status(200).json({
-          success: true,
-           result,
-           size: result.length
-       });
+            success: true,
+            result,
+            size: result.length
+        });
     } catch (e) {
-       return res.status(500).json({ error: 'Obfuscation failed: ' + e.message });
+        return res.status(500).json({ error: 'Obfuscation failed: ' + e.message });
     }
 }
