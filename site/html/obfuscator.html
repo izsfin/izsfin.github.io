@@ -91,7 +91,7 @@
             border: none;
             outline: none;
             resize: none;
-            padding: 18px 20px !important;
+            padding: 14px 16px;
             font-family: 'Poppins', monospace;
             font-size: 12px;
             line-height: 1.75;
@@ -99,9 +99,6 @@
             width: 100%;
         }
 
-        textarea:focus {
-         outline: none;
-        }
         textarea::placeholder { color: rgba(255,255,255,0.15); }
         textarea::-webkit-scrollbar { width: 3px; }
         textarea::-webkit-scrollbar-track { background: transparent; }
@@ -160,6 +157,34 @@
             border-color: rgba(99, 102, 241, 0.65);
             box-shadow: 0 0 18px rgba(99,102,241,0.12);
         }
+
+        /* Limit toggle */
+        .limit-toggle {
+            display: flex;
+            align-items: center;
+            background: rgba(10,11,15,0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            height: 42px;
+        }
+        .limit-opt {
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px; font-weight: 700;
+            padding: 0 16px; height: 100%;
+            display: flex; align-items: center;
+            cursor: pointer; transition: all 0.2s;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 0.3px;
+            border: none; background: transparent;
+        }
+        .limit-opt.active {
+            background: rgba(255,255,255,0.06);
+            color: white;
+        }
+        .limit-opt:hover:not(.active) { color: rgba(255,255,255,0.6); }
+        .limit-sep { width: 1px; height: 60%; background: rgba(255,255,255,0.07); flex-shrink: 0; }
 
         /* Status */
         .status-row {
@@ -249,6 +274,11 @@
     <div class="buttons-row">
         <div class="btn-group">
             <button class="btn btn-obfuscate" id="runBtn" onclick="runObfuscate()">Obfuscate</button>
+            <div class="limit-toggle">
+                <button class="limit-opt active" id="limit16k" onclick="setLimit('16k')">16k</button>
+                <div class="limit-sep"></div>
+                <button class="limit-opt" id="limitInf" onclick="setLimit('inf')">∞</button>
+            </div>
         </div>
         <div class="btn-group">
             <button class="btn" onclick="copyOutput()">Copy</button>
@@ -302,6 +332,14 @@
         setTimeout(() => t.classList.remove('show'), 2200);
     }
 
+    let currentLimit = '16k';
+
+    function setLimit(val) {
+        currentLimit = val;
+        document.getElementById('limit16k').classList.toggle('active', val === '16k');
+        document.getElementById('limitInf').classList.toggle('active', val === 'inf');
+    }
+
     async function runObfuscate() {
         const code = document.getElementById('inputCode').value.trim();
         if (!code) { setStatus('No input code', 'err'); return; }
@@ -315,7 +353,7 @@
             const res = await fetch('/api/obfuscator', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code })
+                body: JSON.stringify({ code, limit: currentLimit })
             });
             const data = await res.json();
 
@@ -324,10 +362,22 @@
                 return;
             }
 
-            document.getElementById('outputCode').value = data.result;
-            const kb = (data.size / 1024).toFixed(1);
-            const ratio = Math.round(data.size / code.length);
-            setStatus(`Done — ${kb} KB  ·  ${ratio}× size increase`, 'ok');
+            let result = data.result;
+
+            // Обрезаем до 16000 символов если режим 16k
+            if (currentLimit === '16k' && result.length > 16000) {
+                // Найдём последний перенос строки до 16000
+                let cutAt = result.lastIndexOf('\n', 15999);
+                if (cutAt < 0) cutAt = 15999;
+                result = result.substring(0, cutAt);
+                setStatus(`Done — trimmed to 16k  ·  ${result.length} chars`, 'ok');
+            } else {
+                const kb = (data.size / 1024).toFixed(1);
+                const ratio = Math.round(data.size / code.length);
+                setStatus(`Done — ${kb} KB  ·  ${ratio}× size increase`, 'ok');
+            }
+
+            document.getElementById('outputCode').value = result;
 
         } catch (e) {
             setStatus('Request failed: ' + e.message, 'err');
