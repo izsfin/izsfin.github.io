@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// ZuraMO Obfuscator — Vercel API endpoint
+// NixuMO Obfuscator — Vercel API endpoint
 // POST /api/obfuscator  { code: "print('hi')" }
 // GET  /api/obfuscator?code=...
 // ─────────────────────────────────────────────────────────────────────────────
