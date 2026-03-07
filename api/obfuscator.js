@@ -323,7 +323,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Code too large (max 50KB)' });
     }
     try {
-      const result = obfuscate(code.trim(), req.body?.minify === true);
+      const result = obfuscate(code.trim(), req.body?.minify === false);
         return res.status(200).json({
           success: true,
            result,
