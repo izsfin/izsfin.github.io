@@ -27,8 +27,7 @@ export default async function handler(req, res) {
 // --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
-    if (host.includes("ethereos-auth")) { codeBranch = "auth"; fallbackFile = "getkey.html"; }
-    else if (host.includes("ethereos-testing")) { codeBranch = "test"; fallbackFile = "test.html"; }
+    if (host.includes("ethereos-testing")) { codeBranch = "test"; fallbackFile = "test.html"; }
     else if (host.includes("ethereos-api")) { codeBranch = "api"; }
     else if (host.includes("ethereos-raw")) { codeBranch = "raw"; }
     else if (host.includes("ethereos-cdn")) { codeBranch = "cdn"; }
@@ -38,6 +37,12 @@ export default async function handler(req, res) {
     // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     if (rawPath === "obfuscator") {
       return serveFallback(res, "obfuscator.html", selectedLang);
+    }
+    if (rawPath === "getkey") {
+      return serveFallback(res, "getkey.html", selectedLang);
+    }
+    if (rawPath === "api/gen") {
+    // pass through to Vercel function directly
     }
     if (rawPath === "status") {
       return serveFallback(res, "status.html", selectedLang);
