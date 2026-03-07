@@ -194,9 +194,9 @@ function minifyLua(code) {
     return out.join(' ').replace(/ {2,}/g, ' ');
 }
 
-// ── Main obfuscate ────────────────────────────────────────────────────────────
+// ── Main obfuscate ──────────────Minify = false─────────────────────────────────────────
 
-function obfuscate(source) {
+function obfuscate(source, minify = false) {   
     const { data: payload, rot, salt1, salt2 } = encryptPayload(source);
 
     // Dynamic key table
@@ -293,9 +293,9 @@ ${junkBottom}
 end)(...)`;
 
     const header = '--[[ V6 ZuraMO | ethereos.vercel.app/obfuscator ]]';
-    return header + ' ' + minifyLua(lua);
+    return header + '\n' + (minify ? minifyLua(lua) : lua);
 }
-
+//     return header + ' ' + minifyLua(lua);
 // ── Vercel handler ────────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
