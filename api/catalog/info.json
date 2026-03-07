@@ -10,6 +10,15 @@
       "type": "Head"
     },
     {
+      "id": "black-beanie",
+      "name": "Black Beanie",
+      "author": "nilletMS",
+      "preview": "site/catalog/BlackBeanie/preview.png",
+      "command": "_G(\"Black Beanie\", \"once\")",
+      "category": "Accessories",
+      "type": "Head"
+    },
+    {
       "id": "emo-spiked-shades",
       "name": "Emo Spiked Shades",
       "author": "nilletMS",
