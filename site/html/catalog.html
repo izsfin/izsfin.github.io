@@ -255,8 +255,8 @@
             allItems = info.items || [];
             verifiedAuthors = ver.verified || [];
             renderGrid(allItems);
-        } catch (e) {
-            document.getElementById('catalogGrid').innerHTML = '<div class="state-msg">Failed to load catalog</div>';
+} catch (e) {
+            document.getElementById('catalogGrid').innerHTML = '<div class="state-msg">Error: ' + e.message + '</div>';
         }
     }
 
