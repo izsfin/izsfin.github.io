@@ -4,6 +4,7 @@
     { "source": "/api/gen", "destination": "/api/gen" },
     { "source": "/api/stats", "destination": "/api/stats" },
     { "source": "/api/logger", "destination": "/api/logger" },
+    { "source": "/api/obfuscator", "destination": "/api/obfuscator" },
     { "source": "/(.*)", "destination": "/api/raw" }
   ]
 }
