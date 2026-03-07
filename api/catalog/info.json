@@ -33,7 +33,8 @@
       "author": "nilletMS",
       "preview": "site/catalog/GxA/preview.png",
       "command": "_G(\"Guns & Alien\", \"once\")",
-      "category": "Body"
+      "category": "Characters",
+      "type": "body"
     },
     {
       "id": "pal-face-static",
@@ -41,7 +42,8 @@
       "author": "nilletMS",
       "preview": "site/catalog/PalFace/preview.png",
       "command": "_G(\"Pal Face Static\", \"once\")",
-      "category": "Body"
+      "category": "Characters",
+      "type": "face"
     },
     {
       "id": "pal-face",
@@ -49,7 +51,8 @@
       "author": "nilletMS",
       "preview": "site/catalog/PalFace/NSpreview.png",
       "command": "_G(\"Pal Face\", \"once\")",
-      "category": "Body"
+      "category": "Characters",
+      "type": "dhead"
     }
   ]
 }
