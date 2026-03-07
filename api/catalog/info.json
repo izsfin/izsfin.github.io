@@ -1,10 +1,10 @@
 {
   "items": [
     {
-      "id": "black-cat-ears",
-      "name": "Black Cat Ears",
+      "id": "kawaii-neutral-black-cat-ears",
+      "name": "Kawaii Neutral Black Cat Ears",
       "author": "nilletMS",
-      "preview": "site/catalog/BlackCatEars/preview.png",
+      "preview": "site/catalog/kNBCE/preview.png",
       "command": "_G(\"Black Cat Ears\", \"once\")",
       "category": "Accessories",
       "type": "Head"
