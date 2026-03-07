@@ -293,7 +293,7 @@ ${junkBottom}
 end)(...)`;
 
     const header = '--[[ V6 ZuraMO | ethereos.vercel.app/obfuscator ]]';
-    return header + '\n' + (minify ? minifyLua(lua) : lua);
+     return header + '\n' + (minify ? minifyLua(lua) : lua);
 }
 //     return header + ' ' + minifyLua(lua);
 // ── Vercel handler ────────────────────────────────────────────────────────────
