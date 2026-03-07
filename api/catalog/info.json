@@ -1,7 +1,7 @@
 {
   "items": [
     {
-      "id": "BlackCatEars",
+      "id": "black-cat-ears",
       "name": "Black Cat Ears",
       "author": "nilletMS",
       "preview": "site/catalog/BlackCatEars/preview.png",
@@ -10,7 +10,7 @@
       "type": "Head"
     },
     {
-      "id": "EmoSpikedShades",
+      "id": "уmo-spiked-shades",
       "name": "Emo Spiked Shades",
       "author": "nilletMS",
       "preview": "site/catalog/EmoSpikedShades/preview.png",
