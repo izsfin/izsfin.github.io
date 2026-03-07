@@ -17,6 +17,14 @@
       "command": "_G(\"Emo Spiked Shades\", \"once\")",
       "category": "Accessories",
       "type": "Face"
+    },
+    {
+      "id": "guns-x-alien",
+      "name": "Gunslinger & Alien",
+      "author": "nilletMS",
+      "preview": "site/catalog/GunsAlien/preview.png",
+      "command": "_G(\"Guns & Alien\", \"once\")",
+      "category": "Body"
     }
   ]
 }
