@@ -35,7 +35,9 @@ export default async function handler(req, res) {
     else if (host.includes("ethereos")) { codeBranch = "off"; }
 
 // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
-if (rawPath === "obfuscator") { codeBranch = "main"; }
+    if (rawPath === "obfuscator") {
+      return serveFallback(res, "obfuscator.html", selectedLang);
+    }
     // --- 4. STATUS ДОМЕН ---
     if (host.includes("celius-status")) {
         return serveFallback(res, "status.html", selectedLang);
