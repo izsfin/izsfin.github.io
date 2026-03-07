@@ -245,8 +245,8 @@
     async function loadData() {
         try {
             const [infoRes, verRes] = await Promise.all([
-                fetch('/api/catalog/info.json'),
-                fetch('/api/catalog/verified.json')
+                fetch('/api/catalog/info'),
+                fetch('/api/catalog/verified')
             ]);
             const info = await infoRes.json();
             const ver = await verRes.json();
