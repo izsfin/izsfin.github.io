@@ -1,194 +1,346 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Ethereos | Status </title>
+    <title>Ethereos | Status</title>
     <link rel="icon" type="image/png" href="/site/html/celius.nobg.png">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            margin: 0; padding: 0; background-color: #02040a;
-            color: #d1d1d1; font-family: 'Poppins', sans-serif;
+            background-color: #02040a; color: #d1d1d1;
+            font-family: 'Poppins', sans-serif;
             height: 100vh; overflow: hidden;
             display: flex; flex-direction: column;
         }
-
-        /* ФОН */
         .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -3; }
-        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
-        .grid-layer { position: fixed; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; }
+        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%), rgba(255,255,255,0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
+        .grid-layer { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px); background-size: 50px 50px; z-index: -1; }
 
-        /* КОНТЕЙНЕР С ОТСТУПАМИ */
-        .main-container {
-            display: flex; flex: 1; gap: 15px;
-            padding: 15px; 
-            padding-top: 90px; 
-            padding-bottom: 50px; /* Отступ 5px от нижней панели (учитывая высоту футера) */
+        /* Header */
+        .page-header {
+            position: relative; z-index: 2;
+            padding: 28px 32px 0;
+            display: flex; align-items: flex-end; justify-content: space-between;
+        }
+        .page-title { font-size: 28px; font-weight: 800; color: white; letter-spacing: 1px; }
+        .page-sub { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.2); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+
+        /* Platform toggle */
+        .platform-toggle {
+            display: flex; align-items: center;
+            background: rgba(10,11,15,0.7); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+            overflow: hidden; height: 36px;
+        }
+        .plat-btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px; font-weight: 700; padding: 0 20px; height: 100%;
+            display: flex; align-items: center; cursor: pointer;
+            color: rgba(255,255,255,0.3); border: none; background: transparent;
+            transition: all 0.2s; letter-spacing: 0.5px;
+        }
+        .plat-btn.active { background: rgba(99,102,241,0.12); color: white; }
+        .plat-sep { width: 1px; height: 60%; background: rgba(255,255,255,0.07); }
+
+        /* Main layout */
+        .main-layout {
+            flex: 1; display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px; padding: 16px 32px 80px;
+            min-height: 0; position: relative; z-index: 2;
         }
 
+        /* Glass panel */
         .glass-panel {
-            background: rgba(10, 11, 15, 0.75);
-            backdrop-filter: blur(35px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 20px; padding: 25px;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-            flex: 1;
-            overflow: hidden; /* Чтобы скролл был только внутри колонок */
+            background: rgba(10,11,15,0.6); backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.06); border-radius: 16px;
+            padding: 20px 22px; display: flex; flex-direction: column;
+            min-height: 0; overflow: hidden;
+        }
+        .panel-title {
+            font-size: 10px; font-weight: 700; color: rgba(99,102,241,0.8);
+            letter-spacing: 2px; text-transform: uppercase;
+            border-bottom: 1px solid rgba(99,102,241,0.15);
+            padding-bottom: 8px; margin-bottom: 12px; flex-shrink: 0;
         }
 
-        .cat-label { font-size: 9px; color: #6366f1; font-weight: 800; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(99, 102, 241, 0.2); padding-bottom: 2px; }
-        .exploit-row { display: flex; justify-content: space-between; font-size: 10px; padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.02); text-transform: uppercase; }
-        
-        .status-working { color: #4ade80; }
-        .status-unknown { color: #fbbf24; opacity: 0.8; }
-        .status-dead { color: #ef4444; opacity: 0.6; }
-        .status-discontinued { color: #ef4444; opacity: 0.5; }
-
-        .game-item { font-size: 11px; color: rgba(255,255,255,0.6); padding: 3px 0; }
-        
-        #update-box { font-size: 11px; color: #6366f1; font-weight: 700; text-align: center; width: 180px; line-height: 1.5; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* СКРЫТЫЙ СКРОЛЛ */
-        .scroll-area { overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        /* Scroll */
+        .scroll-area { overflow-y: auto; flex: 1; scrollbar-width: none; -ms-overflow-style: none; }
         .scroll-area::-webkit-scrollbar { display: none; }
+
+        /* Exploit rows */
+        .exploit-list { display: flex; flex-direction: column; gap: 2px; }
+        .cat-label {
+            font-size: 9px; font-weight: 800; color: rgba(99,102,241,0.6);
+            letter-spacing: 1.5px; text-transform: uppercase;
+            margin-top: 14px; margin-bottom: 4px; display: block;
+        }
+        .cat-label:first-child { margin-top: 0; }
+        .exploit-row {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 10px; font-weight: 600; padding: 3px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            color: rgba(255,255,255,0.55);
+        }
+        .s-working      { color: #4ade80; }
+        .s-unknown      { color: #fbbf24; opacity: 0.8; }
+        .s-dead         { color: #ef4444; opacity: 0.7; }
+        .s-discontinued { color: #ef4444; opacity: 0.45; }
+        .s-patched      { color: #ef4444; opacity: 0.7; }
+
+        /* Projects panel */
+        .project-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 14px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.02);
+            margin-bottom: 8px;
+        }
+        .project-name { font-size: 12px; font-weight: 700; color: white; }
+        .project-badge {
+            font-size: 10px; font-weight: 700; padding: 3px 12px;
+            border-radius: 6px; letter-spacing: 0.5px;
+        }
+        .badge-working { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+        .badge-patched { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+        .badge-unknown { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+
+        /* Bottom nav */
+        .bottom-nav {
+            position: fixed; bottom: 25px; left: 25px;
+            background: rgba(10,11,15,0.6); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
+            padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center;
+        }
+        .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
+        .nav-link:hover { color: white; }
+        .nav-link.active-page { color: rgba(160,140,255,0.8); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        body { animation: fadeIn 0.35s ease forwards; }
+
+        .section-fade { animation: fadeIn 0.25s ease forwards; }
     </style>
 </head>
 <body>
+<div class="bg-base"></div>
+<div class="bg-glow"></div>
+<div class="grid-layer"></div>
 
-    <div class="bg-base"></div>
-    <div id="glow" class="bg-glow"></div>
-    <div class="grid-layer"></div>
-
-    <div class="absolute top-6 left-8">
-        <h1 class="text-3xl font-extrabold tracking-[0.2em] uppercase text-white">NightX Status</h1>
-        <p id="last-update" class="text-[8px] text-gray-500 font-bold tracking-[0.4em] uppercase">STATUS SYNCING...</p>
+<div class="page-header">
+    <div>
+        <div class="page-title">Status</div>
+        <div class="page-sub" id="syncTime">Syncing...</div>
     </div>
+    <div class="platform-toggle">
+        <button class="plat-btn active" id="platPC" onclick="setPlatform('pc')">PC</button>
+        <div class="plat-sep"></div>
+        <button class="plat-btn" id="platMobile" onclick="setPlatform('mobile')">Mobile</button>
+    </div>
+</div>
 
-    <div class="main-container">
-        <div class="glass-panel">
-            <div class="scroll-area pr-2">
-                <span class="cat-label">PC FREE / KEY</span>
-                <div class="exploit-row"><span class="status-working">Working</span><span>Solara</span></div>
-                <div class="exploit-row"><span class="status-working">Working</span><span>Xeno</span></div>
-                <div class="exploit-row"><span class="status-working">Working</span><span>Velocity</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Pluto</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Electron</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Fluxus</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Comet</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Valyse</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>LX63</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>JJsploit</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Ronix</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Celery</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Carbon</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Skisploit</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Drift</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Bunni</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Valex</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Volcano</span></div>
-                <div class="exploit-row"><span class="status-discontinued">Discontinued</span><span>Nihon</span></div>
-                <div class="exploit-row"><span class="status-discontinued">Discontinued</span><span>OxygenU</span></div>
-                <div class="exploit-row"><span class="status-discontinued">Discontinued</span><span>KRNL</span></div>
-
-                <span class="cat-label mt-5">PC PAID</span>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Synapse Z</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Swift</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Seliwave</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>DX9WARE</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Zenith</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Potassium</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Yerba</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Match</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Ronin</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Wave</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>ScriptWare</span></div>
-                <div class="exploit-row"><span class="status-discontinued">Discontinued</span><span>Synapse X</span></div>
-            </div>
-            
-            <div class="scroll-area pr-2 border-l border-white/5 pl-5">
-                <span class="cat-label">Android Free / Key</span>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Ronix</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Fluxus</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Fluxus Z</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Punk X</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Arceus X</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Codex</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Delta X</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Vega X</span></div>
-                <div class="exploit-row"><span class="status-discontinued">Discontinued</span><span>KRNL</span></div>
-
-                <span class="cat-label mt-5">Android Paid</span>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>NCE</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>ScriptWare</span></div>
-
-                <span class="cat-label mt-5">IOS Free / Key</span>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Ronix</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Hydrogen</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>iExecutor</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>AppleWare</span></div>
-                <div class="exploit-row"><span class="status-discontinued">Discontinued</span><span>Nihon</span></div>
-                <div class="exploit-row"><span class="status-discontinued">Discontinued</span><span>KRNL</span></div>
-                <div class="exploit-row"><span class="status-discontinued">Discontinued</span><span>ScriptWare</span></div>
-
-                <span class="cat-label mt-5">MacOS Free / Key</span>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Ronix</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>MacSploit</span></div>
-                <div class="exploit-row"><span class="status-unknown">Unknown</span><span>Hydrogen</span></div>
-                <div class="exploit-row"><span class="status-discontinued">Discontinued</span><span>Fluxus</span></div>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-center">
-            <div id="update-box"></div>
-        </div>
-
-        <div class="glass-panel">
-            <div class="scroll-area pr-2">
-                <span class="cat-label">Supported Games</span>
-                <div class="game-item">• Violence District</div>
-                <div class="game-item">• Evade</div>
-                <div class="game-item">• Bee Swarm Simulator</div>
-                <div class="game-item">• Lumber Tycoon 2</div>
-                <div class="game-item">• IKEA [3008]</div>
-                <div class="game-item">• Murder Mystery 2</div>
-                <div class="game-item">• Natural Disaster Survival</div>
-                <div class="game-item">• BrookHaven</div>
-            </div>
-            
-            <div class="scroll-area border-l border-white/5 pl-5">
-                <span class="cat-label">Supported Soon</span>
-                <div class="game-item">• The Strongest BattleGround</div>
-            </div>
+<div class="main-layout">
+    <!-- Left: Exploits -->
+    <div class="glass-panel">
+        <div class="panel-title" id="exploitPanelTitle">Executors</div>
+        <div class="scroll-area">
+            <div class="exploit-list" id="exploitList"></div>
         </div>
     </div>
 
-    <div class="fixed bottom-4 w-full px-8 flex justify-between items-center opacity-30 text-[9px] font-bold tracking-[0.4em] uppercase">
-        <span>CatxTeam &copy; 2026</span>
-        <div class="flex gap-10">
-            <span onclick="goTo('https://discord.gg/FGXGdVxbue')" class="cursor-pointer hover:text-white transition-all">Discord</span>
-            <span onclick="goTo('https://www.youtube.com/watch?v=dQw4w9WgXcQ')" class="cursor-pointer hover:text-white transition-all">Contact</span>
+    <!-- Right: Projects -->
+    <div class="glass-panel">
+        <div class="panel-title">Our Projects</div>
+        <div class="scroll-area">
+            <div id="projectList">
+                <div class="project-row">
+                    <div class="project-name">Nixu</div>
+                    <div class="project-badge badge-working">Working</div>
+                </div>
+                <div class="project-row">
+                    <div class="project-name">Nixu Legacy</div>
+                    <div class="project-badge badge-working">Working</div>
+                </div>
+                <div class="project-row">
+                    <div class="project-name">Nixu Spectral</div>
+                    <div class="project-badge badge-working">Working</div>
+                </div>
+                <div class="project-row">
+                    <div class="project-name">Nixu DLC</div>
+                    <div class="project-badge badge-patched">Patched</div>
+                </div>
+                <div class="project-row">
+                    <div class="project-name">Ethereos</div>
+                    <div class="project-badge badge-working">Working</div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <script>
-        window.addEventListener('mousemove', (e) => {
-            document.body.style.setProperty('--x', e.clientX + 'px');
-            document.body.style.setProperty('--y', e.clientY + 'px');
-        });
-        function goTo(url) { window.open(url, '_blank'); }
-        document.getElementById('last-update').innerText = "LAST SYNC: " + new Date().toLocaleTimeString();
+<div class="bottom-nav">
+    <span onclick="window.location.href='/'" class="nav-link">Home</span>
+    <span onclick="window.location.href='/catalog'" class="nav-link">Catalog</span>
+    <span onclick="window.location.href='/obfuscator'" class="nav-link">Obfuscator</span>
+    <span onclick="window.location.href='/status'" class="nav-link active-page">Status</span>
+    <span onclick="window.open('https://discord.gg/TRPZg4Xfkq','_blank')" class="nav-link">Discord</span>
+</div>
 
-        async function fetchUpdateText() {
-            try {
-                const res = await fetch('https://raw.githubusercontent.com/ТВОЙ_ПРОФИЛЬ/repo/main/site/html/update.txt');
-                const text = await res.text();
-                document.getElementById('update-box').innerText = text.trim();
-            } catch (e) {
-                document.getElementById('update-box').innerText = ""; 
-            }
+<script>
+    window.addEventListener('mousemove', e => {
+        document.body.style.setProperty('--x', e.clientX + 'px');
+        document.body.style.setProperty('--y', e.clientY + 'px');
+    });
+
+    document.getElementById('syncTime').textContent = 'Last sync: ' + new Date().toLocaleTimeString();
+
+    const PC_DATA = [
+        {
+            label: 'PC Free / Key',
+            items: [
+                { name: 'Solara',    status: 'working' },
+                { name: 'Xeno',      status: 'working' },
+                { name: 'Velocity',  status: 'working' },
+                { name: 'Pluto',     status: 'unknown' },
+                { name: 'Electron',  status: 'unknown' },
+                { name: 'Fluxus',    status: 'unknown' },
+                { name: 'Comet',     status: 'unknown' },
+                { name: 'Valyse',    status: 'unknown' },
+                { name: 'LX63',      status: 'unknown' },
+                { name: 'JJsploit',  status: 'unknown' },
+                { name: 'Ronix',     status: 'unknown' },
+                { name: 'Celery',    status: 'unknown' },
+                { name: 'Carbon',    status: 'unknown' },
+                { name: 'Skisploit', status: 'unknown' },
+                { name: 'Drift',     status: 'unknown' },
+                { name: 'Bunni',     status: 'unknown' },
+                { name: 'Valex',     status: 'unknown' },
+                { name: 'Volcano',   status: 'unknown' },
+                { name: 'Nihon',     status: 'discontinued' },
+                { name: 'OxygenU',   status: 'discontinued' },
+                { name: 'KRNL',      status: 'discontinued' },
+            ]
+        },
+        {
+            label: 'PC Paid',
+            items: [
+                { name: 'Synapse Z',   status: 'unknown' },
+                { name: 'Swift',       status: 'unknown' },
+                { name: 'Seliwave',    status: 'unknown' },
+                { name: 'DX9WARE',     status: 'unknown' },
+                { name: 'Zenith',      status: 'unknown' },
+                { name: 'Potassium',   status: 'unknown' },
+                { name: 'Yerba',       status: 'unknown' },
+                { name: 'Match',       status: 'unknown' },
+                { name: 'Ronin',       status: 'unknown' },
+                { name: 'Wave',        status: 'unknown' },
+                { name: 'ScriptWare',  status: 'unknown' },
+                { name: 'Synapse X',   status: 'discontinued' },
+            ]
+        },
+        {
+            label: 'MacOS Free / Key',
+            items: [
+                { name: 'Ronix',     status: 'unknown' },
+                { name: 'MacSploit', status: 'unknown' },
+                { name: 'Hydrogen',  status: 'unknown' },
+                { name: 'Fluxus',    status: 'discontinued' },
+            ]
         }
-    </script>
+    ];
+
+    const MOBILE_DATA = [
+        {
+            label: 'Android Free / Key',
+            items: [
+                { name: 'Ronix',    status: 'unknown' },
+                { name: 'Fluxus',   status: 'unknown' },
+                { name: 'Fluxus Z', status: 'unknown' },
+                { name: 'Punk X',   status: 'unknown' },
+                { name: 'Arceus X', status: 'unknown' },
+                { name: 'Codex',    status: 'unknown' },
+                { name: 'Delta X',  status: 'unknown' },
+                { name: 'Vega X',   status: 'unknown' },
+                { name: 'KRNL',     status: 'discontinued' },
+            ]
+        },
+        {
+            label: 'Android Paid',
+            items: [
+                { name: 'NCE',        status: 'unknown' },
+                { name: 'ScriptWare', status: 'unknown' },
+            ]
+        },
+        {
+            label: 'iOS Free / Key',
+            items: [
+                { name: 'Ronix',       status: 'unknown' },
+                { name: 'Hydrogen',    status: 'unknown' },
+                { name: 'iExecutor',   status: 'unknown' },
+                { name: 'AppleWare',   status: 'unknown' },
+                { name: 'Nihon',       status: 'discontinued' },
+                { name: 'KRNL',        status: 'discontinued' },
+                { name: 'ScriptWare',  status: 'discontinued' },
+            ]
+        },
+        {
+            label: 'iOS Paid',
+            items: []
+        }
+    ];
+
+    const STATUS_LABEL = {
+        working: 'Working',
+        unknown: 'Unknown',
+        dead: 'Dead',
+        discontinued: 'Discontinued',
+        patched: 'Patched'
+    };
+    const STATUS_CLASS = {
+        working: 's-working',
+        unknown: 's-unknown',
+        dead: 's-dead',
+        discontinued: 's-discontinued',
+        patched: 's-patched'
+    };
+
+    function renderExploits(data) {
+        var list = document.getElementById('exploitList');
+        var html = '';
+        data.forEach(function(cat) {
+            html += '<span class="cat-label">' + cat.label + '</span>';
+            cat.items.forEach(function(item) {
+                html += '<div class="exploit-row">'
+                    + '<span class="' + (STATUS_CLASS[item.status] || '') + '">' + (STATUS_LABEL[item.status] || item.status) + '</span>'
+                    + '<span>' + item.name + '</span>'
+                    + '</div>';
+            });
+        });
+        list.innerHTML = html;
+        list.classList.remove('section-fade');
+        void list.offsetWidth;
+        list.classList.add('section-fade');
+    }
+
+    var currentPlatform = 'pc';
+
+    function setPlatform(val) {
+        currentPlatform = val;
+        document.getElementById('platPC').classList.toggle('active', val === 'pc');
+        document.getElementById('platMobile').classList.toggle('active', val === 'mobile');
+        if (val === 'pc') {
+            document.getElementById('exploitPanelTitle').textContent = 'PC & MacOS Executors';
+            renderExploits(PC_DATA);
+        } else {
+            document.getElementById('exploitPanelTitle').textContent = 'Mobile Executors';
+            renderExploits(MOBILE_DATA);
+        }
+    }
+
+    setPlatform('pc');
+</script>
 </body>
 </html>
