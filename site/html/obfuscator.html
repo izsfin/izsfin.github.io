@@ -99,9 +99,8 @@
             width: 100%;
         }
         textarea:focus {
-    outline: none;
-}
-
+         outline: none;
+        }
         textarea::placeholder { color: rgba(255,255,255,0.15); }
         textarea::-webkit-scrollbar { width: 3px; }
         textarea::-webkit-scrollbar-track { background: transparent; }
@@ -254,6 +253,7 @@
         .toast.show { transform: translateY(0); opacity: 1; }
 
         .spacer { height: 68px; flex-shrink: 0; }
+        .char-counter { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.18); letter-spacing: 0.5px; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -293,6 +293,10 @@
     <div class="status-row">
         <div class="status-dot" id="sDot"></div>
         <span class="status-text" id="sTxt">Ready</span>
+        <span style="flex:1"></span>
+        <span class="char-counter" id="inCounter">Input: 0 chars</span>
+        <span style="width:18px"></span>
+        <span class="char-counter" id="outCounter">Output: 0 chars</span>
     </div>
 
     <div class="spacer"></div>
@@ -384,6 +388,7 @@
             }
 
             document.getElementById('outputCode').value = result;
+            updateOutCounter(result.length);
 
         } catch (e) {
             setStatus('Request failed: ' + e.message, 'err');
@@ -412,7 +417,15 @@
         showToast(`Downloaded ${name}`);
     }
 
-    // Ctrl+Enter shortcut
+    // Char counters
+    document.getElementById('inputCode').addEventListener('input', function() {
+        var len = this.value.length;
+        document.getElementById('inCounter').textContent = 'Input: ' + len.toLocaleString() + ' chars';
+    });
+
+    function updateOutCounter(val) {
+        document.getElementById('outCounter').textContent = 'Output: ' + (val || 0).toLocaleString() + ' chars';
+    }
     document.getElementById('inputCode').addEventListener('keydown', e => {
         if (e.ctrlKey && e.key === 'Enter') runObfuscate();
     });
