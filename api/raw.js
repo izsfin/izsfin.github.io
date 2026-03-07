@@ -45,7 +45,10 @@ export default async function handler(req, res) {
     if (rawPath.startsWith("catalog/")) {
     // /catalog/BlackCatEars → catalog-item.html (item ID читается на клиенте из URL)
       return serveFallback(res, "catalog-item.html", selectedLang);
-}
+     }
+    if (rawPath === "api/catalog/info" || rawPath === "api/catalog/verified") {
+      codeBranch = "main";
+    }
     // --- 4. STATUS ДОМЕН ---
     if (host.includes("celius-status")) {
         return serveFallback(res, "status.html", selectedLang);
