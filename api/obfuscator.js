@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// NixuMO Obfuscator — Vercel API endpoint
+// ZuraMO Obfuscator — Vercel API endpoint
 // POST /api/obfuscator  { code: "print('hi')" }
 // GET  /api/obfuscator?code=...
 // ─────────────────────────────────────────────────────────────────────────────
@@ -194,9 +194,9 @@ function minifyLua(code) {
     return out.join(' ').replace(/ {2,}/g, ' ');
 }
 
-// ── Main obfuscate ──────────────Minify = false─────────────────────────────────────────
+// ── Main obfuscate ────────────────────────────────────────────────────────────
 
-function obfuscate(source) {   
+function obfuscate(source, minify = false, velocityFix = false) {
     const { data: payload, rot, salt1, salt2 } = encryptPayload(source);
 
     // Dynamic key table
@@ -288,15 +288,14 @@ ${invBlock3}
     local ${v.final} = ${v.vm}(${mNum(ops.DECODE)})
     local ${v.tmp} = "${lsStr}"
     local ${v.res} = "${prStr}"
-    return loadstring(${v.res} .. ${v.final} .. "\\034\\041")()
+    return ${velocityFix ? `loadstring(${v.res} .. ${v.final} .. "\\034\\041")()` : `_G[${v.tmp}](${v.res} .. ${v.final} .. "\\034\\041")()`}
 ${junkBottom}
 end)(...)`;
 
-    const header = '--[[ v2.14.6 NixuMO | ethereos.vercel.app/obfuscator ]]';
-     return header + ' ' + minifyLua(lua);
+    const header = '--[[ V6 ZuraMO | ethereos.vercel.app/obfuscator ]]';
+    return header + ' ' + minifyLua(lua);
 }
-//     return header + ' ' + minifyLua(lua);
-//     return header + '\n' + (minify ? minifyLua(lua) : lua);
+
 // ── Vercel handler ────────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
@@ -307,11 +306,14 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     let code = '';
+    let velocityFix = false;
 
     if (req.method === 'POST') {
         code = req.body?.code || '';
+        velocityFix = req.body?.velocityFix === true;
     } else if (req.method === 'GET') {
         code = req.query?.code || '';
+        velocityFix = req.query?.velocityFix === 'true';
     } else {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -325,7 +327,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const result = obfuscate(code.trim());
+        const result = obfuscate(code.trim(), false, velocityFix);
         return res.status(200).json({
             success: true,
             result,

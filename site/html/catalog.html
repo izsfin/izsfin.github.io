@@ -63,7 +63,9 @@
         .ctx-menu { position: fixed; z-index: 200; background: rgba(10,11,15,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 6px; min-width: 160px; }
         .ctx-item { font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700; padding: 9px 14px; border-radius: 7px; cursor: pointer; color: rgba(255,255,255,0.6); transition: all 0.15s; display: flex; align-items: center; gap: 8px; }
         .ctx-item:hover { background: rgba(99,102,241,0.12); color: white; }
-    </style>
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        body { animation: fadeIn 0.35s ease forwards; }
+</style>
 </head>
 <body>
 <div class="bg-base"></div>
@@ -116,6 +118,10 @@
     <div class="ctx-item" onclick="ctxCopy()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy Command
+    </div>
+    <div class="ctx-item" onclick="ctxCopyLink()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Copy Link
     </div>
     <div class="ctx-item" onclick="ctxOpen()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -317,6 +323,13 @@
         hideCtx();
         if (!ctxItemCmd) return;
         navigator.clipboard.writeText(ctxItemCmd).then(function() { showToast('Command copied \u2713'); });
+    }
+
+    function ctxCopyLink() {
+        hideCtx();
+        if (!ctxItemId) return;
+        var link = window.location.origin + '/catalog/' + ctxItemId;
+        navigator.clipboard.writeText(link).then(function() { showToast('Link copied \u2713'); });
     }
 
     function ctxOpen() {

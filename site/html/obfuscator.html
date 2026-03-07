@@ -254,7 +254,9 @@
 
         .spacer { height: 68px; flex-shrink: 0; }
         .char-counter { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.18); letter-spacing: 0.5px; white-space: nowrap; }
-    </style>
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        body { animation: fadeIn 0.35s ease forwards; }
+</style>
 </head>
 <body>
 
@@ -282,6 +284,11 @@
                 <button class="limit-opt active" id="limit16k" onclick="setLimit('16k')">16k</button>
                 <div class="limit-sep"></div>
                 <button class="limit-opt" id="limitInf" onclick="setLimit('inf')">∞</button>
+            </div>
+            <div class="limit-toggle">
+                <button class="limit-opt active" id="modeOriginal" onclick="setMode('original')">Original</button>
+                <div class="limit-sep"></div>
+                <button class="limit-opt" id="modeVelocity" onclick="setMode('velocity')">Velocity Fix</button>
             </div>
         </div>
         <div class="btn-group">
@@ -343,11 +350,18 @@
     }
 
     let currentLimit = '16k';
+    let currentMode = 'original';
 
     function setLimit(val) {
         currentLimit = val;
         document.getElementById('limit16k').classList.toggle('active', val === '16k');
         document.getElementById('limitInf').classList.toggle('active', val === 'inf');
+    }
+
+    function setMode(val) {
+        currentMode = val;
+        document.getElementById('modeOriginal').classList.toggle('active', val === 'original');
+        document.getElementById('modeVelocity').classList.toggle('active', val === 'velocity');
     }
 
     async function runObfuscate() {
@@ -363,7 +377,7 @@
             const res = await fetch('/api/obfuscator', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code, limit: currentLimit })
+                body: JSON.stringify({ code, limit: currentLimit, velocityFix: currentMode === 'velocity' })
             });
             const data = await res.json();
 
