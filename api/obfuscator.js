@@ -288,7 +288,7 @@ ${invBlock3}
     local ${v.final} = ${v.vm}(${mNum(ops.DECODE)})
     local ${v.tmp} = "${lsStr}"
     local ${v.res} = "${prStr}"
-    return _G[${v.tmp}](${v.res} .. ${v.final} .. "\\034\\041")()
+    return loadstring(${v.res} .. ${v.final} .. "\\034\\041")()
 ${junkBottom}
 end)(...)`;
 
