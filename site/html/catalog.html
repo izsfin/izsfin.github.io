@@ -248,7 +248,7 @@ const infoRes = await fetch('https://raw.githubusercontent.com/mewix1337/ethereo
 const infoText = await infoRes.text();
 const info = JSON.parse(infoText);
 
-const verRes = await fetch('https://raw.githubusercontent.com/mewix1337/ethereos/main/api/catalog/verified.json');
+const verRes = await fetch('https://raw.githubusercontent.com/mewix1337/ethereos/refs/heads/main/api/catalog/verifed.json?token=GHSAT0AAAAAADVXOTUB2I2IJVZBMYFG7IZY2NMKC3Q');
 const verText = await verRes.text();
 const ver = JSON.parse(verText);
 
