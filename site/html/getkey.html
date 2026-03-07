@@ -215,6 +215,7 @@
     <span onclick="window.location.href='/'" class="nav-link">Home</span>
     <span onclick="window.location.href='/catalog'" class="nav-link">Catalog</span>
     <span onclick="window.location.href='/obfuscator'" class="nav-link">Obfuscator</span>
+    <span onclick="window.location.href='/getkey'" class="nav-link active-page">Authentication</span>
     <span onclick="window.location.href='/status'" class="nav-link">Status</span>
     <span onclick="window.open('https://discord.gg/TRPZg4Xfkq','_blank')" class="nav-link">Discord</span>
 </div>
@@ -236,7 +237,30 @@
     var stepHistory = [];
     var timerInterval = null;
 
-    var PROMOS = { 'FREEVEX': 1, 'VEX30': 30, 'OWNER': 90 };
+    var PROMOS = {};
+
+    // Duration label → days number
+    var LABEL_TO_DAYS = { '12H': 0.5, '1D': 1, '3D': 3, '7D': 7, '30D': 30, '90D': 90 };
+
+    async function loadPromos() {
+        try {
+            var res = await fetch('https://ethereos.vercel.app/api/promocodes');
+            var data = await res.json();
+            // data = { "Spectral": { days: "7D", uses: 15 }, ... }
+            Object.keys(data).forEach(function(code) {
+                var entry = data[code];
+                var days = LABEL_TO_DAYS[entry.days];
+                if (days && entry.uses > 0) {
+                    PROMOS[code.toUpperCase()] = days;
+                }
+            });
+        } catch(e) {
+            // fallback if API unreachable
+            PROMOS = { 'FREEVEX': 1, 'OWNER': 90 };
+        }
+    }
+
+    loadPromos();
 
     function showToast(msg) {
         var t = document.getElementById('toast');

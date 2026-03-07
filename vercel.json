@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/api/check", "destination": "/api/check" },
     { "source": "/api/gen", "destination": "/api/gen" },
+    { "source": "/api/promocodes", "destination": "/api/promocodes" },
     { "source": "/api/stats", "destination": "/api/stats" },
     { "source": "/api/logger", "destination": "/api/logger" },
     { "source": "/api/obfuscator", "destination": "/api/obfuscator" },
