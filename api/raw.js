@@ -29,11 +29,12 @@ export default async function handler(req, res) {
     let fallbackFile = "main.html";
     if (host.includes("ethereos-auth")) { codeBranch = "auth"; fallbackFile = "getkey.html"; }
     else if (host.includes("ethereos-testing")) { codeBranch = "test"; fallbackFile = "test.html"; }
+    else if (host.includes("ethereos-status")) { codeBranch = "status"; fallbackFile = "status.html"; }
     else if (host.includes("ethereos-api")) { codeBranch = "api"; }
     else if (host.includes("ethereos-raw")) { codeBranch = "raw"; }
     else if (host.includes("ethereos-cdn")) { codeBranch = "cdn"; }
     else if (host.includes("ethereos")) { codeBranch = "off"; }
-    else if (host.includes("ethereos-status")) { fallbackFile = "status.html"; }
+
 // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     if (rawPath === "obfuscator") {
