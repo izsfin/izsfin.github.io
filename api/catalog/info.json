@@ -62,6 +62,15 @@
       "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/spectral\"))()",
       "category": "Scripts",
       "type": "Official Software"
+    },
+    {
+      "id": "test",
+      "name": "test",
+      "author": "test team",
+      "preview": "site/catalog/PalFace/NSpreview.png",
+      "command": "",
+      "category": "Scripts",
+      "type": "Testing Software"
     }
   ]
 }
