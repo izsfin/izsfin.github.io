@@ -55,6 +55,22 @@
       "type": "dhead"
     },
     {
+      "id": "purple-bape",
+      "name": "Purple Bape",
+      "author": "nilletMS",
+      "preview": "site/catalog/bape/purple/preview.png",
+      "command": "_G(\"Purple Bape\", \"once\")",
+      "category": "Outfits"
+    },
+    {
+      "id": "black-bape",
+      "name": "Black Bape",
+      "author": "nilletMS",
+      "preview": "site/catalog/bape/black/preview.png",
+      "command": "_G(\"Black Bape\", \"once\")",
+      "category": "Outfits"
+    },
+    {
       "id": "spectral",
       "name": "Spectral [CMD]",
       "author": "nilletMS",
