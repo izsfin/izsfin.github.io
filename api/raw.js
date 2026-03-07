@@ -24,6 +24,7 @@ export default async function handler(req, res) {
     if (isBotCrawler) return res.status(200).send("OK");
 
     // --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
+// --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
     if (host.includes("ethereos-auth")) { codeBranch = "auth"; fallbackFile = "getkey.html"; }
@@ -33,6 +34,8 @@ export default async function handler(req, res) {
     else if (host.includes("ethereos-cdn")) { codeBranch = "cdn"; }
     else if (host.includes("ethereos")) { codeBranch = "off"; }
 
+// --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
+if (rawPath === "obfuscator") { codeBranch = "main"; }
     // --- 4. STATUS ДОМЕН ---
     if (host.includes("celius-status")) {
         return serveFallback(res, "status.html", selectedLang);
