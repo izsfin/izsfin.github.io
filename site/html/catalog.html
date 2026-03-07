@@ -14,19 +14,16 @@
         .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%), rgba(255,255,255,0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
         .grid-layer { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px); background-size: 50px 50px; z-index: -1; }
         .main { position: relative; z-index: 2; padding: 36px 36px 100px; }
-
         .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
         .page-title { font-size: 32px; font-weight: 800; color: white; letter-spacing: 1px; }
         .search-btn { font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700; padding: 10px 24px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(10,11,15,0.6); backdrop-filter: blur(20px); color: white; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
         .search-btn:hover { border-color: rgba(99,102,241,0.5); color: rgba(160,140,255,1); }
-
         .section-block { margin-bottom: 40px; }
         .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
         .section-title { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.25); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
         .section-line { flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
         .subsection-header { display: flex; align-items: center; gap: 12px; margin: 20px 0 12px; }
         .subsection-title { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.15); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
-
         .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
         .item-card { background: rgba(10,11,15,0.55); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden; cursor: pointer; transition: border-color 0.25s, transform 0.2s; display: flex; flex-direction: column; }
         .item-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
@@ -38,8 +35,6 @@
         .item-btn { width: 100%; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.2s; }
         .item-btn:hover { background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.4); color: white; }
         .state-msg { text-align: center; padding: 80px 0; font-size: 13px; color: rgba(255,255,255,0.2); font-weight: 600; letter-spacing: 0.5px; }
-
-        /* Modal */
         .modal-overlay { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .modal-overlay.open { opacity: 1; pointer-events: all; }
         .modal { background: rgba(10,11,15,0.95); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 32px; width: 500px; max-width: 92vw; transform: translateY(16px); transition: transform 0.2s; max-height: 90vh; overflow-y: auto; }
@@ -47,7 +42,7 @@
         .modal-title { font-size: 16px; font-weight: 800; color: white; text-align: center; margin-bottom: 22px; }
         .modal-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.25); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
         .modal-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 20px 0; }
-        .toggle-row { display: flex; gap: 10px; margin-bottom: 0; }
+        .toggle-row { display: flex; gap: 10px; }
         .toggle-btn { flex: 1; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s; }
         .toggle-btn.active { border-color: rgba(99,102,241,0.5); background: rgba(99,102,241,0.12); color: white; }
         .cat-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -59,7 +54,6 @@
         .script-search-input:focus { border-color: rgba(99,102,241,0.4); }
         .modal-search-btn { width: 100%; margin-top: 22px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700; padding: 13px; border-radius: 10px; border: 1px solid rgba(99,102,241,0.3); background: rgba(99,102,241,0.1); color: white; cursor: pointer; transition: all 0.2s; }
         .modal-search-btn:hover { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.6); }
-
         .bottom-nav { position: fixed; bottom: 25px; left: 25px; background: rgba(10,11,15,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center; }
         .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
         .nav-link:hover { color: white; }
@@ -70,7 +64,6 @@
 <div class="bg-base"></div>
 <div class="bg-glow"></div>
 <div class="grid-layer"></div>
-
 <div class="main">
     <div class="page-header">
         <div class="page-title">Catalog</div>
@@ -85,13 +78,11 @@
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
     <div class="modal">
         <div class="modal-title">Filter</div>
-
         <div class="modal-label">Verification</div>
         <div class="toggle-row">
-            <button class="toggle-btn active" id="toggleVerified" onclick="setVerified(true)">Verified & Official</button>
+            <button class="toggle-btn active" id="toggleVerified" onclick="setVerified(true)">Verified &amp; Official</button>
             <button class="toggle-btn" id="toggleUnverified" onclick="setVerified(false)">Not Verified</button>
         </div>
-
         <hr class="modal-divider">
         <div class="modal-label">Category</div>
         <div class="cat-row">
@@ -101,21 +92,16 @@
             <button class="cat-btn" data-cat="Characters" onclick="setCat(this,'Characters')">Character's</button>
             <button class="cat-btn" data-cat="Scripts" onclick="setCat(this,'Scripts')">Scripts</button>
         </div>
-
-        <!-- Types for Accessories / Characters -->
         <div id="typeSection" style="display:none;">
             <hr class="modal-divider">
             <div class="modal-label" id="typeLabel">Type</div>
             <div class="type-row" id="typeRow"></div>
         </div>
-
-        <!-- Script keyword search -->
         <div id="scriptSearchSection" style="display:none;">
             <hr class="modal-divider">
             <div class="modal-label">Search by game / type</div>
             <input class="script-search-input" id="scriptSearchInput" type="text" placeholder="e.g. Fav, Place, Roleplay...">
         </div>
-
         <button class="modal-search-btn" onclick="applyFilter()">Search</button>
     </div>
 </div>
@@ -139,12 +125,32 @@
     let allItems = [], verifiedAuthors = [];
     let filterVerified = true, filterCat = '', filterType = '';
 
+    // Order of categories on page
     const CAT_ORDER = ['Accessories', 'Outfits', 'Characters', 'Scripts'];
-    const CAT_LABELS = { Accessories: 'Accessories', Outfits: "Outfit's", Characters: "Character's", Scripts: 'Scripts' };
-    const CAT_TYPES = {
-        Accessories: ['Head', 'Face', 'Neck', 'Shoulder', 'Front', 'Back'],
-        Characters:  ["Body's", "Face's", 'Dynamic', "Head's Hair"]
+
+    const CAT_LABELS = {
+        Accessories: 'Accessories',
+        Outfits: "Outfit's",
+        Characters: "Character's",
+        Scripts: 'Scripts'
     };
+
+    // type code -> display label
+    const ACC_TYPES = [
+        { code: 'Head',     label: 'Head' },
+        { code: 'Face',     label: 'Face' },
+        { code: 'Neck',     label: 'Neck' },
+        { code: 'Shoulder', label: 'Shoulder' },
+        { code: 'Front',    label: 'Front' },
+        { code: 'Back',     label: 'Back' }
+    ];
+
+    const CHAR_TYPES = [
+        { code: 'body',  label: "Body's" },
+        { code: 'face',  label: "Face's" },
+        { code: 'dhead', label: 'Dynamic Head' },
+        { code: 'hair',  label: 'Hair' }
+    ];
 
     async function loadData() {
         try {
@@ -166,78 +172,93 @@
 
         const grouped = {};
         CAT_ORDER.forEach(c => grouped[c] = []);
-        items.forEach(i => {
-            const cat = i.category || 'Other';
+        items.forEach(function(i) {
+            var cat = i.category || 'Other';
             if (!grouped[cat]) grouped[cat] = [];
             grouped[cat].push(i);
         });
 
-        let html = '';
-        CAT_ORDER.forEach(cat => {
-            const catItems = grouped[cat];
-            if (!catItems || !catItems.length) return;
-            html += `<div class="section-block">`;
-            html += `<div class="section-header"><div class="section-title">${CAT_LABELS[cat] || cat}</div><div class="section-line"></div></div>`;
+        var html = '';
 
-            if (cat === 'Accessories' || cat === 'Characters') {
-                const typeOrder = CAT_TYPES[cat];
-                const byType = {};
-                typeOrder.forEach(t => byType[t] = []);
-                catItems.forEach(i => {
-                    const t = i.type || 'Other';
-                    if (!byType[t]) byType[t] = [];
-                    byType[t].push(i);
-                });
-                let first = true;
-                typeOrder.forEach(type => {
-                    if (!byType[type] || !byType[type].length) return;
-                    html += `<div class="subsection-header">`;
-                    if (!first) html += `<div class="section-line"></div>`;
-                    html += `<div class="subsection-title">${type}</div><div class="section-line"></div></div>`;
-                    first = false;
-                    html += `<div class="catalog-grid" style="margin-bottom:8px;">`;
-                    byType[type].forEach(i => { html += itemCard(i); });
-                    html += `</div>`;
-                });
+        CAT_ORDER.forEach(function(cat) {
+            var catItems = grouped[cat];
+            if (!catItems || !catItems.length) return;
+
+            html += '<div class="section-block">';
+            html += '<div class="section-header"><div class="section-title">' + (CAT_LABELS[cat] || cat) + '</div><div class="section-line"></div></div>';
+
+            if (cat === 'Accessories') {
+                html += renderTypedSection(catItems, ACC_TYPES);
+            } else if (cat === 'Characters') {
+                html += renderTypedSection(catItems, CHAR_TYPES);
             } else if (cat === 'Scripts') {
-                const byType = {};
-                catItems.forEach(i => {
-                    const t = i.type || 'Other';
+                // group by type dynamically
+                var byType = {};
+                catItems.forEach(function(i) {
+                    var t = i.type || 'Other';
                     if (!byType[t]) byType[t] = [];
                     byType[t].push(i);
                 });
-                let first = true;
-                Object.keys(byType).forEach(type => {
+                var first = true;
+                Object.keys(byType).forEach(function(type) {
                     if (!byType[type].length) return;
-                    html += `<div class="subsection-header">`;
-                    if (!first) html += `<div class="section-line"></div>`;
-                    html += `<div class="subsection-title">${type}</div><div class="section-line"></div></div>`;
+                    html += '<div class="subsection-header">';
+                    if (!first) html += '<div class="section-line"></div>';
+                    html += '<div class="subsection-title">' + type + '</div><div class="section-line"></div></div>';
                     first = false;
-                    html += `<div class="catalog-grid" style="margin-bottom:8px;">`;
-                    byType[type].forEach(i => { html += itemCard(i); });
-                    html += `</div>`;
+                    html += '<div class="catalog-grid" style="margin-bottom:8px;">';
+                    byType[type].forEach(function(i) { html += itemCard(i); });
+                    html += '</div>';
                 });
             } else {
-                html += `<div class="catalog-grid">`;
-                catItems.forEach(i => { html += itemCard(i); });
-                html += `</div>`;
+                // Outfits — no subtypes
+                html += '<div class="catalog-grid">';
+                catItems.forEach(function(i) { html += itemCard(i); });
+                html += '</div>';
             }
-            html += `</div>`;
+
+            html += '</div>';
         });
+
         content.innerHTML = html;
     }
 
+    function renderTypedSection(items, typeList) {
+        var byType = {};
+        typeList.forEach(function(t) { byType[t.code] = []; });
+        items.forEach(function(i) {
+            var t = i.type || '';
+            if (!byType[t]) byType[t] = [];
+            byType[t].push(i);
+        });
+        var html = '';
+        var first = true;
+        typeList.forEach(function(t) {
+            if (!byType[t.code] || !byType[t.code].length) return;
+            html += '<div class="subsection-header">';
+            if (!first) html += '<div class="section-line"></div>';
+            html += '<div class="subsection-title">' + t.label + '</div><div class="section-line"></div></div>';
+            first = false;
+            html += '<div class="catalog-grid" style="margin-bottom:8px;">';
+            byType[t.code].forEach(function(i) { html += itemCard(i); });
+            html += '</div>';
+        });
+        return html;
+    }
+
     function itemCard(item) {
-        const prev = item.preview
-            ? `<img src="/${item.preview}" alt="${item.name}" onerror="this.parentElement.innerHTML='<span class=\\'no-preview\\'>No preview</span>'">`
+        var id = item.id;
+        var name = item.name || '';
+        var preview = item.preview || '';
+        var prevHtml = preview
+            ? '<img src="/' + preview + '" alt="" onerror="this.parentElement.innerHTML=\'<span class=no-preview>No preview</span>\'">'
             : '<span class="no-preview">No preview</span>';
-        return `<div class="item-card" onclick="goToItem('${item.id}')">
-            <div class="item-preview">${prev}</div>
-            <div class="item-info">
-                <div class="item-name">${item.name}</div>
-                <button class="item-btn" onclick="event.stopPropagation();goToItem('${item.id}')">Get Command</button>
-            </div>
-        </div>`;
+        return '<div class="item-card" onclick="goToItem(\'' + id + '\')">'
+            + '<div class="item-preview">' + prevHtml + '</div>'
+            + '<div class="item-info">'
+            + '<div class="item-name">' + name + '</div>'
+            + '<button class="item-btn" onclick="event.stopPropagation();goToItem(\'' + id + '\')">Get Command</button>'
+            + '</div></div>';
     }
 
     function goToItem(id) { window.location.href = '/catalog/' + id; }
@@ -254,49 +275,61 @@
 
     function setCat(el, val) {
         filterCat = val; filterType = '';
-        document.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('[data-cat]').forEach(function(b) { b.classList.remove('active'); });
         el.classList.add('active');
 
-        const typeSection = document.getElementById('typeSection');
-        const scriptSection = document.getElementById('scriptSearchSection');
+        var typeSection = document.getElementById('typeSection');
+        var scriptSection = document.getElementById('scriptSearchSection');
         typeSection.style.display = 'none';
         scriptSection.style.display = 'none';
         document.getElementById('scriptSearchInput').value = '';
 
-        if (val === 'Accessories' || val === 'Characters') {
-            const types = CAT_TYPES[val] || [];
-            document.getElementById('typeLabel').textContent = val === 'Characters' ? 'Character Type' : 'Accessory Type';
-            document.getElementById('typeRow').innerHTML =
-                `<button class="cat-btn active" data-type="" onclick="setType(this,'')">All</button>` +
-                types.map(t => `<button class="cat-btn" data-type="${t}" onclick="setType(this,'${t}')">${t}</button>`).join('');
+        if (val === 'Accessories') {
+            document.getElementById('typeLabel').textContent = 'Accessory Type';
+            buildTypeButtons(ACC_TYPES);
+            typeSection.style.display = 'block';
+        } else if (val === 'Characters') {
+            document.getElementById('typeLabel').textContent = 'Character Type';
+            buildTypeButtons(CHAR_TYPES);
             typeSection.style.display = 'block';
         } else if (val === 'Scripts') {
             scriptSection.style.display = 'block';
         }
     }
 
+    function buildTypeButtons(typeList) {
+        var row = document.getElementById('typeRow');
+        var html = '<button class="cat-btn active" data-type="" onclick="setType(this,\'\')">All</button>';
+        typeList.forEach(function(t) {
+            html += '<button class="cat-btn" data-type="' + t.code + '" onclick="setType(this,\'' + t.code + '\')">' + t.label + '</button>';
+        });
+        row.innerHTML = html;
+    }
+
     function setType(el, val) {
         filterType = val;
-        document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('[data-type]').forEach(function(b) { b.classList.remove('active'); });
         el.classList.add('active');
     }
 
     function applyFilter() {
         closeModal();
-        let filtered = allItems;
+        var filtered = allItems.slice();
 
         if (filterVerified) {
-            filtered = filtered.filter(i => verifiedAuthors.includes(i.author));
+            filtered = filtered.filter(function(i) { return verifiedAuthors.indexOf(i.author) !== -1; });
         } else {
-            filtered = filtered.filter(i => !verifiedAuthors.includes(i.author));
+            filtered = filtered.filter(function(i) { return verifiedAuthors.indexOf(i.author) === -1; });
         }
 
-        if (filterCat) filtered = filtered.filter(i => i.category === filterCat);
-        if (filterType) filtered = filtered.filter(i => i.type === filterType);
+        if (filterCat) filtered = filtered.filter(function(i) { return i.category === filterCat; });
+        if (filterType) filtered = filtered.filter(function(i) { return i.type === filterType; });
 
         if (filterCat === 'Scripts') {
-            const q = document.getElementById('scriptSearchInput').value.trim().toLowerCase();
-            if (q) filtered = filtered.filter(i => (i.type || '').toLowerCase().includes(q) || (i.name || '').toLowerCase().includes(q));
+            var q = document.getElementById('scriptSearchInput').value.trim().toLowerCase();
+            if (q) filtered = filtered.filter(function(i) {
+                return (i.type || '').toLowerCase().indexOf(q) !== -1 || (i.name || '').toLowerCase().indexOf(q) !== -1;
+            });
         }
 
         renderContent(filtered);
