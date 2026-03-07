@@ -249,7 +249,7 @@
                 fetch('/api/catalog/verified')
             ]);
             const infoText = await infoRes.text();
-            const verText = await verRes.text();
+            console.log('INFO:', infoText.substring(0, 200));
             const info = JSON.parse(infoText);
             const ver = JSON.parse(verText);
             allItems = info.items || [];
