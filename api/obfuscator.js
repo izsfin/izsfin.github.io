@@ -196,7 +196,7 @@ function minifyLua(code) {
 
 // ── Main obfuscate ──────────────Minify = false─────────────────────────────────────────
 
-function obfuscate(source, minify = false) {   
+function obfuscate(source) {   
     const { data: payload, rot, salt1, salt2 } = encryptPayload(source);
 
     // Dynamic key table
