@@ -248,8 +248,10 @@
                 fetch('/api/catalog/info'),
                 fetch('/api/catalog/verified')
             ]);
-            const info = await infoRes.json();
-            const ver = await verRes.json();
+            const infoText = await infoRes.text();
+            const verText = await verRes.text();
+            const info = JSON.parse(infoText);
+            const ver = JSON.parse(verText);
             allItems = info.items || [];
             verifiedAuthors = ver.verified || [];
             renderGrid(allItems);
