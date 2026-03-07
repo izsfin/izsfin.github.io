@@ -320,17 +320,16 @@ export default async function handler(req, res) {
     }
 
     if (code.length > 50000) {
-        return res.status(400).json({ error: 'Code too large (max 50KB)' });
+      return res.status(400).json({ error: 'Code too large (max 50KB)' });
     }
-
     try {
-        const result = obfuscate(code.trim());
+      const result = obfuscate(code.trim(), req.body?.minify === true);
         return res.status(200).json({
-            success: true,
-            result,
-            size: result.length
-        });
+          success: true,
+           result,
+           size: result.length
+       });
     } catch (e) {
-        return res.status(500).json({ error: 'Obfuscation failed: ' + e.message });
+       return res.status(500).json({ error: 'Obfuscation failed: ' + e.message });
     }
 }
