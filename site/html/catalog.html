@@ -244,13 +244,12 @@
 
 async function loadData() {
     try {
-        const infoRes = await fetch('/api/catalog/info');
-        const infoText = await infoRes.text();
-        const info = JSON.parse(infoText);
+const infoRes = await fetch('https://raw.githubusercontent.com/mewix1337/ethereos/main/api/catalog/info.json');
+const infoText = await infoRes.text();
+const info = JSON.parse(infoText);
 
-const verRes = await fetch('/api/catalog/verified');
+const verRes = await fetch('https://raw.githubusercontent.com/mewix1337/ethereos/main/api/catalog/verified.json');
 const verText = await verRes.text();
-console.log('VER:', verText.substring(0, 200));
 const ver = JSON.parse(verText);
 
         allItems = info.items || [];
