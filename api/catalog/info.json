@@ -37,8 +37,8 @@
       "type": "body"
     },
     {
-      "id": "pal-face-static",
-      "name": "Pal Face [Static]",
+      "id": "pal-face-classic",
+      "name": "Pal Face",
       "author": "nilletMS",
       "preview": "site/catalog/PalFace/preview.png",
       "command": "_G(\"Pal Face Static\", \"once\")",
@@ -47,7 +47,7 @@
     },
     {
       "id": "pal-face",
-      "name": "Pal Face [Not Static]",
+      "name": "Pal Face",
       "author": "nilletMS",
       "preview": "site/catalog/PalFace/NSpreview.png",
       "command": "_G(\"Pal Face\", \"once\")",
