@@ -248,9 +248,10 @@ async function loadData() {
         const infoText = await infoRes.text();
         const info = JSON.parse(infoText);
 
-        const verRes = await fetch('/api/catalog/verified');
-        const verText = await verRes.text();
-        const ver = JSON.parse(verText);
+const verRes = await fetch('/api/catalog/verified');
+const verText = await verRes.text();
+console.log('VER:', verText.substring(0, 200));
+const ver = JSON.parse(verText);
 
         allItems = info.items || [];
         verifiedAuthors = ver.verified || [];
