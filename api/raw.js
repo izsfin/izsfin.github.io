@@ -46,8 +46,10 @@ export default async function handler(req, res) {
     // /catalog/BlackCatEars → catalog-item.html (item ID читается на клиенте из URL)
       return serveFallback(res, "catalog-item.html", selectedLang);
      }
-    if (rawPath === "api/catalog/info" || rawPath === "api/catalog/verified") {
+    if (rawPath === "api/catalog/info" || rawPath === "api/catalog/info.json" ||
+      rawPath === "api/catalog/verified" || rawPath === "api/catalog/verified.json") {
       codeBranch = "main";
+    }
     }
     // --- 4. STATUS ДОМЕН ---
     if (host.includes("celius-status")) {
@@ -221,7 +223,7 @@ export default async function handler(req, res) {
         if (isRoblox) return res.status(500).send("-- Celius Error: " + e.message);
         return serveFallback(res, fallbackFile, selectedLang);
     }
-}
+
 
 async function serveFallback(res, file, lang) {
     try {
