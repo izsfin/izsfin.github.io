@@ -13,7 +13,7 @@
         .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -3; }
         .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%), rgba(255,255,255,0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
         .grid-layer { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px); background-size: 50px 50px; z-index: -1; }
-        .main { position: relative; z-index: 2; padding: 36px 36px 100px; }
+        .main { position: relative; z-index: 2; padding: 36px 36px 120px; }
         .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
         .page-title { font-size: 32px; font-weight: 800; color: white; letter-spacing: 1px; }
         .search-btn { font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700; padding: 10px 24px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(10,11,15,0.6); backdrop-filter: blur(20px); color: white; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
@@ -54,7 +54,7 @@
         .script-search-input:focus { border-color: rgba(99,102,241,0.4); }
         .modal-search-btn { width: 100%; margin-top: 22px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700; padding: 13px; border-radius: 10px; border: 1px solid rgba(99,102,241,0.3); background: rgba(99,102,241,0.1); color: white; cursor: pointer; transition: all 0.2s; }
         .modal-search-btn:hover { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.6); }
-        .bottom-nav { position: fixed; bottom: 25px; left: 25px; z-index: 999; background: rgba(10,11,15,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center; }
+        .bottom-nav { position: fixed; bottom: 25px; left: 25px; z-index: 9999; background: rgba(10,11,15,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center; }
         .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
         .nav-link:hover { color: white; }
         .nav-link.active-page { color: rgba(160,140,255,0.8); }

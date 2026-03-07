@@ -91,16 +91,14 @@
             border: none;
             outline: none;
             resize: none;
-            padding: 14px 16px !important;
+            padding: 14px 16px;
             font-family: 'Poppins', monospace;
             font-size: 12px;
             line-height: 1.75;
             color: rgba(255,255,255,0.7);
             width: 100%;
-       }
-        textarea:focus {
-            outline: none;
         }
+
         textarea::placeholder { color: rgba(255,255,255,0.15); }
         textarea::-webkit-scrollbar { width: 3px; }
         textarea::-webkit-scrollbar-track { background: transparent; }
@@ -313,7 +311,6 @@
     <span onclick="window.location.href='/'" class="nav-link">Home</span>
     <span onclick="window.location.href='/catalog'" class="nav-link">Catalog</span>
     <span onclick="window.location.href='/obfuscator'" class="nav-link active-page">Obfuscator</span>
-    <span onclick="window.location.href='/getkey'" class="nav-link">Authentication</span>
     <span onclick="window.location.href='/status'" class="nav-link">Status</span>
     <span onclick="window.open('https://discord.gg/TRPZg4Xfkq','_blank')" class="nav-link">Discord</span>
 </div>
