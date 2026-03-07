@@ -244,7 +244,7 @@
 
 async function loadData() {
     try {
-const infoRes = await fetch('https://raw.githubusercontent.com/mewix1337/ethereos/main/api/catalog/info.json');
+const infoRes = await fetch('https://raw.githubusercontent.com/mewix1337/ethereos/refs/heads/main/api/catalog/info.json?token=GHSAT0AAAAAADVXOTUAXEVOH3ASCI5RNOYY2NMKCZQ');
 const infoText = await infoRes.text();
 const info = JSON.parse(infoText);
 
