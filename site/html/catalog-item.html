@@ -9,80 +9,51 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background-color: #02040a;
-            color: #d1d1d1;
-            font-family: 'Poppins', sans-serif;
-            height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-
+        body { background-color: #02040a; color: #d1d1d1; font-family: 'Poppins', sans-serif; min-height: 100vh; overflow-x: hidden; }
         .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -3; }
         .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%), rgba(255,255,255,0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
         .grid-layer { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px); background-size: 50px 50px; z-index: -1; }
 
-        .main {
-            flex: 1; display: flex; align-items: center; justify-content: center;
-            position: relative; z-index: 2; padding: 28px;
+        .page { position: relative; z-index: 2; padding: 80px 36px 100px; max-width: 1100px; margin: 0 auto; }
+
+        /* Layout */
+        .item-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+            align-items: start;
         }
 
-        /* Card */
-        .item-card {
+        /* Left — selected item card */
+        .selected-card {
             background: rgba(10,11,15,0.6); backdrop-filter: blur(24px);
             border: 1px solid rgba(255,255,255,0.07); border-radius: 16px;
-            width: 340px; overflow: hidden;
+            overflow: hidden;
         }
-
-        /* Preview */
         .preview-box {
             width: 100%; aspect-ratio: 1;
             background: rgba(255,255,255,0.03);
             position: relative; overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
-        .preview-box img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .no-preview-txt {
-            font-size: 13px; font-weight: 600;
-            color: rgba(255,255,255,0.2); letter-spacing: 0.5px;
-        }
-
-        /* Author badge */
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .no-preview-txt { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.2); }
         .author-badge {
             position: absolute; top: 12px; left: 12px;
             background: rgba(10,11,15,0.75); backdrop-filter: blur(12px);
             border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
-            padding: 5px 12px;
-            font-size: 11px; font-weight: 700;
-            color: rgba(255,255,255,0.6); letter-spacing: 0.3px;
+            padding: 5px 12px; font-size: 11px; font-weight: 700;
+            color: rgba(255,255,255,0.6);
         }
-
-        /* Info */
-        .item-info { padding: 20px 20px 22px; }
-
-        .item-name {
-            font-size: 20px; font-weight: 800; color: white;
-            margin-bottom: 16px; letter-spacing: 0.3px;
-        }
-
-        .label {
-            font-size: 10px; font-weight: 700;
-            color: rgba(255,255,255,0.25); letter-spacing: 1.5px;
-            text-transform: uppercase; margin-bottom: 6px;
-        }
-
+        .card-info { padding: 20px 20px 22px; }
+        .item-name { font-size: 20px; font-weight: 800; color: white; margin-bottom: 16px; }
+        .label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.25); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
         .command-box {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
             border-radius: 8px; padding: 11px 14px;
-            font-size: 12px; font-weight: 600;
-            color: rgba(155,135,245,0.9);
-            word-break: break-all; line-height: 1.5;
-            margin-bottom: 14px;
+            font-size: 12px; font-weight: 600; color: rgba(155,135,245,0.9);
+            word-break: break-all; line-height: 1.5; margin-bottom: 14px;
         }
-
         .copy-btn {
             width: 100%; font-family: 'Poppins', sans-serif;
             font-size: 13px; font-weight: 700; padding: 12px;
@@ -90,15 +61,40 @@
             background: rgba(99,102,241,0.08); color: white;
             cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
         }
-        .copy-btn::after {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(circle at var(--bx,50%) var(--by,50%), rgba(255,255,255,0.07) 0%, transparent 55%);
-            opacity: 0; transition: opacity 0.3s;
-        }
+        .copy-btn::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at var(--bx,50%) var(--by,50%), rgba(255,255,255,0.07) 0%, transparent 55%); opacity: 0; transition: opacity 0.3s; }
         .copy-btn:hover::after { opacity: 1; }
         .copy-btn:hover { border-color: rgba(99,102,241,0.6); background: rgba(99,102,241,0.15); }
 
-        /* Back link */
+        /* Right — related items */
+        .related-section {}
+        .related-header {
+            display: flex; align-items: center; gap: 16px; margin-bottom: 18px;
+        }
+        .related-title { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.25); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+        .related-line { flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .rel-card {
+            background: rgba(10,11,15,0.55); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.07); border-radius: 12px;
+            overflow: hidden; cursor: pointer;
+            transition: border-color 0.25s, transform 0.2s;
+        }
+        .rel-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .rel-preview { width: 100%; aspect-ratio: 1; background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .rel-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .rel-no-preview { font-size: 10px; color: rgba(255,255,255,0.15); font-weight: 600; }
+        .rel-info { padding: 10px 12px 12px; }
+        .rel-name { font-size: 11px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .no-related { font-size: 13px; color: rgba(255,255,255,0.2); font-weight: 600; padding: 40px 0; }
+
+        /* Back */
         .back-link {
             position: fixed; top: 28px; left: 28px; z-index: 10;
             font-size: 11px; font-weight: 700; letter-spacing: 1px;
@@ -109,37 +105,26 @@
         .back-link:hover { color: white; }
 
         /* Bottom nav */
-        .bottom-nav {
-            position: fixed; bottom: 25px; left: 25px;
-            background: rgba(10,11,15,0.6); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
-            padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center;
-        }
+        .bottom-nav { position: fixed; bottom: 25px; left: 25px; background: rgba(10,11,15,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center; }
         .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
         .nav-link:hover { color: white; }
+        .nav-link.active-page { color: rgba(160,140,255,0.8); }
 
         /* Toast */
-        .toast {
-            position: fixed; bottom: 24px; right: 24px;
-            background: rgba(10,11,15,0.9); backdrop-filter: blur(20px);
-            border: 1px solid rgba(99,102,241,0.35); color: rgba(160,140,255,0.9);
-            font-size: 12px; font-weight: 600; padding: 10px 20px;
-            border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            transform: translateY(14px); opacity: 0;
-            transition: all 0.22s ease; z-index: 100; pointer-events: none;
-        }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: rgba(10,11,15,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(99,102,241,0.35); color: rgba(160,140,255,0.9); font-size: 12px; font-weight: 600; padding: 10px 20px; border-radius: 10px; transform: translateY(14px); opacity: 0; transition: all 0.22s ease; z-index: 100; pointer-events: none; }
         .toast.show { transform: translateY(0); opacity: 1; }
 
-        /* Not found */
-        .not-found {
-            text-align: center;
-        }
+        .not-found { text-align: center; padding: 80px 0; }
         .not-found h2 { font-size: 28px; font-weight: 800; color: white; margin-bottom: 10px; }
         .not-found p { font-size: 13px; color: rgba(255,255,255,0.3); }
+
+        @media (max-width: 700px) {
+            .item-layout { grid-template-columns: 1fr; }
+            .related-grid { grid-template-columns: repeat(3, 1fr); }
+        }
     </style>
 </head>
 <body>
-
 <div class="bg-base"></div>
 <div class="bg-glow"></div>
 <div class="grid-layer"></div>
@@ -149,72 +134,101 @@
     Catalog
 </div>
 
-<div class="main" id="mainContent">
-    <div style="font-size:13px;color:rgba(255,255,255,0.2);font-weight:600;">Loading...</div>
+<div class="page" id="mainContent">
+    <div style="font-size:13px;color:rgba(255,255,255,0.2);font-weight:600;padding-top:40px;">Loading...</div>
 </div>
 
 <div class="bottom-nav">
     <span onclick="window.location.href='/'" class="nav-link">Home</span>
+    <span onclick="window.location.href='/catalog'" class="nav-link active-page">Catalog</span>
+    <span onclick="window.location.href='/obfuscator'" class="nav-link">Obfuscator</span>
     <span onclick="window.open('https://discord.gg/TRPZg4Xfkq','_blank')" class="nav-link">Discord</span>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+    const INFO_URL = 'https://raw.githubusercontent.com/mewix1337/ethereos/refs/heads/main/api/catalog/info.json?token=GHSAT0AAAAAADVXOTUAXEVOH3ASCI5RNOYY2NMKCZQ';
+
     window.addEventListener('mousemove', e => {
         document.body.style.setProperty('--x', e.clientX + 'px');
         document.body.style.setProperty('--y', e.clientY + 'px');
     });
 
-    // Extract item ID from URL: /catalog/SomeItemId
     const pathParts = window.location.pathname.split('/').filter(Boolean);
     const itemId = pathParts[pathParts.length - 1];
 
     async function loadItem() {
         try {
-            const res = await fetch('/api/catalog/info');
+            const res = await fetch(INFO_URL);
             const data = JSON.parse(await res.text());
-            const item = (data.items || []).find(i => i.id.toLowerCase() === itemId.toLowerCase());
+            const items = data.items || [];
+            const item = items.find(i => i.id.toLowerCase() === itemId.toLowerCase());
 
             if (!item) {
-                document.getElementById('mainContent').innerHTML = `
-                    <div class="not-found">
-                        <h2>Item not found</h2>
-                        <p>No item with id "${itemId}"</p>
-                    </div>`;
+                document.getElementById('mainContent').innerHTML = `<div class="not-found"><h2>Item not found</h2><p>No item with id "${itemId}"</p></div>`;
                 return;
             }
 
             document.title = `Celius | ${item.name}`;
 
+            // Related: same category + same type, exclude current
+            const related = items.filter(i => i.id !== item.id && i.category === item.category && i.type === item.type).slice(0, 9);
+
             const previewHtml = item.preview
                 ? `<img src="/${item.preview}" alt="${item.name}" onerror="this.outerHTML='<span class=\\'no-preview-txt\\'>No preview</span>'">`
                 : '<span class="no-preview-txt">No preview</span>';
 
+            let relatedHtml = '';
+            if (related.length) {
+                const cards = related.map(r => {
+                    const rp = r.preview
+                        ? `<img src="/${r.preview}" alt="${r.name}" onerror="this.outerHTML='<span class=\\'rel-no-preview\\'>No preview</span>'">`
+                        : '<span class="rel-no-preview">No preview</span>';
+                    return `<div class="rel-card" onclick="window.location.href='/catalog/${r.id}'">
+                        <div class="rel-preview">${rp}</div>
+                        <div class="rel-info"><div class="rel-name">${r.name}</div></div>
+                    </div>`;
+                }).join('');
+                relatedHtml = `
+                    <div class="related-section">
+                        <div class="related-header">
+                            <div class="related-title">Similar Items</div>
+                            <div class="related-line"></div>
+                        </div>
+                        <div class="related-grid">${cards}</div>
+                    </div>`;
+            } else {
+                relatedHtml = `<div class="related-section"><div class="no-related">No similar items found</div></div>`;
+            }
+
             document.getElementById('mainContent').innerHTML = `
-                <div class="item-card">
-                    <div class="preview-box">
-                        ${previewHtml}
-                        <div class="author-badge">${item.author || 'Unknown'}</div>
+                <div class="item-layout">
+                    <div class="selected-card">
+                        <div class="preview-box">
+                            ${previewHtml}
+                            <div class="author-badge">${item.author || 'Unknown'}</div>
+                        </div>
+                        <div class="card-info">
+                            <div class="item-name">${item.name}</div>
+                            <div class="label">Command</div>
+                            <div class="command-box" id="cmdBox">${item.command}</div>
+                            <button class="copy-btn" id="copyBtn" onclick="copyCmd()">Copy</button>
+                        </div>
                     </div>
-                    <div class="item-info">
-                        <div class="item-name">${item.name}</div>
-                        <div class="label">Command</div>
-                        <div class="command-box" id="cmdBox">${item.command}</div>
-                        <button class="copy-btn" id="copyBtn" onclick="copyCmd()">Copy</button>
-                    </div>
+                    ${relatedHtml}
                 </div>`;
 
-            // Button glow
             const btn = document.getElementById('copyBtn');
-            btn.addEventListener('mousemove', e => {
-                const r = btn.getBoundingClientRect();
-                btn.style.setProperty('--bx', ((e.clientX - r.left) / r.width * 100) + '%');
-                btn.style.setProperty('--by', ((e.clientY - r.top) / r.height * 100) + '%');
-            });
-
+            if (btn) {
+                btn.addEventListener('mousemove', e => {
+                    const r = btn.getBoundingClientRect();
+                    btn.style.setProperty('--bx', ((e.clientX - r.left) / r.width * 100) + '%');
+                    btn.style.setProperty('--by', ((e.clientY - r.top) / r.height * 100) + '%');
+                });
+            }
         } catch(e) {
-            document.getElementById('mainContent').innerHTML = `<div style="font-size:13px;color:rgba(248,113,113,0.7);font-weight:600;">Failed to load</div>`;
+            document.getElementById('mainContent').innerHTML = `<div style="font-size:13px;color:rgba(248,113,113,0.7);font-weight:600;padding-top:40px;">Failed to load: ${e.message}</div>`;
         }
     }
 
