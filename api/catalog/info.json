@@ -22,7 +22,7 @@
       "id": "guns-x-alien",
       "name": "Gunslinger & Alien",
       "author": "nilletMS",
-      "preview": "site/catalog/GunsAlien/preview.png",
+      "preview": "site/catalog/GxA/preview.png",
       "command": "_G(\"Guns & Alien\", \"once\")",
       "category": "Body"
     }
