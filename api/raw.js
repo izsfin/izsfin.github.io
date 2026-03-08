@@ -55,7 +55,19 @@ export default async function handler(req, res) {
       return serveFallback(res, "catalog-item.html", selectedLang);
      }
     if (rawPath === "api/catalog/info" || rawPath === "api/catalog/verified") {
-      codeBranch = "main";
+        try {
+            const fileName = rawPath === "api/catalog/info" ? "info.json" : "verifed.json";
+            const { data } = await octokit.repos.getContent({
+                owner: OWNER, repo: REPO,
+                path: "api/catalog/" + fileName, ref: "main"
+            });
+            const content = Buffer.from(data.content, "base64").toString("utf-8");
+            res.setHeader("Content-Type", "application/json");
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            return res.status(200).send(content);
+        } catch(e) {
+            return res.status(404).json({ error: "Not found", detail: e.message });
+        }
     }
     // --- 4. STATUS ДОМЕН ---
     if (host.includes("celius-status")) {
