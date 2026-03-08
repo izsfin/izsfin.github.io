@@ -36,7 +36,7 @@ local Library = {
         Name = "Face Blind Fold",
         Weld = "Head",
         MeshID = "rbxassetid://120177601931635",
-        Texture = "rbxassetid://111644589425325",
+        TextureID = "rbxassetid://111644589425325",
         CFrame = CFrame.new(0, -0.2, 0) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
         ReqPlaceID = 0
     },
@@ -63,7 +63,7 @@ local Library = {
         Name = "Cap",
         Weld = "Head",
         MeshID = "rbxassetid://92976453142475",
-        Texture = "rbxassetid://84600492178264",
+        TextureID = "rbxassetid://84600492178264",
         CFrame = CFrame.new(0, -0.4, -0.05) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
         ReqPlaceID = 0
     },
@@ -90,7 +90,7 @@ local Library = {
         Name = "Back Tail",
         Weld = "Torso",
         MeshID = "rbxassetid://85052393126449",
-        Texture = "rbxassetid://76742493960027",
+        TextureID = "rbxassetid://76742493960027",
         CFrame = CFrame.new(0, 0.7, -0.7) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
         ReqPlaceID = 0
     },
@@ -99,7 +99,7 @@ local Library = {
         Name = "Two Time Back",
         Weld = "Torso",
         MeshID = "rbxassetid://102535235285318",
-        Texture = "rbxassetid://132597092841215",
+        TextureID = "rbxassetid://132597092841215",
         CFrame = CFrame.new(0, 0.7, -0.8) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
         ReqPlaceID = 0
     },
@@ -204,7 +204,7 @@ local Library = {
         Name = "Hat",
         Weld = "Head",
         MeshID = "rbxassetid://73083430479187",
-        Texture = "rbxassetid://104381302798685",
+        TextureID = "rbxassetid://104381302798685",
         CFrame = CFrame.new(-0.013, 0.1, -0.005, 1, 0, 0, 0, 1, 0, 0, 0, 1),
 		ReqPlaceID = 0
     },
@@ -272,7 +272,7 @@ local function LoadConfig(name)
 end
 
 local function GetVersion()
-    local s, r = pcall(game.HttpGet, game, "https://api-celius.vercel.app/Version")
+    local s, r = pcall(game.HttpGet, game, "https://ethereos-api.vercel.app/Version")
     return s and r:gsub("\n", "") or "v0.0.0 [Unknown]"
 end
 
@@ -378,7 +378,7 @@ local function Apply(data)
         for _, pN in pairs(parts) do if data[pN] then local m = Instance.new("CharacterMesh", char); m.BodyPart = Enum.BodyPart[pN]; m.MeshId = data[pN]:match("%d+") end end
     elseif data.Class == "Accessory" then
         DoClear(lowName); local part = Instance.new("Part", char); part.Name, part.Size, part.CanCollide = "G_Item_"..lowName, Vector3.new(1,1,1), false
-        local m = Instance.new("SpecialMesh", part); m.MeshId, m.TextureId = data.MeshID, data.Texture or ""
+        local m = Instance.new("SpecialMesh", part); m.MeshId, m.TextureId = data.MeshID, data.Texture or data.TextureID or ""
         local w = Instance.new("Weld", part); w.Part0, w.Part1, w.C0 = part, char:FindFirstChild(data.Weld or "Head"), data.CFrame
     elseif data.Class == "AnimID" then
         if ActiveAnimations[lowName] then DoClear(lowName) return end
@@ -456,4 +456,4 @@ lp.CharacterAdded:Connect(function()
         if IsPlaceAllowed(d) then Apply(d) end 
     end 
 end)
-print(" Cometix CMD load ! | " .. GetVersion())
+print(" Nixu CMD load ! | " .. GetVersion())
