@@ -253,11 +253,11 @@ local Library = {
 -- [ ПЕРЕМЕННЫЕ ]
 local lp = game:GetService("Players").LocalPlayer
 local HttpService, RunService, UIS = game:GetService("HttpService"), game:GetService("RunService"), game:GetService("UserInputService")
-local folderPath, activeAutoRespawns, ActiveAnimations, _G_CurrentMode = "KayozNT/Cometix/CMD", {}, {}, "once"
+local folderPath, activeAutoRespawns, ActiveAnimations, _G_CurrentMode = "nilletMS/Nixu/spectra", {}, {}, "once"
 
 -- [ СЕРВИСЫ ]
 local function SaveConfig(name, data)
-    if not isfolder("Cometix") then makefolder("Cometix") end
+    if not isfolder("Nixu") then makefolder("Nixu") end
     if not isfolder(folderPath) then makefolder(folderPath) end
     writefile(folderPath .. "/" .. name .. ".json", HttpService:JSONEncode(data))
 end
@@ -272,7 +272,7 @@ local function LoadConfig(name)
 end
 
 local function GetVersion()
-    local s, r = pcall(game.HttpGet, game, "https://raw.githubusercontent.com/mewix1337/DxBreak/refs/heads/main/version.txt")
+    local s, r = pcall(game.HttpGet, game, "https://api-celius.vercel.app/Version")
     return s and r:gsub("\n", "") or "v0.0.0 [Unknown]"
 end
 
@@ -414,7 +414,7 @@ local function MainHandler(name, mode, key)
 
     if n == "cmd" then
         local version = GetVersion()
-        local text = "--[[\n    Cometix CMD " .. version .. "\n\nClass        Name               Function\n"
+        local text = "--[[\n    Spectral Commands " .. version .. "\n\nClass        Name               Function\n"
         for _, item in pairs(Library) do
             -- В CMD показываем только те вещи, которые доступны здесь
             if IsPlaceAllowed(item) then
