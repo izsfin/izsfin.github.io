@@ -145,9 +145,37 @@ local Library = {
     },
     {
         Class = "Outfit",
-        Name = "Bape",
+        Name = "Black Bape",
+        ShirtID = "rbxassetid://12479984354",
+        PantsID = "rbxassetid://86502284322720",
+		ReqPlaceID = 0
+    },
+    {
+        Class = "Outfit",
+        Name = "Blue Bape #1",
+        ShirtID = "rbxassetid://104101450723927",
+        PantsID = "rbxassetid://13548583082",
+		ReqPlaceID = 0
+    },
+    {
+        Class = "Outfit",
+        Name = "Blue Bape #2",
+        ShirtID = "rbxassetid://1480219794",
+        PantsID = "rbxassetid://85218720417005",
+		ReqPlaceID = 0
+    },
+    {
+        Class = "Outfit",
+        Name = "Purple Bape #1",
         ShirtID = "rbxassetid://12594352160",
-        PantsID = "rbxassetid://4748004844",
+        PantsID = "rbxassetid://4748004844", 
+		ReqPlaceID = 0
+    },
+    {
+        Class = "Outfit",
+        Name = "Purple Bape #2",
+        ShirtID = "rbxassetid://12594352160",
+        PantsID = "rbxassetid://2032528065", 
 		ReqPlaceID = 0
     },
     {
