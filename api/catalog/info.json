@@ -55,10 +55,18 @@
       "type": "dhead"
     },
     {
-      "id": "purple-bape",
-      "name": "Purple Bape",
+      "id": "purple-bape-v1",
+      "name": "Purple Bape #1",
       "author": "nilletMS",
-      "preview": "site/catalog/bape/purple/preview.png",
+      "preview": "site/catalog/bape/purple/v.1/preview.png",
+      "command": "_G(\"Purple Bape\", \"once\")",
+      "category": "Outfits"
+    },
+    {
+      "id": "purple-bape-v2",
+      "name": "Purple Bape #2",
+      "author": "nilletMS",
+      "preview": "site/catalog/bape/purple/v.2/preview.png",
       "command": "_G(\"Purple Bape\", \"once\")",
       "category": "Outfits"
     },
@@ -68,6 +76,22 @@
       "author": "nilletMS",
       "preview": "site/catalog/bape/black/preview.png",
       "command": "_G(\"Black Bape\", \"once\")",
+      "category": "Outfits"
+    },
+    {
+      "id": "blue-bape-v1",
+      "name": "Blue Bape #1",
+      "author": "nilletMS",
+      "preview": "site/catalog/bape/blue/v.1/preview.png",
+      "command": "_G(\"Blue Bape #1\", \"once\")",
+      "category": "Outfits"
+    },
+    {
+      "id": "blue-bape-v2",
+      "name": "Blue Bape #2",
+      "author": "nilletMS",
+      "preview": "site/catalog/bape/blue/v.2/preview.png",
+      "command": "_G(\"Blue Bape #2\", \"once\")",
       "category": "Outfits"
     },
     {
