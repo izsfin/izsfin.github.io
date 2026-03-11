@@ -1,3 +1,5 @@
+local RELOADASS_URL = "https://ethereos.vercel.app/assets"
+
 getgenv().assets = {}
 
 local function ensurePath(path)
@@ -36,7 +38,7 @@ end
 -- Перезапуск с сайта
 function assets.restart()
     assets.unload()
-    loadstring(game:HttpGet(assets_url))()
+    loadstring(game:HttpGet(RELOADASS_URL))()
 end
 
 function assets.unload()
@@ -47,6 +49,5 @@ function assets.unload()
     print("✅ assets выгружен!")
 end
 
-local assets_url = "https://ethereos.vercel.app/assets"
-
 loadAssets()
+
