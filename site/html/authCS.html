@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ethereos Auth</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0c0c0c;
+    color: #c8c8c8;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    min-height: 100vh;
+    padding: 20px;
+    line-height: 1.7;
+  }
+  #terminal { max-width: 760px; margin: 0 auto; }
+  .line { white-space: pre-wrap; }
+  .dim    { color: #444; }
+  .accent { color: #6391e0; }
+  .ok     { color: #55c080; }
+  .err    { color: #e05555; }
+  .warn   { color: #e0b855; }
+  .white  { color: #ffffff; }
+  .input-row { display: flex; align-items: center; margin-top: 2px; }
+  .prompt { color: #6391e0; user-select: none; white-space: pre; }
+  #cmdInput {
+    background: transparent; border: none; outline: none;
+    color: #c8c8c8; font-family: 'Courier New', Courier, monospace;
+    font-size: 14px; flex: 1; caret-color: #6391e0;
+  }
+  .bar-wrap { color: #6391e0; }
+</style>
+</head>
+<body>
+<div id="terminal"></div>
+<script>
+const PROMPT = "E:/ethereos/auth/v1 || ";
+const HELPER = "E:/Helper || ";
+const API    = "/api";
+const BOT    = "@nixuMSbot";
+
+let state    = "idle";
+let authCode = "";
+let pollTimer = null;
+
+// ── DOM helpers ──────────────────────────────────────────────────────────────
+function ln(text, cls) {
+    const d = document.createElement("div");
+    d.className = "line" + (cls ? " " + cls : "");
+    d.textContent = text;
+    document.getElementById("terminal").appendChild(d);
+    window.scrollTo(0, document.body.scrollHeight);
+    return d;
+}
+function blank() { ln(""); }
+
+function removeInput() {
+    const r = document.getElementById("inputRow");
+    if (r) r.remove();
+}
+
+function showInput(masked) {
+    removeInput();
+    const row = document.createElement("div");
+    row.className = "input-row"; row.id = "inputRow";
+    const p = document.createElement("span");
+    p.className = "prompt"; p.textContent = PROMPT;
+    const inp = document.createElement("input");
+    inp.type = masked ? "password" : "text";
+    inp.id = "cmdInput"; inp.autocomplete = "off"; inp.spellcheck = false;
+    inp.style.cssText = "background:transparent;border:none;outline:none;color:#c8c8c8;font-family:'Courier New',monospace;font-size:14px;flex:1;caret-color:#6391e0;";
+    row.appendChild(p); row.appendChild(inp);
+    document.getElementById("terminal").appendChild(row);
+    inp.focus();
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); submit(inp.value.trim()); } });
+    window.scrollTo(0, document.body.scrollHeight);
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Progress bar ─────────────────────────────────────────────────────────────
+async function progressBar(label, ms) {
+    const total = 20;
+    const el = ln(HELPER + label + " [" + " ".repeat(total) + "]   0%", "bar-wrap");
+    for (let i = 1; i <= total; i++) {
+        await delay(ms / total);
+        const pct = Math.round((i / total) * 100);
+        el.textContent = HELPER + label + " [" + "█".repeat(i) + " ".repeat(total - i) + "]  " + pct + "%";
+    }
+}
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+async function boot() {
+    const boots = [
+        "Starting Ethereos Auth Server...",
+        "Loading modules...",
+        "Connecting to Redis...",
+        "Initializing HWID engine...",
+        "Auth service ready.",
+    ];
+    for (const b of boots) { await delay(80); ln(b, "dim"); }
+    await delay(300); blank();
+    ln(HELPER.trimEnd(), "accent"); blank();
+    ln("  Commands:", "white"); blank();
+    ln("  /auth          |  Start authentication", "accent");
+    ln("  /fca = CODE    |  Fast auth with FCA code", "accent");
+    ln("  /exit          |  Go to ethereos.vercel.app", "accent");
+    ln("  /contact       |  Open contact page", "accent");
+    blank();
+    state = "idle";
+    showInput(false);
+}
+
+// ── HWID fingerprint ─────────────────────────────────────────────────────────
+function getHWID() {
+    const raw = [navigator.userAgent, navigator.language,
+        screen.width+"x"+screen.height, screen.colorDepth,
+        new Date().getTimezoneOffset(), navigator.hardwareConcurrency||0,
+        navigator.platform||""].join("|");
+    let h = 0;
+    for (let i = 0; i < raw.length; i++) { h = ((h << 5) - h) + raw.charCodeAt(i); h |= 0; }
+    return Math.abs(h).toString(16).toUpperCase().padStart(8, "0");
+}
+
+// ── Command handler ───────────────────────────────────────────────────────────
+async function submit(cmd) {
+    removeInput();
+    ln(PROMPT + cmd, "dim");
+    blank();
+    await handle(cmd);
+}
+
+async function handle(cmd) {
+    const low = cmd.toLowerCase().trim();
+
+    if (low === "/exit") {
+        ln(HELPER + "Opening ethereos.vercel.app...", "dim");
+        await delay(400);
+        window.open("https://ethereos.vercel.app", "_blank");
+        blank(); showInput(false); return;
+    }
+
+    if (low === "/contact") {
+        ln(HELPER + "Opening contact page...", "dim");
+        await delay(400);
+        window.open("https://ethereos.vercel.app/contact", "_blank");
+        blank(); showInput(false); return;
+    }
+
+    if (low === "/auth") {
+        await startAuth(); return;
+    }
+
+    if (low.startsWith("/fca =") || low.startsWith("/fca=")) {
+        const code = cmd.replace(/^\/fca\s*=\s*/i, "").trim();
+        await doFCA(code); return;
+    }
+
+    // state-based input (no slash command)
+    if (state === "awaiting_code") {
+        authCode = cmd;
+        await sendCodeToBot(cmd); return;
+    }
+
+    ln(HELPER + "Unknown command. Type /auth to start.", "err");
+    blank(); showInput(false);
+}
+
+// ── /auth flow ────────────────────────────────────────────────────────────────
+async function startAuth() {
+    state = "idle";
+    ln(HELPER + "Generating auth code...", "dim");
+    await progressBar("Creating code", 1200);
+
+    try {
+        const r = await fetch(`${API}/hwid/auth/v1/start`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ hwid: getHWID() })
+        });
+        const data = await r.json();
+        if (!data.ok) {
+            ln(HELPER + "Error: " + (data.error || "Failed"), "err");
+            blank(); showInput(false); return;
+        }
+        authCode = data.code;
+        blank();
+        ln(HELPER + "Your auth code:  " + data.code, "white");
+        blank();
+        ln(HELPER + "Write this code to our Telegram bot — " + BOT, "accent");
+        ln(HELPER + "Waiting for confirmation...", "dim");
+        blank();
+
+        state = "awaiting_bot";
+        startPolling(data.session);
+    } catch(e) {
+        ln(HELPER + "Connection error.", "err");
+        blank(); showInput(false);
+    }
+}
+
+// ── Polling ───────────────────────────────────────────────────────────────────
+function startPolling(session) {
+    const waitEl = document.querySelector(".line.dim:last-of-type");
+    let elapsed = 0;
+    const MAX = 600; // 10 min
+
+    pollTimer = setInterval(async () => {
+        elapsed += 5;
+        if (elapsed >= MAX) {
+            clearInterval(pollTimer);
+            if (waitEl) waitEl.style.color = "#444";
+            ln(HELPER + "Failed to auth! Session expired.", "err");
+            blank(); state = "idle"; showInput(false); return;
+        }
+        try {
+            const r = await fetch(`${API}/hwid/auth/v1/poll?session=${session}`);
+            const data = await r.json();
+            if (data.status === "confirmed") {
+                clearInterval(pollTimer);
+                if (waitEl) waitEl.style.color = "#444";
+                blank();
+                ln(HELPER + "Successfully authorized!", "ok");
+                ln(HELPER + "FCA: " + data.fca, "accent");
+                blank();
+                ln(HELPER + "Save your FCA code for fast login: /fca = " + data.fca, "white");
+                document.cookie = `eth_auth=${data.token}; path=/; max-age=${60*60*24*30}; SameSite=Strict`;
+                state = "done";
+                await delay(1500);
+                window.location.href = "https://ethereos.vercel.app";
+            }
+        } catch(e) {}
+    }, 5000);
+}
+
+// ── /fca flow ─────────────────────────────────────────────────────────────────
+async function doFCA(code) {
+    if (!code) {
+        ln(HELPER + "Usage: /fca = YOUR_FCA_CODE", "err");
+        blank(); showInput(false); return;
+    }
+    ln(HELPER + "Checking FCA code...", "dim");
+    await progressBar("Verifying", 800);
+    try {
+        const r = await fetch(`${API}/hwid/auth/v1/fca`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fca: code, hwid: getHWID() })
+        });
+        const data = await r.json();
+        blank();
+        if (data.ok) {
+            document.cookie = `eth_auth=${data.token}; path=/; max-age=${60*60*24*30}; SameSite=Strict`;
+            ln(HELPER + "Successfully authorized!", "ok");
+            await delay(1200);
+            window.location.href = "https://ethereos.vercel.app";
+        } else {
+            ln(HELPER + "FCA not found or invalid.", "err");
+            blank(); showInput(false);
+        }
+    } catch(e) {
+        ln(HELPER + "Connection error.", "err");
+        blank(); showInput(false);
+    }
+}
+
+boot();
+</script>
+</body>
+</html>

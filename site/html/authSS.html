@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ethereos — Auth</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e0e0ea;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(99,145,224,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,145,224,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+  .glow {
+    position: fixed;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,145,224,0.06) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Card ── */
+  .card {
+    position: relative; z-index: 1;
+    background: rgba(14,14,22,0.96);
+    border: 1px solid rgba(99,145,224,0.18);
+    border-radius: 18px;
+    padding: 44px 40px 36px;
+    width: 440px;
+    box-shadow: 0 8px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,145,224,0.06);
+    transition: filter 0.4s;
+  }
+  .card.blurred { filter: blur(6px) brightness(0.6); pointer-events: none; }
+
+  .logo { text-align: center; margin-bottom: 30px; }
+  .logo h1 {
+    font-size: 20px; font-weight: 700; letter-spacing: 3px;
+    background: linear-gradient(135deg, #6391e0 0%, #3a5fa0 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .logo p { font-size: 10px; color: #3a4a6a; margin-top: 5px; letter-spacing: 2px; text-transform: uppercase; }
+
+  /* ── Steps ── */
+  .steps {
+    display: flex; justify-content: center; gap: 8px; margin-bottom: 30px;
+  }
+  .step {
+    height: 3px; width: 32px; border-radius: 2px;
+    background: rgba(99,145,224,0.15);
+    transition: all 0.4s;
+  }
+  .step.active { background: #6391e0; width: 48px; }
+  .step.done   { background: rgba(85,192,128,0.6); }
+
+  /* ── Panels ── */
+  .panel { display: none; animation: fadeUp 0.3s ease; }
+  .panel.visible { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Field ── */
+  .field-label {
+    font-size: 10px; color: #6391e0; letter-spacing: 1.5px;
+    text-transform: uppercase; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .input-wrap { position: relative; margin-bottom: 14px; }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    background: rgba(20,20,35,0.8);
+    border: 1px solid rgba(99,145,224,0.18);
+    border-radius: 9px;
+    padding: 12px 40px 12px 14px;
+    color: #e0e0ea; font-size: 14px; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+  }
+  input:focus {
+    border-color: rgba(99,145,224,0.5);
+    box-shadow: 0 0 0 3px rgba(99,145,224,0.07);
+  }
+  .input-icon {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: #3a4a6a; font-size: 15px; pointer-events: none;
+  }
+
+  /* ── Button ── */
+  .btn {
+    width: 100%; padding: 13px;
+    background: linear-gradient(135deg, rgba(99,145,224,0.12), rgba(60,95,160,0.12));
+    border: 1px solid rgba(99,145,224,0.3);
+    border-radius: 9px; color: #6391e0;
+    font-size: 13px; font-weight: 600; letter-spacing: 1.5px;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+    text-transform: uppercase;
+  }
+  .btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(99,145,224,0.22), rgba(60,95,160,0.22));
+    border-color: rgba(99,145,224,0.55); color: #a0c0ff;
+    box-shadow: 0 0 20px rgba(99,145,224,0.1);
+  }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ── Status ── */
+  .status {
+    margin-top: 14px; font-size: 12px; text-align: center;
+    min-height: 18px; transition: all 0.3s;
+  }
+  .status.err  { color: #e05555; }
+  .status.ok   { color: #55c080; }
+  .status.info { color: #6391e0; }
+  .status.dim  { color: #555570; }
+
+  .divider {
+    height: 1px; background: rgba(99,145,224,0.08); margin: 20px 0;
+  }
+
+  /* ── Code display ── */
+  .code-box {
+    background: rgba(20,20,35,0.9);
+    border: 1px solid rgba(99,145,224,0.2);
+    border-radius: 9px; padding: 14px;
+    text-align: center; margin-bottom: 16px;
+  }
+  .code-box .code-val {
+    font-size: 26px; font-weight: 700; letter-spacing: 6px;
+    color: #6391e0; font-family: 'Courier New', monospace;
+  }
+  .code-box .code-hint {
+    font-size: 11px; color: #555570; margin-top: 6px;
+  }
+
+  /* ── Waiting spinner ── */
+  .waiting {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; color: #555570; font-size: 13px; margin: 16px 0;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(99,145,224,0.2);
+    border-top-color: #6391e0;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── FCA tag ── */
+  .fca-box {
+    background: rgba(85,192,128,0.06);
+    border: 1px solid rgba(85,192,128,0.2);
+    border-radius: 9px; padding: 14px; text-align: center;
+    margin-bottom: 14px;
+  }
+  .fca-box .fca-label { font-size: 10px; color: #55c080; letter-spacing: 2px; margin-bottom: 6px; }
+  .fca-box .fca-val   { font-size: 15px; font-family: 'Courier New', monospace; color: #a0e0b8; letter-spacing: 2px; }
+
+  /* ── Overlay message ── */
+  .overlay-msg {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; opacity: 0; transition: opacity 0.3s;
+  }
+  .overlay-msg.visible { opacity: 1; }
+  .overlay-msg span {
+    background: rgba(14,14,22,0.95);
+    border: 1px solid rgba(99,145,224,0.25);
+    border-radius: 12px; padding: 16px 28px;
+    font-size: 14px; color: #6391e0; letter-spacing: 1px;
+  }
+
+  /* ── Bottom link ── */
+  .bottom-link {
+    text-align: center; margin-top: 20px;
+    font-size: 11px; color: #3a4a6a;
+  }
+  .bottom-link a { color: #6391e0; text-decoration: none; }
+  .bottom-link a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="glow"></div>
+
+<div class="overlay-msg" id="overlayMsg"><span id="overlayText"></span></div>
+
+<div class="card" id="card">
+  <div class="logo">
+    <h1>ETHEREOS AUTH</h1>
+    <p>Device Authorization System</p>
+  </div>
+
+  <div class="steps">
+    <div class="step active" id="s1"></div>
+    <div class="step" id="s2"></div>
+    <div class="step" id="s3"></div>
+  </div>
+
+  <!-- Panel 1: Start -->
+  <div class="panel visible" id="p1">
+    <div class="field-label">🔒 Authorization</div>
+    <p style="font-size:13px;color:#888;margin-bottom:18px;line-height:1.6">
+      To authorize your device, we'll generate a one-time code.
+      Send it to our Telegram bot to complete verification.
+    </p>
+    <button class="btn" id="startBtn" onclick="startAuth()">GET AUTH CODE</button>
+    <div class="divider"></div>
+    <div class="field-label">⚡ Fast Login (FCA)</div>
+    <div class="input-wrap">
+      <input type="text" id="fcaInput" placeholder="Enter your FCA code" maxlength="16" />
+      <span class="input-icon">⚡</span>
+    </div>
+    <button class="btn" onclick="doFCA()">FAST LOGIN</button>
+    <div class="status" id="st1"></div>
+  </div>
+
+  <!-- Panel 2: Show code + waiting -->
+  <div class="panel" id="p2">
+    <div class="field-label">✅ Code Generated</div>
+    <div class="code-box">
+      <div class="code-val" id="codeVal">——————</div>
+      <div class="code-hint">Send this code to <strong style="color:#6391e0">@nixuMSbot</strong> on Telegram</div>
+    </div>
+    <div class="waiting" id="waitRow">
+      <div class="spinner"></div>
+      <span>Waiting for Telegram confirmation...</span>
+    </div>
+    <div class="status" id="st2"></div>
+  </div>
+
+  <!-- Panel 3: Success -->
+  <div class="panel" id="p3">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:36px">✅</div>
+      <div style="font-size:16px;color:#55c080;font-weight:600;margin-top:8px">Successfully Authorized!</div>
+    </div>
+    <div class="fca-box">
+      <div class="fca-label">YOUR FCA CODE — SAVE IT</div>
+      <div class="fca-val" id="fcaVal">————————————————</div>
+    </div>
+    <p style="font-size:11px;color:#555570;text-align:center;margin-bottom:16px">
+      Use this code for instant login on any device
+    </p>
+    <button class="btn" onclick="window.location.href='https://ethereos.vercel.app'">GO TO SITE →</button>
+  </div>
+
+  <div class="bottom-link">
+    <a href="https://ethereos.vercel.app">ethereos.vercel.app</a>
+  </div>
+</div>
+
+<script>
+const API = "/api";
+let sessionId = "";
+let pollTimer = null;
+
+function setStatus(id, msg, cls) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = "status " + (cls || "");
+}
+
+function setStep(n) {
+    for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById("s" + i);
+        if (i < n)      el.className = "step done";
+        else if (i === n) el.className = "step active";
+        else            el.className = "step";
+    }
+}
+
+function showPanel(n) {
+    for (let i = 1; i <= 3; i++) {
+        document.getElementById("p" + i).className = "panel" + (i === n ? " visible" : "");
+    }
+    setStep(n);
+}
+
+function showOverlay(msg) {
+    document.getElementById("overlayText").textContent = msg;
+    document.getElementById("overlayMsg").classList.add("visible");
+}
+function hideOverlay() {
+    document.getElementById("overlayMsg").classList.remove("visible");
+}
+
+function getHWID() {
+    const raw = [navigator.userAgent, navigator.language,
+        screen.width+"x"+screen.height, screen.colorDepth,
+        new Date().getTimezoneOffset(), navigator.hardwareConcurrency||0,
+        navigator.platform||""].join("|");
+    let h = 0;
+    for (let i = 0; i < raw.length; i++) { h = ((h << 5) - h) + raw.charCodeAt(i); h |= 0; }
+    return Math.abs(h).toString(16).toUpperCase().padStart(8, "0");
+}
+
+async function startAuth() {
+    const btn = document.getElementById("startBtn");
+    btn.disabled = true; btn.textContent = "GENERATING...";
+    setStatus("st1", "Connecting to server...", "dim");
+
+    try {
+        const r = await fetch(`${API}/hwid/auth/v1/start`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ hwid: getHWID() })
+        });
+        const data = await r.json();
+        if (!data.ok) {
+            setStatus("st1", data.error || "Server error", "err");
+            btn.disabled = false; btn.textContent = "GET AUTH CODE"; return;
+        }
+        sessionId = data.session;
+        document.getElementById("codeVal").textContent = data.code;
+        showPanel(2);
+        startPolling();
+    } catch(e) {
+        setStatus("st1", "Connection error", "err");
+        btn.disabled = false; btn.textContent = "GET AUTH CODE";
+    }
+}
+
+function startPolling() {
+    let elapsed = 0;
+    const MAX = 600;
+    pollTimer = setInterval(async () => {
+        elapsed += 5;
+        if (elapsed >= MAX) {
+            clearInterval(pollTimer);
+            document.getElementById("waitRow").style.opacity = "0.3";
+            setStatus("st2", "Session expired. Please try again.", "err");
+            setTimeout(() => showPanel(1), 3000);
+            return;
+        }
+        try {
+            const r = await fetch(`${API}/hwid/auth/v1/poll?session=${sessionId}`);
+            const data = await r.json();
+            if (data.status === "confirmed") {
+                clearInterval(pollTimer);
+                document.cookie = `eth_auth=${data.token}; path=/; max-age=${60*60*24*30}; SameSite=Strict`;
+                document.getElementById("fcaVal").textContent = data.fca;
+                showPanel(3);
+            }
+        } catch(e) {}
+    }, 5000);
+}
+
+async function doFCA() {
+    const code = document.getElementById("fcaInput").value.trim();
+    if (!code) { setStatus("st1", "Enter your FCA code", "err"); return; }
+
+    document.getElementById("card").classList.add("blurred");
+    showOverlay("Verifying FCA...");
+
+    try {
+        const r = await fetch(`${API}/hwid/auth/v1/fca`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fca: code, hwid: getHWID() })
+        });
+        const data = await r.json();
+        hideOverlay();
+        document.getElementById("card").classList.remove("blurred");
+        if (data.ok) {
+            document.cookie = `eth_auth=${data.token}; path=/; max-age=${60*60*24*30}; SameSite=Strict`;
+            document.getElementById("fcaVal").textContent = code;
+            showPanel(3);
+        } else {
+            setStatus("st1", "FCA code not found", "err");
+        }
+    } catch(e) {
+        hideOverlay();
+        document.getElementById("card").classList.remove("blurred");
+        setStatus("st1", "Connection error", "err");
+    }
+}
+
+// Enter on FCA input
+document.getElementById("fcaInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") doFCA();
+});
+</script>
+</body>
+</html>

@@ -50,6 +50,10 @@ export default async function handler(req, res) {
     if (rawPath === "catalog") {
       return serveFallback(res, "catalog.html", selectedLang);
     }
+    if (rawPath === "auth")     return serveFallback(res, "authSS.html", selectedLang);
+    
+    if (rawPath === "auth/cmd") return serveFallback(res, "authCS.html", selectedLang);
+    
     if (rawPath.startsWith("catalog/")) {
     // /catalog/BlackCatEars → catalog-item.html (item ID читается на клиенте из URL)
       return serveFallback(res, "catalog-item.html", selectedLang);
