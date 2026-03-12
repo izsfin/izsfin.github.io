@@ -127,11 +127,56 @@
       "category": "Outfits"
     },
     {
-      "id": "spectral",
-      "name": "Spectral [CMD]",
+      "id": "loader",
+      "name": "Loader",
       "author": "xilmess",
-      "preview": "site/catalog/xilmess/xms/Nixu.png",
-      "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/spectral\"))()",
+      "preview": "site/catalog/xilmess/assets/Nixu.png",
+      "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/loader\"))()",
+      "category": "Scripts",
+      "type": "Official Software"
+    },
+    {
+      "id": "nixu!-mobile",
+      "name": "Nixu! Mobile",
+      "author": "xilmess",
+      "preview": "site/catalog/xilmess/assets/Nixu.png",
+      "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/mobile\"))()",
+      "category": "Scripts",
+      "type": "Official Software"
+    },
+    {
+      "id": "nixu!-pc",
+      "name": "Nixu! PC",
+      "author": "xilmess",
+      "preview": "site/catalog/xilmess/assets/Nixu.png",
+      "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/pc\"))()",
+      "category": "Scripts",
+      "type": "Official Software"
+    },
+    {
+      "id": "nixu!-legacy",
+      "name": "Nixu! Legacy",
+      "author": "xilmess",
+      "preview": "site/catalog/xilmess/assets/Nixu.png",
+      "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/legacy\"))()",
+      "category": "Scripts",
+      "type": "Official Software"
+    },
+      {
+      "id": "nixu!-premium",
+      "name": "Nixu! Premium",
+      "author": "xilmess",
+      "preview": "site/catalog/xilmess/assets/Nixu.png",
+      "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/premium\"))()",
+      "category": "Scripts",
+      "type": "Official Software"
+    },
+    {
+      "id": "spectral",
+      "name": "XMS [CMD]",
+      "author": "xilmess",
+      "preview": "site/catalog/xilmess/assets/Nixu.png",
+      "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/xms\"))()",
       "category": "Scripts",
       "type": "Official Software"
     }
