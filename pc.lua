@@ -1,11 +1,17 @@
-local storage = loadstring(game:HttpGet("https://api-celius.vercel.app/storage"))()
-local Library = loadstring(game:HttpGet("https://cdn-celius.vercel.app/library/cerberus/sourceR"))()
-local window = Library.new("Cometix | YUMI")
+local storage = loadstring(game:HttpGet("https://ethereos-api.vercel.app/storage"))()
+
+local Library = loadstring(game:HttpGet("https://ethereos-cdn.vercel.app/library/cerberus/sourceR"))()
+
+local window = Library.new("Nixu! || PC v1.0.1")
+
 window:LockScreenBoundaries(false)
+
 local mainTab = window:Tab("Main")
+
 local mainSection = mainTab:Section("Main")
 mainSection:Button("Site", function()
-    setclipboard("https://celius.vercel.app")
+
+    setclipboard("https://ethereos.vercel.app")
 end)
 mainSection:Label("0.0.1")
 

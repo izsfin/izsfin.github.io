@@ -180,6 +180,41 @@ local Library = {
     },
     {
         Class = "Outfit",
+        Name = "Classic Camo",
+        ShirtID = "rbxassetid://5349579058",
+        PantsID = "rbxassetid://5545983180",
+		ReqPlaceID = 0
+    },
+    {
+        Class = "Outfit",
+        Name = "Blue Camo",
+        ShirtID = "rbxassetid://7335989658",
+        PantsID = "rbxassetid://7336069002",
+		ReqPlaceID = 0
+    },
+    {
+        Class = "Outfit",
+        Name = "Black Camo #1",
+        ShirtID = "rbxassetid://12433294632",
+        PantsID = "rbxassetid://13284675767",
+		ReqPlaceID = 0
+    },
+    {
+        Class = "Outfit",
+        Name = "Black Camo #2",
+        ShirtID = "rbxassetid://13284655735",
+        PantsID = "rbxassetid://13284675767",
+		ReqPlaceID = 0
+    },
+    {
+        Class = " ",
+        Name = " ",
+        ShirtID = "rbxassetid:// ",
+        PantsID = "rbxassetid:// ",
+		ReqPlaceID = 0
+    },
+    {
+        Class = "Outfit",
         Name = "Jester",
         ShirtID = "rbxassetid://6280071638",
         PantsID = "rbxassetid://11760797553",
