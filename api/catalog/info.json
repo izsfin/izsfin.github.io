@@ -127,6 +127,34 @@
       "category": "Outfits"
     },
     {
+      "id": "test-v1",
+      "name": "Test #1",
+      "author": "nilletMS",
+      "preview": "No Command",
+      "category": "Outfits"
+    },
+    {
+      "id": "test-v2",
+      "name": "Test #2",
+      "author": "nilletMS",
+      "preview": "No Command",
+      "category": "Outfits"
+    },
+    {
+      "id": "test-v3",
+      "name": "Test #3",
+      "author": "nilletMS",
+      "preview": "No Command",
+      "category": "Outfits"
+    },
+    {
+      "id": "test-v4",
+      "name": "Test #4",
+      "author": "nilletMS",
+      "preview": "No Command",
+      "category": "Outfits"
+    },
+    {
       "id": "spectral",
       "name": "Spectral [CMD]",
       "author": "nilletMS",
