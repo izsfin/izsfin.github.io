@@ -3,7 +3,7 @@
     {
       "id": "kawaii-neutral-black-cat-ears",
       "name": "Kawaii Neutral Black Cat Ears",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/kNBCE/preview.png",
       "command": "_G(\"Black Cat Ears\", \"once\")",
       "category": "Accessories",
@@ -12,7 +12,7 @@
     {
       "id": "black-beanie",
       "name": "Black Beanie",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/BlackBeanie/preview.png",
       "command": "_G(\"Black Beanie\", \"once\")",
       "category": "Accessories",
@@ -21,7 +21,7 @@
     {
       "id": "emo-spiked-shades",
       "name": "Emo Spiked Shades",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/EmoSpikedShades/preview.png",
       "command": "_G(\"Emo Spiked Shades\", \"once\")",
       "category": "Accessories",
@@ -30,7 +30,7 @@
     {
       "id": "guns-x-alien",
       "name": "Gunslinger & Alien",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/GxA/preview.png",
       "command": "_G(\"Guns & Alien\", \"once\")",
       "category": "Characters",
@@ -39,7 +39,7 @@
     {
       "id": "pal-face-classic",
       "name": "Pal Face",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/PalFace/preview.png",
       "command": "_G(\"Pal Face Static\", \"once\")",
       "category": "Characters",
@@ -48,7 +48,7 @@
     {
       "id": "pal-face",
       "name": "Pal Face",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/PalFace/NSpreview.png",
       "command": "_G(\"Pal Face\", \"once\")",
       "category": "Characters",
@@ -57,7 +57,7 @@
     {
       "id": "purple-bape-v1",
       "name": "Purple Bape #1",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/bape/purple/v.1/preview.png",
       "command": "_G(\"Purple Bape\", \"once\")",
       "category": "Outfits"
@@ -65,7 +65,7 @@
     {
       "id": "purple-bape-v2",
       "name": "Purple Bape #2",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/bape/purple/v.2/preview.png",
       "command": "_G(\"Purple Bape\", \"once\")",
       "category": "Outfits"
@@ -73,7 +73,7 @@
     {
       "id": "black-bape",
       "name": "Black Bape",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/bape/black/preview.png",
       "command": "_G(\"Black Bape\", \"once\")",
       "category": "Outfits"
@@ -81,7 +81,7 @@
     {
       "id": "blue-bape-v1",
       "name": "Blue Bape #1",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/bape/blue/v.1/preview.png",
       "command": "_G(\"Blue Bape #1\", \"once\")",
       "category": "Outfits"
@@ -89,7 +89,7 @@
     {
       "id": "blue-bape-v2",
       "name": "Blue Bape #2",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/bape/blue/v.2/preview.png",
       "command": "_G(\"Blue Bape #2\", \"once\")",
       "category": "Outfits"
@@ -97,7 +97,7 @@
     {
       "id": "black-camo-v1",
       "name": "Black Camo #1",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/Millitary/BlackCamo/v1/preview.png",
       "command": "_G(\"Black Camo #1\", \"once\")",
       "category": "Outfits"
@@ -105,7 +105,7 @@
     {
       "id": "black-camo-v2",
       "name": "Black Camo #2",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/Millitary/BlackCamo/v2/preview.png",
       "command": "_G(\"Black Camo #2\", \"once\")",
       "category": "Outfits"
@@ -113,7 +113,7 @@
     {
       "id": "blue-camo",
       "name": "Blue Camo",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/Millitary/BlueCamo/preview.png",
       "command": "_G(\"Blue Camo\", \"once\")",
       "category": "Outfits"
@@ -121,44 +121,16 @@
     {
       "id": "classic-camo",
       "name": "Classic Camo",
-      "author": "nilletMS",
+      "author": "xilmess",
       "preview": "site/catalog/Millitary/ClassicCamo/preview.png",
       "command": "_G(\"Classic Camo\", \"once\")",
       "category": "Outfits"
     },
     {
-      "id": "test-v1",
-      "name": "Test #1",
-      "author": "nilletMS",
-      "preview": "No Command",
-      "category": "Outfits"
-    },
-    {
-      "id": "test-v2",
-      "name": "Test #2",
-      "author": "nilletMS",
-      "preview": "No Command",
-      "category": "Outfits"
-    },
-    {
-      "id": "test-v3",
-      "name": "Test #3",
-      "author": "nilletMS",
-      "preview": "No Command",
-      "category": "Outfits"
-    },
-    {
-      "id": "test-v4",
-      "name": "Test #4",
-      "author": "nilletMS",
-      "preview": "No Command",
-      "category": "Outfits"
-    },
-    {
       "id": "spectral",
       "name": "Spectral [CMD]",
-      "author": "nilletMS",
-      "preview": "site/catalog/nilletMS/Spectral/preview.png",
+      "author": "xilmess",
+      "preview": "site/catalog/xilmess/Spectral/preview.png",
       "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/spectral\"))()",
       "category": "Scripts",
       "type": "Official Software"
