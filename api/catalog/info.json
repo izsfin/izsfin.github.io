@@ -130,7 +130,7 @@
       "id": "spectral",
       "name": "Spectral [CMD]",
       "author": "xilmess",
-      "preview": "site/catalog/xilmess/Spectral/preview.png",
+      "preview": "site/catalog/xilmess/xms/Nixu.png",
       "command": "loadstring(game:HttpGet(\"https://ethereos.vercel.app/spectral\"))()",
       "category": "Scripts",
       "type": "Official Software"
