@@ -95,6 +95,38 @@
       "category": "Outfits"
     },
     {
+      "id": "black-camo-v1",
+      "name": "Black Camo #1",
+      "author": "nilletMS",
+      "preview": "site/catalog/Millitary/BlackCamo/#1/preview.png",
+      "command": "_G(\"Black Camo #1\", \"once\")",
+      "category": "Outfits"
+    },
+    {
+      "id": "black-camo-v2",
+      "name": "Black Camo #2",
+      "author": "nilletMS",
+      "preview": "site/catalog/Millitary/BlackCamo/#2/preview.png",
+      "command": "_G(\"Black Camo #2\", \"once\")",
+      "category": "Outfits"
+    },
+    {
+      "id": "blue-camo",
+      "name": "Blue Camo",
+      "author": "nilletMS",
+      "preview": "site/catalog/Millitary/BlueCamo/preview.png",
+      "command": "_G(\"Blue Camo\", \"once\")",
+      "category": "Outfits"
+    },
+    {
+      "id": "classic-camo",
+      "name": "Classic Camo",
+      "author": "nilletMS",
+      "preview": "site/catalog/Millitary/ClassicCamo/preview.png",
+      "command": "_G(\"Classic Camo\", \"once\")",
+      "category": "Outfits"
+    },
+    {
       "id": "spectral",
       "name": "Spectral [CMD]",
       "author": "nilletMS",
