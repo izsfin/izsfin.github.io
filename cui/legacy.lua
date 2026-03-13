@@ -625,5 +625,5 @@ task.spawn(function()
     end
 end)
 
-showNotification("NIXU! Legacy v2.1.55 beta loaded", "success")
+showNotification("Nixu! Legacy v2.1.55 beta loaded", "success")
 showNotification("by xilmess", "info")

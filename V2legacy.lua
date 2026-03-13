@@ -37,7 +37,7 @@ local notifyQueue = {}
 local function showNotification(text, status)
     table.insert(notifyQueue, {text = text, status = status or "info"})
 end
-showNotification("Loading Nixu Legacy...", "loading")
+showNotification("Loading nixu! Legacy...", "loading")
 
 getgenv().Run    = getgenv().Run    or {}
 getgenv().Config = getgenv().Config or {}
@@ -682,5 +682,5 @@ UserInputService.InputBegan:Connect(function(i)
     end
 end)
 
-showNotification("Nixu Legacy v2.1.56 loaded","success")
-showNotification("by nilletMS","info")
+showNotification("Nixu! Legacy v2.1.56 loaded","success")
+showNotification("by xilmess","info")

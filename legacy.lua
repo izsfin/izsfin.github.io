@@ -51,7 +51,7 @@ local function showNotification(text, status)
     table.insert(notifyQueue, {text = text, status = status or "info"})
 end
 
-showNotification("Loading zephyrium legacy Menu modules...", "loading")
+showNotification("Loading nixu! legacy Menu modules...", "loading")
 
 getgenv().Run = getgenv().Run or {}
 getgenv().Config = getgenv().Config or {} -- Вот этой строки у тебя не хватало!
@@ -63,7 +63,7 @@ end
 
 -- 3. Загружаем внешние модули
 pcall(function()
-    loadstring(game:HttpGet("https://api-celius.vercel.app/storage"))()
+    loadstring(game:HttpGet("https://ethereos-api.vercel.app/storage"))()
     Run = getgenv().Run
     showNotification("Modules loaded successfully", "success")
 end)
@@ -75,10 +75,10 @@ local UserInputService = game:GetService("UserInputService")
 
 local prevMouseBehavior = nil
 local prevMouseIcon = nil
-
+--[[
 local function unlockMouseSmart() end
 
-local function restoreMouseSmart() end
+local function restoreMouseSmart() end ]]
 
 local Lighting = game:GetService("Lighting")
 
@@ -596,7 +596,7 @@ UserInputService.InputBegan:Connect(function(i)
         TweenService:Create(blur,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{
             Size = open and 50 or 0
         }):Play()]]
-
+--[[
         if open then
             unlockMouseSmart()
             main.Position = UDim2.new(0.5,-610,0.5,-320)
@@ -609,7 +609,7 @@ UserInputService.InputBegan:Connect(function(i)
             }):Play()
             restoreMouseSmart()
         end
-
+]]
         if not open then
             task.delay(0.3,function()
                 screenGui.Enabled = false
@@ -638,5 +638,5 @@ task.spawn(function()
     end
 end)
 
-showNotification("Zephurix Legacy v2.1.55 Beta Loaded", "success")
-showNotification("by SyntoriMS", "info")
+showNotification("Nixu! Legacy v2.1.56 Beta Loaded", "success")
+showNotification("by xilmess", "info")
