@@ -27,11 +27,11 @@ export default async function handler(req, res) {
 // --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
-    if (host.includes("ethereos-testing")) { codeBranch = "test"; fallbackFile = "test.html"; }
-    else if (host.includes("ethereos-api")) { codeBranch = "api"; }
-    else if (host.includes("ethereos-raw")) { codeBranch = "raw"; }
-    else if (host.includes("ethereos-cdn")) { codeBranch = "cdn"; }
-    else if (host.includes("ethereos")) { codeBranch = "off"; }
+    if (host.includes("wexly-testing"))  { codeBranch = "test"; fallbackFile = "test.html"; }
+    else if (host.includes("wexly-api")) { codeBranch = "api"; }
+    else if (host.includes("wexly-raw")) { codeBranch = "raw"; }
+    else if (host.includes("wexly-cdn")) { codeBranch = "cdn"; }
+    else if (host.includes("wexly"))     { codeBranch = "off"; }
 
 // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
         }
     }
     // --- 4. STATUS ДОМЕН ---
-    if (host.includes("celius-status")) {
+    if (host.includes("wexly-status")) {
         return serveFallback(res, "status.html", selectedLang);
     }
 
