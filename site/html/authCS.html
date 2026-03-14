@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ethereos Auth</title>
+<title>Wexly | Auth</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -36,7 +36,7 @@
 <body>
 <div id="terminal"></div>
 <script>
-const PROMPT = "E:/ethereos/auth/v1 || ";
+const PROMPT = "E:/wexly/auth/v1 || ";
 const HELPER = "E:/Helper || ";
 const API    = "/api";
 const BOT    = "@nixuMSbot";
@@ -94,7 +94,7 @@ async function progressBar(label, ms) {
 // ── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
     const boots = [
-        "Starting Ethereos Auth Server...",
+        "Starting Wexly Auth Server...",
         "Loading modules...",
         "Connecting to Redis...",
         "Initializing HWID engine...",
@@ -106,7 +106,7 @@ async function boot() {
     ln("  Commands:", "white"); blank();
     ln("  /auth          |  Start authentication", "accent");
     ln("  /fca = CODE    |  Fast auth with FCA code", "accent");
-    ln("  /exit          |  Go to ethereos.vercel.app", "accent");
+    ln("  /exit          |  Go to wexly.vercel.app", "accent");
     ln("  /contact       |  Open contact page", "accent");
     blank();
     state = "idle";
@@ -136,16 +136,16 @@ async function handle(cmd) {
     const low = cmd.toLowerCase().trim();
 
     if (low === "/exit") {
-        ln(HELPER + "Opening ethereos.vercel.app...", "dim");
+        ln(HELPER + "Opening wexly.vercel.app...", "dim");
         await delay(400);
-        window.open("https://ethereos.vercel.app", "_blank");
+        window.open("https://wexly.vercel.app", "_blank");
         blank(); showInput(false); return;
     }
 
     if (low === "/contact") {
         ln(HELPER + "Opening contact page...", "dim");
         await delay(400);
-        window.open("https://ethereos.vercel.app/contact", "_blank");
+        window.open("https://wexly.vercel.app/contact", "_blank");
         blank(); showInput(false); return;
     }
 
@@ -229,7 +229,7 @@ function startPolling(session) {
                 document.cookie = `eth_auth=${data.token}; path=/; max-age=${60*60*24*30}; SameSite=Strict`;
                 state = "done";
                 await delay(1500);
-                window.location.href = "https://ethereos.vercel.app";
+                window.location.href = "https://wexly.vercel.app";
             }
         } catch(e) {}
     }, 5000);
@@ -255,7 +255,7 @@ async function doFCA(code) {
             document.cookie = `eth_auth=${data.token}; path=/; max-age=${60*60*24*30}; SameSite=Strict`;
             ln(HELPER + "Successfully authorized!", "ok");
             await delay(1200);
-            window.location.href = "https://ethereos.vercel.app";
+            window.location.href = "https://wexly.vercel.app";
         } else {
             ln(HELPER + "FCA not found or invalid.", "err");
             blank(); showInput(false);
