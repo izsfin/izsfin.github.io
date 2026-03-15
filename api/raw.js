@@ -64,7 +64,7 @@ export default async function handler(req, res) {
     }
 
     // --- 5. ЗАГРУЗКА СЕКРЕТОВ ---
-    let secretWord = "night";
+    let secretWord = "sosi";
     let secretRules = [];
     let aliases = {};
     try {
