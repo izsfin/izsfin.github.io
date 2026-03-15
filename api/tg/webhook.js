@@ -20,7 +20,7 @@ export default async function handler(req, res) {
             method: "sendMessage",
             chat_id: chatId,
             parse_mode: "Markdown",
-            text: `👋 Hello @${username}!\n\nWelcome to *Ethereos Auth Bot*.\n\nTo authorize your device go to:\nhttps://ethereos.vercel.app/auth\n\nThen send your auth code here.`
+            text: `👋 Hello @${username}!\n\nWelcome to *wexly Auth Bot*.\n\nTo authorize your device go to:\nhttps://wexly.vercel.app/auth\n\nThen send your auth code here.`
         });
     }
 
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
             return res.json({
                 method: "sendMessage",
                 chat_id: chatId,
-                text: "❌ Code not found or expired.\n\nGet a new one at: https://ethereos.vercel.app/auth"
+                text: "❌ Code not found or expired.\n\nGet a new one at: https://wexly.vercel.app/auth"
             });
         }
 
