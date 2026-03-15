@@ -24,7 +24,6 @@ export default async function handler(req, res) {
     if (isBotCrawler) return res.status(200).send("OK");
 
     // --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
-// --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
     if (host.includes("wexly-testing"))  { codeBranch = "test"; fallbackFile = "test.html"; }
@@ -33,31 +32,16 @@ export default async function handler(req, res) {
     else if (host.includes("wexly-cdn")) { codeBranch = "cdn"; }
     else if (host.includes("wexly"))     { codeBranch = "off"; }
 
-// --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
-    if (rawPath === "obfuscator") {
-      return serveFallback(res, "obfuscator.html", selectedLang);
-    }
-    if (rawPath === "getkey") {
-      return serveFallback(res, "getkey.html", selectedLang);
-    }
-    if (rawPath === "api/gen") {
-    // pass through to Vercel function directly
-    }
-    if (rawPath === "status") {
-      return serveFallback(res, "status.html", selectedLang);
-    }
-    if (rawPath === "catalog") {
-      return serveFallback(res, "catalog.html", selectedLang);
-    }
-    if (rawPath === "auth")     return serveFallback(res, "authSS.html", selectedLang);
-    
-    if (rawPath === "auth/cmd") return serveFallback(res, "authCS.html", selectedLang);
-    
-    if (rawPath.startsWith("catalog/")) {
-    // /catalog/BlackCatEars → catalog-item.html (item ID читается на клиенте из URL)
-      return serveFallback(res, "catalog-item.html", selectedLang);
-     }
+    if (rawPath === "obfuscator") return serveFallback(res, "obfuscator.html", selectedLang);
+    if (rawPath === "getkey")     return serveFallback(res, "getkey.html", selectedLang);
+    if (rawPath === "api/gen") { /* pass through to Vercel function directly */ }
+    if (rawPath === "status")     return serveFallback(res, "status.html", selectedLang);
+    if (rawPath === "catalog")    return serveFallback(res, "catalog.html", selectedLang);
+    if (rawPath === "auth")       return serveFallback(res, "authSS.html", selectedLang);
+    if (rawPath === "auth/cmd")   return serveFallback(res, "authCS.html", selectedLang);
+    if (rawPath.startsWith("catalog/")) return serveFallback(res, "catalog-item.html", selectedLang);
+
     if (rawPath === "api/catalog/info" || rawPath === "api/catalog/verified") {
         try {
             const fileName = rawPath === "api/catalog/info" ? "info.json" : "verifed.json";
@@ -73,6 +57,7 @@ export default async function handler(req, res) {
             return res.status(404).json({ error: "Not found", detail: e.message });
         }
     }
+
     // --- 4. STATUS ДОМЕН ---
     if (host.includes("wexly-status")) {
         return serveFallback(res, "status.html", selectedLang);
@@ -159,10 +144,8 @@ export default async function handler(req, res) {
     try {
         const pathParts = rawPath.split('/').filter(p => p);
         const searchFileName = pathParts.pop().toLowerCase();
-        // Принудительно в нижний регистр для GitHub
-        const searchDir = pathParts.join('/').toLowerCase(); 
+        const searchDir = pathParts.join('/').toLowerCase();
 
-        // ЛОГ ДЛЯ ОТЛАДКИ (появится в Vercel Logs)
         console.log(`Trying: Branch=${codeBranch}, Dir=${searchDir}, File=${searchFileName}`);
 
         const { data: items } = await octokit.repos.getContent({
@@ -171,9 +154,7 @@ export default async function handler(req, res) {
 
         const target = Array.isArray(items) && items.find(i => {
             const n = i.name.toLowerCase();
-            // Отделяем имя от расширения правильно
             const nameWithoutExt = n.includes('.') ? n.split('.').slice(0, -1).join('.') : n;
-            
             return i.type === 'file' && (n === searchFileName || nameWithoutExt === searchFileName);
         });
 
@@ -186,7 +167,6 @@ export default async function handler(req, res) {
         const isArchive = archiveExts.includes(ext);
         const isApp = appExts.includes(ext);
 
-        // Архивы и приложения — Roblox не получает
         if ((isArchive || isApp) && isRoblox) {
             return res.status(403).send("-- Winxs Error: Access Denied");
         }
@@ -210,7 +190,7 @@ export default async function handler(req, res) {
             await sendToLogger(ip, target.name, host, userAgent, "✅ File Loaded");
         }
 
-        // --- 11. ПОЛУЧЕНИЕ ФАЙЛА (фикс больших файлов) ---
+        // --- 11. ПОЛУЧЕНИЕ ФАЙЛА ---
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
@@ -226,7 +206,6 @@ export default async function handler(req, res) {
 
         const mime = mimeTypes[ext] || mimeTypes["default"];
 
-        // Архивы/приложения — принудительное скачивание для людей
         if ((isArchive || isApp) && !isRoblox) {
             res.setHeader('Content-Disposition', `attachment; filename="${target.name}"`);
         }
@@ -242,14 +221,16 @@ export default async function handler(req, res) {
 
     } catch (e) {
         console.error("Fetch Error:", e.message);
-        if (isRoblox) return res.status(500).send("-- Celius Error: " + e.message);
+        if (isRoblox) return res.status(500).send("-- Winxs Error: " + e.message);
         return serveFallback(res, fallbackFile, selectedLang);
     }
 }
 
 async function serveFallback(res, file, lang) {
     try {
-        const { data: fb } = await octokit.repos.getContent({ owner: "varmoxd", repo: "celius", path: `site/html/${file}`, ref: "main" });
+        const { data: fb } = await octokit.repos.getContent({
+            owner: OWNER, repo: REPO, path: `site/html/${file}`, ref: "main"
+        });
         const html = Buffer.from(fb.content, 'base64').toString('utf-8');
         res.setHeader('Content-Type', 'text/html');
         return res.status(200).send(html.replace(/{{LANG}}/g, lang));
