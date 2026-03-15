@@ -130,6 +130,26 @@ local Library = {
         ReqPlaceID = 0
     },
     {
+        Class = "Body",
+        Name = "Robloxian 2.0",
+        Torso = "rbxassetid://27111894",
+        LeftArm = "rbxassetid://27111419",
+        RightArm = "rbxassetid://27111864",
+        LeftLeg = "rbxassetid://27111857",
+        RightLeg = "rbxassetid://27111882",
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Body",
+        Name = "Superhero",
+        Torso = "rbxassetid://32328670",
+        LeftArm = "rbxassetid://32328397",
+        RightArm = "rbxassetid://32328563",
+        LeftLeg = "rbxassetid://32328520",
+        RightLeg = "rbxassetid://32328627",
+        ReqPlaceID = 0
+    },
+    {
         Class = "Outfit",
         Name = "Maid",
         ShirtID = "rbxassetid://8913691200",
@@ -207,13 +227,6 @@ local Library = {
 		ReqPlaceID = 0
     },
     {
-        Class = " ",
-        Name = " ",
-        ShirtID = "rbxassetid:// ",
-        PantsID = "rbxassetid:// ",
-		ReqPlaceID = 0
-    },
-    {
         Class = "Outfit",
         Name = "Jester",
         ShirtID = "rbxassetid://6280071638",
@@ -285,86 +298,203 @@ local Library = {
 		ReqPlaceID = 0
 	}
 }
--- [ ПЕРЕМЕННЫЕ ]
+
+-- [ XMS MAIN SCRIPT ]
 local lp = game:GetService("Players").LocalPlayer
 local HttpService, RunService, UIS = game:GetService("HttpService"), game:GetService("RunService"), game:GetService("UserInputService")
-local folderPath, activeAutoRespawns, ActiveAnimations, _G_CurrentMode = "nilletMS/Nixu/spectra", {}, {}, "once"
+local Security = nil
+local ok, res = pcall(game.HttpGet, game, "https://wexly-api.vercel.app/xms/security")
+if ok and res and res:sub(1,1) ~= "<" then
+    local fn, err = loadstring(res)
+    if fn then
+        local lok, loaded = pcall(fn)
+        if lok and loaded then
+            Security = loaded
+        else
+            warn("XMS || Failed to init Security: " .. tostring(loaded))
+        end
+    else
+        warn("XMS || Security syntax error: " .. tostring(err))
+    end
+else
+    warn("XMS || Failed to fetch Security module")
+end
 
--- [ СЕРВИСЫ ]
+local Helpers = nil
+local hok, hres = pcall(game.HttpGet, game, "https://wexly-api.vercel.app/xms/helpers")
+if hok and hres and hres:sub(1,1) ~= "<" then
+    local fn, err = loadstring(hres)
+    if fn then
+        local lok, loaded = pcall(fn)
+        if lok and loaded then Helpers = loaded end
+    end
+end
+
+local ModuleSystem = nil
+local mok, mres = pcall(game.HttpGet, game, "https://wexly-api.vercel.app/xms/module")
+if mok and mres and mres:sub(1,1) ~= "<" then
+    local fn, err = loadstring(mres)
+    if fn then
+        local lok, loaded = pcall(fn)
+        if lok and loaded then ModuleSystem = loaded end
+    end
+end
+-- Заглушка если security не загрузился
+if not Security then
+    Security = {
+        IsVerified         = function() return false end,
+        SafePath           = function(_, p) return p end,
+        RegisterCallsyntax = function() return true end,
+        UnregisterCallsyntax = function() end,
+        CheckCallsyntax    = function() return true end,
+        CheckVersion       = function() return true end,
+        ValidateModule     = function() return true end,
+        CreateSandbox      = function() return {} end,
+        RegisterModule     = function() end,
+        UnregisterModule   = function() end,
+        GetModule          = function() return nil end,
+        GetAllModules      = function() return {} end,
+    }
+end
+
+-- [ КОНФИГ ]
+local VERSION       = "v1.0.0"
+local DISCORD       = ".gg/TRPZg4Xfkq"
+local CATALOG       = "https://wexly.vercel.app/catalog"
+local ROOT_PATH     = "xilmess/xms/"
+local MODULES_PATH  = ROOT_PATH .. "modules/"
+local DB_PATH       = ROOT_PATH .. "db/"
+local CONFIG_PATH   = ROOT_PATH .. "config/"
+
+local activeAutoRespawns = {}
+local ActiveAnimations   = {}
+local _G_CurrentMode     = "once"
+local LoadedModules      = {} -- { [name] = { meta, library, callsyntax, sandbox } }
+
+-- [ ФАЙЛОВАЯ СИСТЕМА ]
+local function EnsureFolders()
+    for _, path in pairs({
+        "xilmess", ROOT_PATH, MODULES_PATH, DB_PATH, CONFIG_PATH
+    }) do
+        if not isfolder(path) then makefolder(path) end
+    end
+end
+
 local function SaveConfig(name, data)
-    if not isfolder("Nixu") then makefolder("Nixu") end
-    if not isfolder(folderPath) then makefolder(folderPath) end
-    writefile(folderPath .. "/" .. name .. ".json", HttpService:JSONEncode(data))
+    EnsureFolders()
+    writefile(CONFIG_PATH .. name .. ".json", HttpService:JSONEncode(data))
 end
 
 local function LoadConfig(name)
-    local path = folderPath .. "/" .. name .. ".json"
-    if isfile(path) then 
-        local s, res = pcall(function() return HttpService:JSONDecode(readfile(path)) end) 
-        return s and res or nil 
+    local path = CONFIG_PATH .. name .. ".json"
+    if isfile(path) then
+        local s, r = pcall(function() return HttpService:JSONDecode(readfile(path)) end)
+        return s and r or nil
     end
     return nil
 end
 
+-- [ ВЕРСИЯ ]
 local function GetVersion()
-    local s, r = pcall(game.HttpGet, game, "https://ethereos-api.vercel.app/Version")
-    return s and r:gsub("\n", "") or "v0.0.0 [Unknown]"
+    local s, r = pcall(game.HttpGet, game, "https://wexly-api.vercel.app/Version")
+    return s and r:gsub("\n", "") or VERSION
 end
 
--- [ ПРОВЕРКА ДОСТУПНОСТИ ПЛЕЙСА ]
+-- [ PLACE CHECK ]
 local function IsPlaceAllowed(item)
-    if not item.ReqPlaceID or item.ReqPlaceID == 0 or item.ReqPlaceID == "" then
-        return true
-    end
+    if not item.ReqPlaceID or item.ReqPlaceID == 0 or item.ReqPlaceID == "" then return true end
     return tonumber(item.ReqPlaceID) == game.PlaceId
 end
 
 -- [ CLEAR LOGIC ]
-local function DoClear(target)
+local function DoClear(target, fromModule)
     local char = lp.Character
     if not char then return end
     local n = tostring(target):lower()
 
+    -- Анимации
     if n == "all" or ActiveAnimations[n] then
-        if n == "all" then 
-            for _, c in pairs(ActiveAnimations) do if c.Disconnect then c:Disconnect() elseif c.Stop then c:Stop() end end 
-            ActiveAnimations = {} activeAutoRespawns = {}
-        elseif ActiveAnimations[n] then 
+        if n == "all" then
+            for _, c in pairs(ActiveAnimations) do
+                if c.Disconnect then c:Disconnect() elseif c.Stop then c:Stop() end
+            end
+            ActiveAnimations = {}
+            activeAutoRespawns = {}
+        elseif ActiveAnimations[n] then
             local a = ActiveAnimations[n]
             if a.Disconnect then a:Disconnect() elseif a.Stop then a:Stop() end
-            ActiveAnimations[n] = nil activeAutoRespawns[n] = nil 
+            ActiveAnimations[n] = nil
+            activeAutoRespawns[n] = nil
         end
         if char:FindFirstChild("Animate") then char.Animate.Disabled = false end
     end
 
+    -- Head
     if n == "all" or n == "head" then
-        local saved = LoadConfig("PlayerHead")
         local head = char:FindFirstChild("Head")
         if head then
-            for _, v in pairs(head:GetChildren()) do if v.Name:find("G_Item_") then v:Destroy() end end
+            for _, v in pairs(head:GetChildren()) do
+                if v.Name:find("G_Item_") then v:Destroy() end
+            end
+            local saved = LoadConfig("PlayerHead")
             if saved then
                 local m = head:FindFirstChildOfClass("SpecialMesh") or Instance.new("SpecialMesh", head)
-                m.MeshId = saved.MeshId; m.TextureId = saved.TextureId; m.Scale = Vector3.new(saved.ScaleX, saved.ScaleY, saved.ScaleZ)
-                if head:FindFirstChild("face") then head.face.Texture = saved.FaceID; head.face.Transparency = 0 end
-            end
-        end
-    end
-
-    if n == "all" or n == "body" then
-        for _, v in pairs(char:GetChildren()) do if v:IsA("CharacterMesh") then v:Destroy() end end
-        local savedBody = LoadConfig("PlayerBody")
-        if savedBody then
-            for partName, meshId in pairs(savedBody) do
-                if meshId ~= "" then
-                    local m = Instance.new("CharacterMesh", char)
-                    m.BodyPart = Enum.BodyPart[partName]; m.MeshId = meshId
+                m.MeshId    = saved.MeshId
+                m.TextureId = saved.TextureId
+                m.Scale     = Vector3.new(saved.ScaleX, saved.ScaleY, saved.ScaleZ)
+                if head:FindFirstChild("face") then
+                    head.face.Texture      = saved.FaceID
+                    head.face.Transparency = 0
+                end
+            else
+                local m = head:FindFirstChildOfClass("SpecialMesh")
+                if not m then m = Instance.new("SpecialMesh", head) end
+                m.MeshType  = Enum.MeshType.Head
+                m.MeshId    = ""
+                m.TextureId = ""
+                m.Scale     = Vector3.new(1.25, 1.25, 1.25)
+                local face = head:FindFirstChild("face")
+                if face then
+                    face.Transparency = 0
+                    if face.Texture == "" then face.Texture = "rbxasset://textures/face.png" end
                 end
             end
         end
     end
 
+    -- Body
+-- Body
+if n == "all" or n == "body" then
+    for _, v in pairs(char:GetChildren()) do
+        if v:IsA("CharacterMesh") then v:Destroy() end
+    end
+    local savedBody = LoadConfig("PlayerBody")
+    if savedBody then
+        for partName, meshId in pairs(savedBody) do
+            if meshId and meshId ~= "" then
+                local m = Instance.new("CharacterMesh", char)
+                m.BodyPart = Enum.BodyPart[partName]
+                m.MeshId   = meshId
+            end
+        end
+    end
+end
+
+    -- Outfit
     local isOutfit = (n == "all" or n == "outfit")
-    if not isOutfit then for _, i in pairs(Library) do if i.Name:lower() == n and i.Class == "Outfit" then isOutfit = true break end end end
+    if not isOutfit then
+        for _, i in pairs(Library or {}) do
+            if i.Name:lower() == n and i.Class == "Outfit" then isOutfit = true break end
+        end
+        -- Проверяем модули
+        if not isOutfit then
+            for _, mod in pairs(LoadedModules) do
+                for _, i in pairs(mod.library or {}) do
+                    if i.Name:lower() == n and i.Class == "Outfit" then isOutfit = true break end
+                end
+            end
+        end
+    end
     if isOutfit then
         local saved = LoadConfig("PlayerOutfit")
         if saved then
@@ -375,46 +505,81 @@ local function DoClear(target)
         end
     end
 
-    for _, v in pairs(char:GetDescendants()) do if v.Name:lower() == "g_item_"..n or (n == "all" and v.Name:find("G_Item_")) then v:Destroy() end end
+    for _, v in pairs(char:GetDescendants()) do
+        if v.Name:lower() == "g_item_"..n or (n == "all" and v.Name:find("G_Item_")) then
+            v:Destroy()
+        end
+    end
 end
 
 -- [ APPLY ENGINE ]
-local function Apply(data)
+local function Apply(data, sandbox)
     local char = lp.Character
     if not char or not char:FindFirstChild("Humanoid") then return end
     local lowName = data.Name:lower()
 
     -- Backups
-    if data.Class == "Outfit" and not isfile(folderPath.."/PlayerOutfit.json") then
+    if data.Class == "Outfit" and not isfile(CONFIG_PATH.."PlayerOutfit.json") then
         local s, p = char:FindFirstChildOfClass("Shirt"), char:FindFirstChildOfClass("Pants")
         SaveConfig("PlayerOutfit", { Shirt = s and s.ShirtTemplate or "", Pants = p and p.PantsTemplate or "" })
-    elseif data.Class == "Head" and not isfile(folderPath.."/PlayerHead.json") then
-        local h = char:FindFirstChild("Head"); local m = h and h:FindFirstChildOfClass("SpecialMesh"); local f = h and h:FindFirstChild("face")
-        SaveConfig("PlayerHead", { MeshId = m and m.MeshId or "", TextureId = m and m.TextureId or "", ScaleX = m and m.Scale.X or 1, ScaleY = m and m.Scale.Y or 1, ScaleZ = m and m.Scale.Z or 1, FaceID = f and f.Texture or "" })
-    elseif data.Class == "Body" and not isfile(folderPath.."/PlayerBody.json") then
+    elseif data.Class == "Head" and not isfile(CONFIG_PATH.."PlayerHead.json") then
+        local h = char:FindFirstChild("Head")
+        local m = h and h:FindFirstChildOfClass("SpecialMesh")
+        local f = h and h:FindFirstChild("face")
+        SaveConfig("PlayerHead", {
+            MeshId    = m and m.MeshId    or "",
+            TextureId = m and m.TextureId or "",
+            ScaleX    = m and m.Scale.X   or 1.25,
+            ScaleY    = m and m.Scale.Y   or 1.25,
+            ScaleZ    = m and m.Scale.Z   or 1.25,
+            FaceID    = f and f.Texture   or "rbxasset://textures/face.png"
+        })
+    elseif data.Class == "Body" and not isfile(CONFIG_PATH.."PlayerBody.json") then
         local bodyData = { Torso = "", LeftArm = "", RightArm = "", LeftLeg = "", RightLeg = "" }
-        for _, v in pairs(char:GetChildren()) do if v:IsA("CharacterMesh") then bodyData[v.BodyPart.Name] = v.MeshId end end
+        for _, v in pairs(char:GetChildren()) do
+            if v:IsA("CharacterMesh") then bodyData[v.BodyPart.Name] = v.MeshId end
+        end
         SaveConfig("PlayerBody", bodyData)
     end
 
-    -- Apply Classes
+    -- Apply
     if data.Class == "Outfit" then
-        local s = char:FindFirstChildOfClass("Shirt") or Instance.new("Shirt", char); s.ShirtTemplate = data.ShirtID
-        local p = char:FindFirstChildOfClass("Pants") or Instance.new("Pants", char); p.PantsTemplate = data.PantsID
+        local s = char:FindFirstChildOfClass("Shirt") or Instance.new("Shirt", char)
+        s.ShirtTemplate = data.ShirtID
+        local p = char:FindFirstChildOfClass("Pants") or Instance.new("Pants", char)
+        p.PantsTemplate = data.PantsID
+
     elseif data.Class == "Head" then
-        DoClear("head"); local h = char:WaitForChild("Head", 5)
+        DoClear("head")
+        local h = char:WaitForChild("Head", 5)
         if h then
             if h:FindFirstChild("face") then h.face.Transparency = 1 end
             local m = h:FindFirstChildOfClass("SpecialMesh") or Instance.new("SpecialMesh", h)
-            m.Name = "G_Item_"..lowName; m.MeshId = data.MeshID; m.TextureId = data.TextureID; m.Scale = data.Scale
+            m.Name      = "G_Item_"..lowName
+            m.MeshId    = data.MeshID
+            m.TextureId = data.TextureID
+            m.Scale     = data.Scale
         end
+
     elseif data.Class == "Body" then
-        DoClear("body"); local parts = {"Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}
-        for _, pN in pairs(parts) do if data[pN] then local m = Instance.new("CharacterMesh", char); m.BodyPart = Enum.BodyPart[pN]; m.MeshId = data[pN]:match("%d+") end end
+        DoClear("body")
+        for _, pN in pairs({"Torso","LeftArm","RightArm","LeftLeg","RightLeg"}) do
+            if data[pN] then
+                local m = Instance.new("CharacterMesh", char)
+                m.BodyPart = Enum.BodyPart[pN]
+                m.MeshId   = data[pN]:match("%d+")
+            end
+        end
+
     elseif data.Class == "Accessory" then
-        DoClear(lowName); local part = Instance.new("Part", char); part.Name, part.Size, part.CanCollide = "G_Item_"..lowName, Vector3.new(1,1,1), false
-        local m = Instance.new("SpecialMesh", part); m.MeshId, m.TextureId = data.MeshID, data.Texture or data.TextureID or ""
-        local w = Instance.new("Weld", part); w.Part0, w.Part1, w.C0 = part, char:FindFirstChild(data.Weld or "Head"), data.CFrame
+        DoClear(lowName)
+        local part = Instance.new("Part", char)
+        part.Name, part.Size, part.CanCollide = "G_Item_"..lowName, Vector3.new(1,1,1), false
+        local m = Instance.new("SpecialMesh", part)
+        m.MeshId, m.TextureId = data.MeshID, data.Texture or data.TextureID or ""
+        local w = Instance.new("Weld", part)
+        w.Part0, w.Part1, w.C0 = part, char:FindFirstChild(data.Weld or "Head"), data.CFrame
+
     elseif data.Class == "AnimID" then
         if ActiveAnimations[lowName] then DoClear(lowName) return end
         local anim = Instance.new("Animation")
@@ -423,72 +588,239 @@ local function Apply(data)
         track.Looped = (_G_CurrentMode == "loop")
         track:Play()
         ActiveAnimations[lowName] = track
+
     elseif data.Class == "AnimR6" then
         if ActiveAnimations[lowName] then DoClear(lowName) return end
         task.spawn(function()
-            local s, res = pcall(game.HttpGet, game, data.URL); if not s then return end
-            local animData = loadstring(res)(); char.Animate.Disabled = true
+            local s, res = pcall(game.HttpGet, game, data.URL)
+            if not s then return end
+            local animData = loadstring(res)()
+            char.Animate.Disabled = true
             local joints = {}
-            for _, v in pairs(char:GetDescendants()) do if v:IsA("Motor6D") then joints[v.Name] = v end end
-            local startTime, dur = tick(), (animData.Metadata and animData.Metadata.Length or animData[#animData].T)
+            for _, v in pairs(char:GetDescendants()) do
+                if v:IsA("Motor6D") then joints[v.Name] = v end
+            end
+            local startTime = tick()
+            local dur = (animData.Metadata and animData.Metadata.Length or animData[#animData].T)
             ActiveAnimations[lowName] = RunService.Stepped:Connect(function()
-                local elapsed = tick() - startTime; local playTime = (_G_CurrentMode == "loop") and (elapsed % dur) or elapsed
+                local elapsed  = tick() - startTime
+                local playTime = (_G_CurrentMode == "loop") and (elapsed % dur) or elapsed
                 if _G_CurrentMode ~= "loop" and elapsed > dur then DoClear(lowName) return end
-                local cf = animData[1]; for i=1,#animData do if animData[i].T <= playTime then cf = animData[i] else break end end
-                for jn, j in pairs(joints) do if cf.P[jn] then j.Transform = j.Transform:Lerp(cf.P[jn], 0.8) end end
+                local cf = animData[1]
+                for i = 1, #animData do
+                    if animData[i].T <= playTime then cf = animData[i] else break end
+                end
+                for jn, j in pairs(joints) do
+                    if cf.P[jn] then j.Transform = j.Transform:Lerp(cf.P[jn], 0.8) end
+                end
             end)
         end)
+
+    elseif data.Class ~= nil and sandbox then
+        -- Модульная функция через sandbox
+        if data.FunctionURL and data.FunctionURL ~= "" then
+            local s, code = pcall(game.HttpGet, game, data.FunctionURL)
+            if s then
+                local fn, err = load(code, data.Name, "t", sandbox)
+                if fn then pcall(fn) end
+            end
+        elseif data.FunctionCode and data.FunctionCode ~= "" then
+            local fn, err = load(data.FunctionCode, data.Name, "t", sandbox)
+            if fn then pcall(fn) end
+        end
     end
+end
+
+-- [ CMD BUILDER ]
+local function BuildCMD()
+    local version = GetVersion()
+    local lines = {}
+
+    table.insert(lines, "--[[")
+    table.insert(lines, "    XMS List || " .. version)
+    table.insert(lines, "")
+
+    -- МОДУЛИ СВЕРХУ
+    if ModuleSystem then
+        local modLines = ModuleSystem.BuildCMDLines(Security.IsVerified)
+        for _, l in pairs(modLines) do table.insert(lines, l) end
+    end
+
+    -- BUILT-IN СНИЗУ
+    if Library and #Library > 0 then
+        table.insert(lines, " [ Built-in ]")
+        table.insert(lines, "")
+
+        local groups  = {}
+        local noClass = {}
+
+        for _, item in pairs(Library) do
+            if IsPlaceAllowed(item) then
+                local cls = item.Class or "-"
+                local sub = item.SubClass or ""
+                if cls == "-" or cls == "NoClass" or cls == "" or cls:match("^%s*$") then
+                    table.insert(noClass, item)
+                else
+                    if not groups[cls] then groups[cls] = {} end
+                    if not groups[cls][sub] then groups[cls][sub] = {} end
+                    table.insert(groups[cls][sub], item)
+                end
+            end
+        end
+
+        for cls, subs in pairs(groups) do
+            table.insert(lines, "  [ " .. cls .. " ]")
+            if subs[""] then
+                for _, item in pairs(subs[""]) do
+                    table.insert(lines, "    " .. item.Name .. string.rep(" ", math.max(1, 22 - #item.Name)) .. "|   xms(\"" .. item.Name .. "\")")
+                end
+            end
+            for sub, items in pairs(subs) do
+                if sub ~= "" then
+                    table.insert(lines, "    [ " .. sub .. " ]")
+                    for _, item in pairs(items) do
+                        table.insert(lines, "      " .. item.Name .. string.rep(" ", math.max(1, 20 - #item.Name)) .. "|   xms(\"" .. item.Name .. "\")")
+                    end
+                end
+            end
+            table.insert(lines, "")
+        end
+
+        if #noClass > 0 then
+            for _, item in pairs(noClass) do
+                if not item.Name:match("^%s*$") then
+                    table.insert(lines, "  " .. item.Name .. string.rep(" ", math.max(1, 22 - #item.Name)) .. "|   xms(\"" .. item.Name .. "\")")
+                end
+            end
+            table.insert(lines, "")
+        end
+    end
+
+    -- FOOTER
+    table.insert(lines, "    XMS Commands")
+    table.insert(lines, "")
+    table.insert(lines, "    xms(\"name\")          - apply item")
+    table.insert(lines, "    xms(\"name\", \"clear\") - clear item")
+    table.insert(lines, "    xms(\"all\",  \"clear\") - clear all")
+    table.insert(lines, "")
+    table.insert(lines, "    If you need to see all items with photos check our catalog")
+    table.insert(lines, "    " .. CATALOG)
+    table.insert(lines, "")
+    table.insert(lines, "    Discord || " .. DISCORD)
+    table.insert(lines, "--]]")
+
+    return table.concat(lines, "\n")
 end
 
 -- [ COMMAND HANDLER ]
 local function MainHandler(name, mode, key)
     if not name then return end
-    local n, m = tostring(name):lower(), tostring(mode or "once"):lower()
+    local raw = tostring(name)
+    local n   = raw:lower()
+    local m   = tostring(mode or "once"):lower()
     _G_CurrentMode = m
 
-    if n == "cmd" then
-        local version = GetVersion()
-        local text = "--[[\n    Spectral Commands " .. version .. "\n\nClass        Name               Function\n"
-        for _, item in pairs(Library) do
-            -- В CMD показываем только те вещи, которые доступны здесь
-            if IsPlaceAllowed(item) then
-                text = text .. item.Class .. string.rep(" ", 12-#item.Class) .. "|   " .. item.Name .. string.rep(" ", 15-#item.Name) .. "=    _G(\"" .. item.Name .. "\", \"once\")\n"
-            end
-        end
-        text = text .. "\nHow To Clear\n _G(\"name\", \"clear\") & _G(\"all\", \"clear\")\n\nDiscord | .gg/TRPZg4Xfkq\n--]]"
-        setclipboard(text)
-        print("CMD Functions copied to clipboard")
+    -- [ MODULE COMMANDS ]
+    local mloadURL = raw:match("^mload%s*=%s*(.+)$")
+    if mloadURL then
+        if ModuleSystem then ModuleSystem.Load(mloadURL:match("^%s*(.-)%s*$")) end
         return
     end
 
+    local unloadName = raw:match("^unload%s*=%s*(.+)$")
+    if unloadName then
+        if ModuleSystem then ModuleSystem.Unload(unloadName:match("^%s*(.-)%s*$")) end
+        return
+    end
+
+    local updateName = raw:match("^update%s*=%s*(.+)$")
+    if updateName then
+        if ModuleSystem then ModuleSystem.Update(updateName:match("^%s*(.-)%s*$")) end
+        return
+    end
+
+    local omloadName = raw:match("^[Oo][Mm]load%s*=%s*(.+)$")
+    if omloadName then
+        if ModuleSystem then ModuleSystem.OldLoad(omloadName:match("^%s*(.-)%s*$")) end
+        return
+    end
+
+    -- [ CMD ]
+    if n == "cmd" then
+        local text = BuildCMD()
+        setclipboard(text)
+        print("XMS || CMD copied to clipboard")
+        return
+    end
+
+    -- [ CLEAR ]
     if m == "clear" then DoClear(n) return end
 
-    for _, d in pairs(Library) do
-        if d.Name:lower() == n then
-            -- Проверка PlaceID перед применением
-            if not IsPlaceAllowed(d) then
-                warn("❌ Item '" .. d.Name .. "' is not available in this game (ReqPlaceID: " .. tostring(d.ReqPlaceID) .. ")")
+    -- [ ПОИСК В ВСТРОЕННОЙ БИБЛИОТЕКЕ ]
+    if Library then
+        for _, d in pairs(Library) do
+            if d.Name:lower() == n then
+                if not IsPlaceAllowed(d) then
+                    warn("❌ Item '" .. d.Name .. "' is not available in this game (ReqPlaceID: " .. tostring(d.ReqPlaceID) .. ")")
+                    return
+                end
+                if key and key ~= "" then
+                    UIS.InputBegan:Connect(function(input, gpe)
+                        if not gpe and input.KeyCode == Enum.KeyCode[key:upper()] then Apply(d) end
+                    end)
+                else
+                    Apply(d)
+                end
+                if m == "loop" or m == "true" or m == "spawn" then activeAutoRespawns[n] = d end
                 return
             end
-
-            if key and key ~= "" then
-                UIS.InputBegan:Connect(function(input, gpe) 
-                    if not gpe and input.KeyCode == Enum.KeyCode[key:upper()] then Apply(d) end 
-                end)
-            else Apply(d) end
-            if m == "loop" or m == "true" or m == "spawn" then activeAutoRespawns[n] = d end
-            return
         end
     end
+
+    -- [ ПОИСК В МОДУЛЯХ ]
+    for _, mod in pairs(LoadedModules) do
+        for _, d in pairs(mod.library or {}) do
+            if d.Name:lower() == n then
+                Apply(d, mod.sandbox)
+                if m == "loop" or m == "true" or m == "spawn" then activeAutoRespawns[n] = d end
+                return
+            end
+        end
+    end
+
+    warn("XMS || Item '" .. name .. "' not found")
 end
 
 -- [ ИНИЦИАЛИЗАЦИЯ ]
+if ModuleSystem then
+    ModuleSystem.Init({
+        Security      = Security,
+        Helpers       = Helpers,
+        LoadedModules = LoadedModules,
+        DoClear       = function(...) return DoClear(...) end,
+        GetVersion    = function(...) return GetVersion(...) end,
+        Apply         = function(...) return Apply(...) end,
+        MODULES_PATH  = MODULES_PATH,
+        DB_PATH       = DB_PATH,
+    })
+end
+
+EnsureFolders()
+
+getgenv().xms = function(...) return MainHandler(...) end
 setmetatable(_G, { __call = function(_, ...) return MainHandler(...) end })
-lp.CharacterAdded:Connect(function() 
-    task.wait(1.5) 
-    for name, d in pairs(activeAutoRespawns) do 
-        if IsPlaceAllowed(d) then Apply(d) end 
-    end 
+
+lp.CharacterAdded:Connect(function()
+    task.wait(1.5)
+    for name, d in pairs(activeAutoRespawns) do
+        local mod = nil
+        for _, mod2 in pairs(LoadedModules) do
+            for _, item in pairs(mod2.library or {}) do
+                if item.Name:lower() == name then mod = mod2 break end
+            end
+        end
+        if IsPlaceAllowed(d) then Apply(d, mod and mod.sandbox or nil) end
+    end
 end)
-print(" Nixu CMD load ! | " .. GetVersion())
+
+print("XMS || Loaded || " .. GetVersion())
