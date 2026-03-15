@@ -1,6 +1,4 @@
-
 local RELOADASS_URL = "https://wexly.vercel.app/assets.lua"
-local ASSET_BASE_URL = "https://wexly-cdn.vercel.app/assets/"
 
 getgenv().assets = {}
 local assets = getgenv().assets
@@ -14,14 +12,22 @@ local function ensurePath(path)
 end
 
 local assetMap = {
-    ["nilletMS/assets/icons/NixuC.png"]         = "NixuC",
-    ["nilletMS/assets/icons/SomeIcon.png"]       = "SomeIcon",
-    ["nilletMS/assets/icons/Logo.png"]           = "Logo",
-    ["nilletMS/assets/icons/swanmo/SWANMO_B.png"] = "swanmo_b",
+    ["ximeax/swanmo/assets/icon/SWANMO_B.png"] = "swanmo_b",
+	["ximeax/swanmo/assets/bg/bg.png"] = "bgswnmo",
+    ["ximeax/swanmo/assets/icon/swanmo_lb.png"] = "swanmo_lb",
 }
 
-local function downloadAsset(path)
-    local url = ASSET_BASE_URL .. path
+local assetURL = {
+    ["swanmo_b"] = "https://wexly-cdn.vercel.app/assets/icon/swanmo/SWANMO_B",
+    ["bgswnmo"] = "https://wexly-cdn.vercel.app/assets/icon/swanmo/bg/bg",
+    ["swanmo_lb"] = "https://wexly-cdn.vercel.app/assets/icon/swanmo/swanmo_lb",
+}
+local function downloadAsset(path, name)
+    local url = assetURL[name]
+    if not url then
+        warn("XMS || No URL for asset: " .. name)
+        return false
+    end
     local ok, data = pcall(game.HttpGet, game, url)
     if ok and data and data:sub(1,1) ~= "<" then
         ensurePath(path)
@@ -37,7 +43,7 @@ local function loadAssets(filter)
             ensurePath(path)
             if not isfile(path) then
                 print("XMS || Downloading asset: " .. name)
-                downloadAsset(path)
+                downloadAsset(path, name)
             end
             if isfile(path) then
                 local ok, id = pcall(getcustomasset, path)
@@ -68,13 +74,4 @@ function assets.unload()
     print("XMS || Assets unloaded!")
 end
 
-return function(...)
-    local args = {...}
-    if #args > 0 then
-        local filter = {}
-        for _, name in pairs(args) do filter[name] = true end
-        loadAssets(filter)
-    else
-        loadAssets(nil)
-    end
-end
+loadAssets(nil)
