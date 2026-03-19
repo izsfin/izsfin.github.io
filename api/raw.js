@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     // --- 1. ОПРЕДЕЛЕНИЕ КЛИЕНТА ---
     const ua = userAgent.toLowerCase();
-    const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || req.headers['winxs-access'] === 'true';
+    const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || req.headers['Wexly-access'] === 'true';
     const isOwner = ip === MY_IP;
 
     // --- 2. ФИЛЬТР БОТОВ ---
@@ -41,7 +41,14 @@ export default async function handler(req, res) {
     if (rawPath === "auth")       return serveFallback(res, "authSS.html", selectedLang);
     if (rawPath === "auth/cmd")   return serveFallback(res, "authCS.html", selectedLang);
     if (rawPath.startsWith("catalog/")) return serveFallback(res, "catalog-item.html", selectedLang);
-
+    
+    if (rawPath.startsWith("ximeax/")) {
+    const xmsUA = req.headers['user-agent'] || "";
+    if (!xmsUA.includes("ximeax/software")) {
+        if (isRoblox) return res.status(403).send("-- Wexly Error: Access Denied");
+        return res.status(403).send("Forbidden");
+      }
+    }
     if (rawPath === "api/catalog/info" || rawPath === "api/catalog/verified") {
         try {
             const fileName = rawPath === "api/catalog/info" ? "info.json" : "verifed.json";
@@ -159,7 +166,7 @@ export default async function handler(req, res) {
         });
 
         if (!target) {
-            if (isRoblox) return res.status(404).send("-- Winxs Error: File not found");
+            if (isRoblox) return res.status(404).send("-- Wexly Error: File not found");
             return serveFallback(res, fallbackFile, selectedLang);
         }
 
@@ -168,19 +175,19 @@ export default async function handler(req, res) {
         const isApp = appExts.includes(ext);
 
         if ((isArchive || isApp) && isRoblox) {
-            return res.status(403).send("-- Winxs Error: Access Denied");
+            return res.status(403).send("-- Wexly Error: Access Denied");
         }
 
         // --- 9. ПРОВЕРКА ДОСТУПА ---
         if (matchedRule) {
             if (!matchedRule.extensions.includes(ext)) {
-                if (isRoblox) return res.status(403).send("-- Winxs Error: Wrong file type for this secret");
+                if (isRoblox) return res.status(403).send("-- Wexly Error: Wrong file type for this secret");
                 return serveFallback(res, fallbackFile, selectedLang);
             }
         } else if (!isSecretValid) {
             if (!isOwner) {
                 await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked");
-                if (isRoblox) return res.status(403).send("-- Winxs Error: Access Denied. Use @secret");
+                if (isRoblox) return res.status(403).send("-- Wexly Error: Access Denied. Use @secret");
                 return serveFallback(res, fallbackFile, selectedLang);
             }
         }
@@ -221,7 +228,7 @@ export default async function handler(req, res) {
 
     } catch (e) {
         console.error("Fetch Error:", e.message);
-        if (isRoblox) return res.status(500).send("-- Winxs Error: " + e.message);
+        if (isRoblox) return res.status(500).send("-- Wexly Error: " + e.message);
         return serveFallback(res, fallbackFile, selectedLang);
     }
 }
