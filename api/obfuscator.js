@@ -186,10 +186,21 @@ function minifyLua(code) {
     }
 
     // Склеиваем всё в одну строку
-    // После этих конструкций ; нельзя — только пробел
-    const NO_SEMI_AFTER  = /^(then|do|else|repeat|elseif\b.*|.*\)\s*$|.*\(\.\.\.)\s*$|local function \w+\(.*\)\s*$)/;
-    // Перед этими ; нельзя
-    const NO_SEMI_BEFORE = /^(end|else|elseif|until|then|do|,|\)|\]|\})/;
+    // Определяем нужен ли ; между двумя строками
+    function needsSemi(cur, nxt) {
+        // После этих — только пробел
+        if (/^(then|do|else|repeat)$/.test(cur)) return false;
+        if (/elseif\b/.test(cur)) return false;
+        if (cur.endsWith('(')) return false;
+        if (cur.endsWith(',')) return false;
+        if (/\(\.\.\.)$/.test(cur)) return false;       // (function(...)
+        if (/\)$/.test(cur) && /^local\b/.test(nxt)) return false; // )\nlocal
+        if (/^local function\b/.test(cur) && cur.endsWith(')')) return false;
+        // Перед этими — только пробел
+        if (/^(end|else|elseif|until|then|do)\b/.test(nxt)) return false;
+        if (/^[,)\]\}]/.test(nxt)) return false;
+        return true;
+    }
 
     let result = '';
     for (let i = 0; i < out.length; i++) {
@@ -197,14 +208,7 @@ function minifyLua(code) {
         const next = out[i + 1];
         result += cur;
         if (!next) break;
-        // После открывающих конструкций и перед закрывающими — пробел
-        if (NO_SEMI_AFTER.test(cur) || NO_SEMI_BEFORE.test(next)) {
-            result += ' ';
-        } else if (/[a-zA-Z0-9_"')}\]]$/.test(cur) && /^[a-zA-Z0-9_"'({\[]/.test(next)) {
-            result += ';';
-        } else {
-            result += ' ';
-        }
+        result += needsSemi(cur, next) ? ';' : ' ';
     }
     return result;
 }
