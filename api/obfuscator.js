@@ -75,10 +75,41 @@ function condFalse() {
     return '(2^8) == 255';
 }
 
+// Реалистичные junk операции которые выглядят как настоящий код
+function junkExpr() {
+    const k = ri(0, 7);
+    const a = ri(1, 999), b = ri(1, 999), c = ri(1, 999);
+    const ops = [
+        `math.floor(${a} * ${b} / ${c})`,
+        `(${a + b} - ${b})`,
+        `math.max(${a}, ${b})`,
+        `math.min(${a + b}, ${a + b + c})`,
+        `bit and ${a + b} or ${b}`,
+        `select(1, ${a}, ${b})`,
+        `(${a} + ${b} - ${a})`,
+        `math.abs(${a} - ${a + 1}) + ${b}`,
+    ];
+    return ops[k % ops.length];
+}
+
+function junkStatement(varName) {
+    const k = ri(0, 5);
+    const a = ri(1, 100), b = ri(1, 100);
+    const stmts = [
+        `local ${varName} = ${junkExpr()}`,
+        `local ${varName} = type(${a}) == "number" and ${a + b} or ${b}`,
+        `local ${varName}; ${varName} = ${junkExpr()}`,
+        `local ${varName} = (function() return ${junkExpr()} end)()`,
+        `local ${varName} = ${a} > 0 and ${a + b} or 0`,
+        `local ${varName} = math.fmod(${a * b}, ${b + 1}) + ${a}`,
+    ];
+    return stmts[k % stmts.length];
+}
+
 function deadBlock() {
     const lines = [];
     for (let i = 0; i < ri(2, 4); i++) {
-        lines.push(`    local ${rStr()} = ${ri(1, 9999)}`);
+        lines.push(`    ${junkStatement(rStr())}`);
     }
     return `if ${condFalse()} then\n${lines.join('\n')}\nend`;
 }
@@ -86,8 +117,7 @@ function deadBlock() {
 function junkVars(count) {
     const lines = [];
     for (let i = 0; i < count; i++) {
-        const a = ri(1000, 9000), b = ri(1, 500);
-        lines.push(`local ${rStr()} = (${a + b}-${b})`);
+        lines.push(junkStatement(rStr()));
     }
     return lines.join('\n');
 }
