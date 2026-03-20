@@ -25,10 +25,8 @@ export default async function handler(req, res) {
     const isRoblox = ua.includes('roblox') || ua === '' || ua === 'unknown'
         || req.headers['nekoq-access'] === 'true';
 
-    const path = req.url?.split('?')[0] || '';
-
-    // /api/sym/loader — отдаём Lua таблицу (только Roblox)
-    if (path.endsWith('/loader')) {
+    // /api/sym?loader=1 — отдаём Lua таблицу (только Roblox)
+    if (req.query?.loader === '1') {
         if (!isRoblox) return res.status(403).send('-- Forbidden');
 
         // Генерируем таблицу для диапазона -500..9999 (покрывает все числа в обфускаторе)

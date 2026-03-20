@@ -193,7 +193,7 @@ async function obfuscate(source) {
     lines.push(`--[[ Nekoq Obfuscator | wexly.vercel.app/obfuscator ]]`);
     lines.push(`return (function(...)`);
     lines.push(`local _A = {...}`);
-    lines.push(`local ${vSym} = loadstring(game:HttpGet("https://nekoq.vercel.app/api/sym/loader"))()`);
+    lines.push(`local ${vSym} = loadstring(game:HttpGet("https://nekoq.vercel.app/api/sym?loader=1"))()`);
     lines.push(``);
 
     // bxor функция
