@@ -8,22 +8,68 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        :root {
+            --primary: #6366f1; /* Основной цвет для блобов (индиго) */
+        }
+
         body {
             margin: 0; padding: 0; background-color: #0a0202;
             color: #d1d1d1; font-family: 'Poppins', sans-serif;
             display: flex; justify-content: flex-start; align-items: center;
             height: 100vh; overflow: hidden;
         }
-        .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -3; }
+
+        /* Фоновые слои */
+        .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
+        
+        /* Новая сетка с маской */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+            z-index: -4;
+        }
+
+        /* Блобы (плавающие пятна) */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.08;
+            will-change: transform;
+            animation: floatBlob 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -3;
+        }
+        .blob-1 {
+            top: -10%; left: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+        }
+        .blob-2 {
+            bottom: -10%; right: -10%; width: 60vw; height: 60vw;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            animation-delay: -5s;
+        }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(10%, 10%) scale(1.1); }
+        }
+
         .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
-        .grid-layer { position: fixed; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; }
+        
+        /* Контент */
         .content { max-width: 650px; margin-left: 10%; z-index: 2; }
         h1 { color: white; font-size: 52px; font-weight: 800; letter-spacing: 2px; margin-bottom: 25px; }
         .text-container { line-height: 1.7; font-size: 15px; margin-bottom: 20px; color: rgba(255,255,255,0.7); }
         .signature { margin-top: 40px; font-size: 15px; color: white; }
         .footer-copy { margin-top: 10px; font-size: 11px; opacity: 0.3; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Bottom nav */
+        /* Навигация */
         .bottom-nav {
             position: fixed; bottom: 25px; left: 25px;
             background: rgba(10, 11, 15, 0.6);
@@ -35,29 +81,29 @@
         .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
         .nav-link:hover { color: white; }
         .nav-link.active-page { color: rgba(160,140,255,0.8); }
-
         .nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
 
-        /* Lang */
         .lang-box { display: flex; gap: 10px; }
         .lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); }
         .lang-btn.active { color: #6366f1; }
 
-        /* Center credit */
         .bottom-credit {
             position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
             font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
             color: rgba(255,255,255,0.15); text-transform: uppercase;
             z-index: 10; white-space: nowrap;
         }
-            @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         body { animation: fadeIn 0.35s ease forwards; }
-</style>
+    </style>
 </head>
 <body>
     <div class="bg-base"></div>
+    <div class="bg-grid"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
     <div id="glow" class="bg-glow"></div>
-    <div class="grid-layer"></div>
 
     <div class="content">
         <h1>Nekoq</h1>
@@ -75,10 +121,8 @@
         <span onclick="window.open('https://discord.gg/TRPZg4Xfkq','_blank')" class="nav-link">Discord</span>
         <div class="nav-divider"></div>
         <div class="lang-box">
-        <span onclick="setLang('RU')" id="lang-RU" class="lang-btn">RU</span>
-        <span onclick="setLang('EN')" id="lang-EN" class="lang-btn">EN</span>
-     </div>
-    </div>
+            <span onclick="setLang('RU')" id="lang-RU" class="lang-btn">RU</span>
+            <span onclick="setLang('EN')" id="lang-EN" class="lang-btn">EN</span>
         </div>
     </div>
 
@@ -90,7 +134,6 @@
             document.body.style.setProperty('--y', e.clientY + 'px');
         });
 
-        function goTo(url) { window.open(url, '_blank'); }
         function setLang(lang) {
             const url = new URL(window.location.href);
             url.searchParams.set('lang', lang);
@@ -102,12 +145,12 @@
             RU: {
                 text: `<p><strong>Привет пользователь!</strong> Это файловый хостинг для проектов от 0xSquad. Мы поддерживаем и патчим скрипты каждый день нашей командой ! </p><p>Nekoq настроен очень удобно настроен + понятен для поиска и использования наших проектов !</p>`,
                 sign: `Искренне,<br><strong>Команда 0xSquad.</strong>`,
-                credit: `Написанно ellyMS`
+                credit: `Написано ellyMS`
             },
             EN: {
                 text: `<p><strong>Hii user !</strong> This is file hosting for 0xSquad projects. Our team maintains and patches scripts daily ! </p><p>Nekoq is very user-friendly and easy to use, making it easy to find and use our projects ! </p>`,
                 sign: `Sincerely,<br><strong>0xSquad.</strong>`,
-                credit: `Writed by ellyMS`
+                credit: `Written by ellyMS`
             }
         };
 
