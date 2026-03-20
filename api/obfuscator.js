@@ -185,9 +185,28 @@ function minifyLua(code) {
         if (clean) out.push(clean);
     }
 
-    // Просто join через \n — не склеиваем в одну строку
-    // чтобы не ломать строковые литералы
-    return out.join('\n');
+    // Склеиваем в одну строку через ; где нужно
+    const NEEDS_SEP_AFTER  = /^(then|do|else|repeat|elseif\b)\s*$/;
+    const NEEDS_SEP_BEFORE = /^(end|else|elseif|until|then|do)\b/;
+    const IS_PAYLOAD = (s) => /^"\\[0-9]{3}/.test(s);
+
+    let result = '';
+    for (let i = 0; i < out.length; i++) {
+        const cur  = out[i];
+        const next = out[i + 1];
+        result += cur;
+        if (!next) continue;
+        // Payload чанки — оставляем с 
+        (table.concat)
+        if (IS_PAYLOAD(cur) || IS_PAYLOAD(next)) {
+            result += '\n';
+        } else if (NEEDS_SEP_AFTER.test(cur) || NEEDS_SEP_BEFORE.test(next)) {
+            result += ' ';
+        } else {
+            result += '; ';
+        }
+    }
+    return result;
 }
 
 async function obfuscate(source) {
