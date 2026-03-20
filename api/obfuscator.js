@@ -158,7 +158,8 @@ function minifyLua(code) {
         const clean = result.trim();
         if (clean) out.push(clean);
     }
-    return out.join(' ').replace(/ {2,}/g, ' ');
+    return out.join('
+');
 }
 
 function obfuscate(source) {
@@ -255,7 +256,7 @@ ${invBlock3}
 ${junkBottom}
 end)(...)`;
 
-    const header = '--[[ v3.1.0 Nekoq | wexly.vercel.app/obfuscator ]]';
+    const header = '--[[ v3.2.0 fix Nekoq | wexly.vercel.app/obfuscator ]]';
     return header + ' ' + minifyLua(lua);
 }
 
