@@ -49,21 +49,12 @@ function mNum(n) {
 
 // Symbol table: число → символ через API
 const SYM_CACHE = new Map();
-async function fetchSym(n) {
+function fetchSym(n) {
     if (SYM_CACHE.has(n)) return SYM_CACHE.get(n);
-    try {
-        // Всегда используем продакшн URL для sym API
-        const r = await fetch(`https://nekoq.vercel.app/api/sym?n=${n}`, {
-            headers: { 'nekoq-access': 'true' }
-        });
-        if (!r.ok) return null;
-        const d = await r.json();
-        if (!d.sym) return null;
-        SYM_CACHE.set(n, d.sym);
-        return d.sym;
-    } catch {
-        return null; // fallback к mNum
-    }
+    // Вычисляем напрямую через numToSym — без HTTP запроса
+    const sym = numToSym(n);
+    SYM_CACHE.set(n, sym);
+    return sym;
 }
 
 function condFalse() {
@@ -209,8 +200,8 @@ async function obfuscate(source) {
     const vSym  = rStr(); // имя таблицы символов
 
     // Предзагружаем символы для key, salt, 1, 256, 0
-    const symKey  = await fetchSym(key)  || null;
-    const symSalt = await fetchSym(salt) || null;
+    const symKey  = fetchSym(key) || null;
+    const symSalt = fetchSym(salt) || null;
 
     // Вспомогательная функция: число → sym выражение или fallback
     const S = (n) => {
