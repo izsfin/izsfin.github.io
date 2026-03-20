@@ -1,7 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Nekoq Obfuscator — Vercel API endpoint
-// POST /api/obfuscator  { code: "print('hi')" }
-// GET  /api/obfuscator?code=...
+// Lua 5.1 compatible (uses bit.bxor instead of ~)
 // ─────────────────────────────────────────────────────────────────────────────
 
 function rStr(l) {
@@ -27,8 +26,13 @@ function mNum(n) {
     return `(${r + n}-${r})`;
 }
 
+// XOR совместимый с Lua 5.1 через bit.bxor
+function xor(a, b) {
+    return `_bxor(${a},${b})`;
+}
+
 function invariantTrue() {
-    const kind = ri(0, 8);
+    const kind = ri(0, 7);
     if (kind === 0) return 'math.pi > 3';
     if (kind === 1) return 'math.huge > 1e300';
     if (kind === 2) return '(math.pi * math.pi) > 9';
@@ -39,21 +43,16 @@ function invariantTrue() {
     if (kind === 4) return 'type("") == "string"';
     if (kind === 5) return 'tostring(0) == "0"';
     if (kind === 6) return 'math.floor(1.9) == 1';
-    if (kind === 7) {
-        const a = ri(1, 100), b = ri(1, 100);
-        return `math.max(${a},${b}) >= ${Math.min(a, b)}`;
-    }
     return '(2^8) == 256';
 }
 
 function invariantFalse() {
-    const kind = ri(0, 6);
+    const kind = ri(0, 5);
     if (kind === 0) return 'math.pi < 3';
     if (kind === 1) return 'math.huge < 1';
-    if (kind === 2) return '(math.pi * math.pi) < 9';
-    if (kind === 3) return 'type(0) == "string"';
-    if (kind === 4) return 'math.floor(1.9) == 2';
-    if (kind === 5) return 'tostring(1) == "0"';
+    if (kind === 2) return 'type(0) == "string"';
+    if (kind === 3) return 'math.floor(1.9) == 2';
+    if (kind === 4) return 'tostring(1) == "0"';
     return '(2^8) == 255';
 }
 
@@ -62,27 +61,27 @@ function invariantGuardFake(body) {
 }
 
 function invariantBlock() {
-    const lines = Array.from({ length: ri(3, 7) }, () => {
+    const lines = Array.from({ length: ri(3, 6) }, () => {
         const vn = rStr();
-        return `    local ${vn} = ${mNum(ri(1, 200))} ~ ${mNum(ri(1, 127))}`;
+        return `    local ${vn} = ${mNum(ri(1, 200))}`;
     });
     return invariantGuardFake(lines.join('\n'));
 }
 
 function fakeBytecodeBlock(varName) {
-    const arr = Array.from({ length: ri(80, 200) }, () => ri(0, 255));
+    const arr = Array.from({ length: ri(40, 100) }, () => ri(0, 255));
     const arrStr = '{' + arr.join(',') + '}';
     const loopVar = rStr(), op1 = rStr(), op2 = rStr();
     const body = `    for ${loopVar}=${mNum(1)},#${varName} do
-        local ${op1} = ${varName}[${loopVar}] ~ ${loopVar}
+        local ${op1} = ${xor(`${varName}[${loopVar}]`, loopVar)}
         local ${op2} = (${op1} + ${mNum(ri(1, 127))}) % ${mNum(256)}
-        ${varName}[${loopVar}] = ${op2} ~ ${op1}
+        ${varName}[${loopVar}] = ${xor(op2, op1)}
     end`;
     return `local ${varName} = ${arrStr}\n${invariantGuardFake(body)}`;
 }
 
 function junkBlock(count) {
-    count = count || ri(40, 90);
+    count = count || ri(30, 60);
     const lines = [];
     let prev = null;
     for (let i = 0; i < count; i++) {
@@ -103,7 +102,7 @@ function encryptPayload(source) {
     const rot = ri(1, 127);
     data = data.map(b => (b + rot) % 256);
     const salt1 = ri(10, 60);
-    data = data.map((b, i) => (b ^ (salt1 + i)) % 256);
+    data = data.map((b, i) => ((b ^ (salt1 + i)) & 0xff));
     const salt2 = ri(5, 40);
     data = data.map(b => (b + salt2) % 256);
     data.reverse();
@@ -127,13 +126,12 @@ function fakeOpCases(ops, v, exclude) {
     return Object.entries(ops)
         .filter(([name]) => !exclude.has(name))
         .map(([, val]) => {
-            const iv = rStr(), iv2 = rStr(), iv3 = rStr();
-            const innerDead = `            local ${iv3} = ${iv2} * ${mNum(2)}\n            ${v.res} = string.char(${iv3} % ${mNum(256)})`;
+            const iv = rStr(), iv2 = rStr();
             return `        elseif ${v.op_arg} == ${mNum(val)} then
             local ${iv} = ${mNum(ri(1, 200))}
-            local ${iv2} = ${iv} ~ ${mNum(ri(1, 127))}
+            local ${iv2} = ${iv} + ${mNum(ri(1, 127))}
             if ${invariantFalse()} then
-${innerDead}
+                ${v.res} = string.char(${iv2} % ${mNum(256)})
             end`;
         }).join('\n');
 }
@@ -178,24 +176,23 @@ function obfuscate(source) {
     const junkTbl = '{' + junkArr.join(',') + '}';
 
     const v = {};
-    for (const k of ['bc','stk','pc','op','vm','op_arg','val','res','tmp','b','final','jtbl','k_rot','k_s1','k_s2','rev','idx','fn']) {
+    for (const k of ['bxor','bc','stk','pc','op','vm','op_arg','val','res','tmp','b','final','jtbl','k_rot','k_s1','k_s2','rev','idx','fn','err']) {
         v[k] = rStr();
     }
 
     const ops = makeOpcodes();
-    const fakeNames = Array.from({ length: ri(3, 6) }, rStr);
+    const fakeNames = Array.from({ length: ri(2, 4) }, rStr);
     const fakeBlocks = fakeNames.map(fakeBytecodeBlock).join('\n');
     const fakeCases = fakeOpCases(ops, v, new Set(['PUSH', 'DECODE']));
 
-    const junkTop    = junkBlock(ri(50, 90));
-    const junkMiddle = junkBlock(ri(30, 60));
-    const junkBottom = junkBlock(ri(20, 40));
+    const junkTop    = junkBlock(ri(30, 50));
+    const junkMiddle = junkBlock(ri(20, 40));
+    const junkBottom = junkBlock(ri(20, 35));
 
     const invBlock1 = invariantBlock();
     const invBlock2 = invariantBlock();
     const invBlock3 = invariantBlock();
 
-    // Декодирует байты обратно в исходный код
     const decodeBody = `            local ${v.rev} = {}
             for ${v.idx} = ${mNum(1)}, #${v.stk} do
                 ${v.rev}[#${v.stk} - ${v.idx} + ${mNum(1)}] = ${v.stk}[${v.idx}]
@@ -203,7 +200,7 @@ function obfuscate(source) {
             local ${v.res} = ""
             for ${v.idx} = ${mNum(1)}, #${v.rev} do
                 local ${v.b} = (${v.rev}[${v.idx}] - ${v.k_s2}) % ${mNum(256)}
-                ${v.b} = (${v.b} ~ (${v.k_s1} + ${v.idx} - ${mNum(1)})) % ${mNum(256)}
+                ${v.b} = _bxor(${v.b}, (${v.k_s1} + ${v.idx} - ${mNum(1)}) % ${mNum(256)}) % ${mNum(256)}
                 ${v.b} = (${v.b} - ${v.k_rot}) % ${mNum(256)}
                 ${v.res} = ${v.res} .. string.char(${v.b})
             end
@@ -212,29 +209,26 @@ function obfuscate(source) {
     const decoyRes = rStr(), decoyB = rStr(), decoyI = rStr();
     const decoyBody = `            local ${decoyRes} = ""
             for ${decoyI} = ${mNum(1)}, #${v.stk} do
-                local ${decoyB} = ${v.stk}[${decoyI}] ~ ${mNum(ri(1, 255))}
+                local ${decoyB} = _bxor(${v.stk}[${decoyI}], ${mNum(ri(1, 255))} % ${mNum(256)})
                 ${decoyRes} = ${decoyRes} .. string.char(${decoyB} % ${mNum(256)})
             end
             return ${decoyRes}`;
 
-    // Имя loadstring через байты чтобы не палиться
-    const lsBytes = toDec(strToBytes('loadstring'));
-
     const lua = `return (function(...)
+    local _bxor = bit and bit.bxor or bit32 and bit32.bxor or function(a,b) local r=0 local m=1 while a>0 or b>0 do if (a%2)~=(b%2) then r=r+m end a=math.floor(a/2) b=math.floor(b/2) m=m*2 end return r end
 ${junkTop}
 ${invBlock1}
     local ${v.bc} = "${toDec(payload)}"
     local ${v.stk} = {}
     local ${v.pc} = ${mNum(1)}
     local ${v.jtbl} = ${junkTbl}
-    local ${v.k_rot} = (${v.jtbl}[${mNum(idxRot + 1)}] ~ ${mNum(maskRot)})
-    local ${v.k_s1}  = (${v.jtbl}[${mNum(idxS1 + 1)}]  ~ ${mNum(maskS1)})
-    local ${v.k_s2}  = (${v.jtbl}[${mNum(idxS2 + 1)}]  ~ ${mNum(maskS2)})
+    local ${v.k_rot} = _bxor(${v.jtbl}[${mNum(idxRot + 1)}], ${mNum(maskRot)})
+    local ${v.k_s1}  = _bxor(${v.jtbl}[${mNum(idxS1 + 1)}],  ${mNum(maskS1)})
+    local ${v.k_s2}  = _bxor(${v.jtbl}[${mNum(idxS2 + 1)}],  ${mNum(maskS2)})
 ${fakeBlocks}
 ${invBlock2}
 ${junkMiddle}
     local function ${v.vm}(${v.op_arg}, ${v.val})
-        local ${v.tmp} = ${junkTbl}
         if ${v.op_arg} == ${mNum(ops.PUSH)} then
             table.insert(${v.stk}, ${v.val})
 ${fakeCases}
@@ -254,14 +248,14 @@ ${decoyBody}
 ${invBlock3}
     local ${v.final} = ${v.vm}(${mNum(ops.DECODE)})
     local ${v.fn} = load or loadstring
-    assert(${v.fn}, "loadstring not available")
-    local ${v.res}, ${v.tmp} = ${v.fn}(${v.final})
-    assert(${v.res}, ${v.tmp})
+    assert(${v.fn}, "no loadstring")
+    local ${v.res}, ${v.err} = ${v.fn}(${v.final})
+    assert(${v.res}, ${v.err})
     return ${v.res}(...)
 ${junkBottom}
 end)(...)`;
 
-    const header = '--[[ v3.0.0 Nekoq | wexly.vercel.app/obfuscator ]]';
+    const header = '--[[ v3.1.0 Nekoq | wexly.vercel.app/obfuscator ]]';
     return header + ' ' + minifyLua(lua);
 }
 
@@ -282,13 +276,8 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    if (!code || !code.trim()) {
-        return res.status(400).json({ error: 'No code provided' });
-    }
-
-    if (code.length > 50000) {
-        return res.status(400).json({ error: 'Code too large (max 50KB)' });
-    }
+    if (!code || !code.trim()) return res.status(400).json({ error: 'No code provided' });
+    if (code.length > 50000) return res.status(400).json({ error: 'Code too large (max 50KB)' });
 
     try {
         const result = obfuscate(code.trim());
