@@ -3,134 +3,179 @@
     {
       "id": "kawaii-neutral-black-cat-ears",
       "name": "Kawaii Neutral Black Cat Ears",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/kNBCE/preview.png",
-      "command": "_G(\"Black Cat Ears\", \"once\")",
+      "command": "_G(\"Black Cat Ears\")",
       "category": "Accessories",
       "type": "Head"
     },
     {
       "id": "black-beanie",
       "name": "Black Beanie",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/BlackBeanie/preview.png",
-      "command": "_G(\"Black Beanie\", \"once\")",
+      "command": "_G(\"Black Beanie\")",
+      "category": "Accessories",
+      "type": "Head"
+    },
+    {
+      "id": "black-balaclava-fisher-hat",
+      "name": "Black Balaclava Fisher Hat",
+      "author": "0xSquad",
+      "preview": "site/catalog/balaclava/fisher-hat/preview.png",
+      "command": "_G(\"Black Balaclava Fisher Hat\")",
       "category": "Accessories",
       "type": "Head"
     },
     {
       "id": "emo-spiked-shades",
       "name": "Emo Spiked Shades",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/EmoSpikedShades/preview.png",
-      "command": "_G(\"Emo Spiked Shades\", \"once\")",
+      "command": "_G(\"Emo Spiked Shades\")",
+      "category": "Accessories",
+      "type": "Face"
+    },
+    {
+      "id": "white-polarized-sunglasses",
+      "name": "White Polarized Sunglasses",
+      "author": "0xSquad",
+      "preview": "site/catalog/wptsglasses/white/preview.png",
+      "command": "_G(\"White Polarized Sunglasses\")",
+      "category": "Accessories",
+      "type": "Face"
+    },
+    {
+      "id": "pink-polarized-sunglasses",
+      "name": "Pink Polarized Sunglasses",
+      "author": "0xSquad",
+      "preview": "site/catalog/polarizedSG/pink/preview.png",
+      "command": "_G(\"Pink Polarized Sunglasses\")",
+      "category": "Accessories",
+      "type": "Face"
+    },
+    {
+      "id": "black-neck-mask_low",
+      "name": "Black Neck Mask (Low)",
+      "author": "0xSquad",
+      "preview": "site/catalog/neck-mask/black/preview.png",
+      "command": "_G(\"Black Neck Mask (Low)\")",
+      "category": "Accessories",
+      "type": "Face"
+    },
+    {
+      "id": "white-ski-mask",
+      "name": "White Ski Mask",
+      "author": "0xSquad",
+      "preview": "site/catalog/neck-mask/white/preview.png",
+      "command": "_G(\"White Ski Mask\")",
       "category": "Accessories",
       "type": "Face"
     },
     {
       "id": "guns-x-alien",
       "name": "Gunslinger & Alien",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/GxA/preview.png",
-      "command": "_G(\"Guns & Alien\", \"once\")",
+      "command": "_G(\"Guns & Alien\")",
       "category": "Characters",
       "type": "body"
     },
     {
       "id": "pal-face-classic",
       "name": "Pal Face",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/PalFace/preview.png",
-      "command": "_G(\"Pal Face Static\", \"once\")",
+      "command": "_G(\"Pal Face Static\")",
       "category": "Characters",
       "type": "face"
     },
     {
       "id": "pal-face",
       "name": "Pal Face",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/PalFace/NSpreview.png",
-      "command": "_G(\"Pal Face\", \"once\")",
+      "command": "_G(\"Pal Face\")",
       "category": "Characters",
       "type": "dhead"
     },
     {
       "id": "purple-bape-v1",
       "name": "Purple Bape #1",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/bape/purple/v.1/preview.png",
-      "command": "_G(\"Purple Bape\", \"once\")",
+      "command": "_G(\"Purple Bape\")",
       "category": "Outfits"
     },
     {
       "id": "purple-bape-v2",
       "name": "Purple Bape #2",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/bape/purple/v.2/preview.png",
-      "command": "_G(\"Purple Bape\", \"once\")",
+      "command": "_G(\"Purple Bape\")",
       "category": "Outfits"
     },
     {
       "id": "black-bape",
       "name": "Black Bape",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/bape/black/preview.png",
-      "command": "_G(\"Black Bape\", \"once\")",
+      "command": "_G(\"Black Bape\")",
       "category": "Outfits"
     },
     {
       "id": "blue-bape-v1",
       "name": "Blue Bape #1",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/bape/blue/v.1/preview.png",
-      "command": "_G(\"Blue Bape #1\", \"once\")",
+      "command": "_G(\"Blue Bape #1\")",
       "category": "Outfits"
     },
     {
       "id": "blue-bape-v2",
       "name": "Blue Bape #2",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/bape/blue/v.2/preview.png",
-      "command": "_G(\"Blue Bape #2\", \"once\")",
+      "command": "_G(\"Blue Bape #2\")",
       "category": "Outfits"
     },
     {
       "id": "black-camo-v1",
       "name": "Black Camo #1",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/Millitary/BlackCamo/v1/preview.png",
-      "command": "_G(\"Black Camo #1\", \"once\")",
+      "command": "_G(\"Black Camo #1\")",
       "category": "Outfits"
     },
     {
       "id": "black-camo-v2",
       "name": "Black Camo #2",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/Millitary/BlackCamo/v2/preview.png",
-      "command": "_G(\"Black Camo #2\", \"once\")",
+      "command": "_G(\"Black Camo #2\")",
       "category": "Outfits"
     },
     {
       "id": "blue-camo",
       "name": "Blue Camo",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/Millitary/BlueCamo/preview.png",
-      "command": "_G(\"Blue Camo\", \"once\")",
+      "command": "_G(\"Blue Camo\")",
       "category": "Outfits"
     },
     {
       "id": "classic-camo",
       "name": "Classic Camo",
-      "author": "ximeax",
+      "author": "0xSquad",
       "preview": "site/catalog/Millitary/ClassicCamo/preview.png",
-      "command": "_G(\"Classic Camo\", \"once\")",
+      "command": "_G(\"Classic Camo\")",
       "category": "Outfits"
     },
     {
       "id": "loader",
       "name": "Loader",
-      "author": "ximeax",
-      "preview": "site/catalog/ximeax/assets/Loader.png",
+      "author": "0xSquad",
+      "preview": "site/catalog/0xSquad/assets/Loader.png",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/loader\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -138,8 +183,8 @@
     {
       "id": "nixu!-mobile",
       "name": "Nixu! Mobile",
-      "author": "ximeax",
-      "preview": "site/catalog/ximeax/assets/",
+      "author": "0xSquad",
+      "preview": "site/catalog/0xSquad/assets/",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/mobile\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -147,8 +192,8 @@
     {
       "id": "swanmo-pc",
       "name": "Swanmo PC",
-      "author": "ximeax",
-      "preview": "site/catalog/ximeax/assets/PC.png",
+      "author": "0xSquad",
+      "preview": "site/catalog/0xSquad/assets/PC.png",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/pc\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -156,8 +201,8 @@
     {
       "id": "swanmo-legacy",
       "name": "Swanmo Legacy",
-      "author": "ximeax",
-      "preview": "site/catalog/ximeax/assets/Legacy.png",
+      "author": "0xSquad",
+      "preview": "site/catalog/0xSquad/assets/Legacy.png",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/legacy\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -165,8 +210,8 @@
       {
       "id": "swanmo-premium",
       "name": "Swanmo Premium",
-      "author": "ximeax",
-      "preview": "site/catalog/ximeax/assets/Premium.png",
+      "author": "0xSquad",
+      "preview": "site/catalog/0xSquad/assets/Premium.png",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/premium\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -174,8 +219,8 @@
     {
       "id": "xms",
       "name": "XMS [CMD]",
-      "author": "ximeax",
-      "preview": "site/catalog/ximeax/assets/xms.png",
+      "author": "0xSquad",
+      "preview": "site/catalog/0xSquad/assets/xms.png",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/xms\"))()",
       "category": "Scripts",
       "type": "Official Software"
