@@ -8,16 +8,44 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        :root {
+            --primary: #ff0073;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #02040a; color: #d1d1d1;
+            background-color: #050204; color: #d1d1d1;
             font-family: 'Poppins', sans-serif;
             height: 100vh; overflow: hidden;
             display: flex; flex-direction: column;
+            animation: fadeIn 0.35s ease forwards;
         }
-        .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -3; }
+
+        /* Фоновые слои (как в Obfuscator) */
+        .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
+        .bg-grid {
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+            z-index: -4;
+        }
+        .blob {
+            position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08;
+            will-change: transform; animation: floatBlob 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); z-index: -3;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--primary), transparent 70%); }
+        .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--primary), transparent 70%); animation-delay: -5s; }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(10%, 10%) scale(1.1); }
+        }
+
         .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%), rgba(255,255,255,0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
-        .grid-layer { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px); background-size: 50px 50px; z-index: -1; }
 
         /* Header */
         .page-header {
@@ -36,99 +64,83 @@
             overflow: hidden; height: 36px;
         }
         .plat-btn {
-            font-family: 'Poppins', sans-serif;
-            font-size: 11px; font-weight: 700; padding: 0 20px; height: 100%;
-            display: flex; align-items: center; cursor: pointer;
-            color: rgba(255,255,255,0.3); border: none; background: transparent;
+            font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700; padding: 0 20px; height: 100%;
+            display: flex; align-items: center; cursor: pointer; color: rgba(255,255,255,0.3); border: none; background: transparent;
             transition: all 0.2s; letter-spacing: 0.5px;
         }
-        .plat-btn.active { background: rgba(99,102,241,0.12); color: white; }
+        .plat-btn.active { background: rgba(255, 0, 115, 0.12); color: var(--primary); }
         .plat-sep { width: 1px; height: 60%; background: rgba(255,255,255,0.07); }
 
         /* Main layout */
         .main-layout {
-            flex: 1; display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px; padding: 16px 32px 80px;
-            min-height: 0; position: relative; z-index: 2;
+            flex: 1; display: grid; grid-template-columns: 1fr 1fr;
+            gap: 16px; padding: 16px 32px 80px; min-height: 0; position: relative; z-index: 2;
         }
 
         /* Glass panel */
         .glass-panel {
-            background: rgba(10,11,15,0.6); backdrop-filter: blur(30px);
+            background: rgba(15, 10, 13, 0.434); backdrop-filter: blur(30px);
             border: 1px solid rgba(255,255,255,0.06); border-radius: 16px;
-            padding: 20px 22px; display: flex; flex-direction: column;
-            min-height: 0; overflow: hidden;
+            padding: 20px 22px; display: flex; flex-direction: column; min-height: 0; overflow: hidden;
         }
         .panel-title {
-            font-size: 10px; font-weight: 700; color: rgba(99,102,241,0.8);
+            font-size: 10px; font-weight: 700; color: var(--primary);
             letter-spacing: 2px; text-transform: uppercase;
-            border-bottom: 1px solid rgba(99,102,241,0.15);
+            border-bottom: 1px solid rgba(255, 0, 115, 0.15);
             padding-bottom: 8px; margin-bottom: 12px; flex-shrink: 0;
         }
 
-        /* Scroll */
-        .scroll-area { overflow-y: auto; flex: 1; scrollbar-width: none; -ms-overflow-style: none; }
+        .scroll-area { overflow-y: auto; flex: 1; scrollbar-width: none; }
         .scroll-area::-webkit-scrollbar { display: none; }
 
         /* Exploit rows */
         .exploit-list { display: flex; flex-direction: column; gap: 2px; }
         .cat-label {
-            font-size: 9px; font-weight: 800; color: rgba(99,102,241,0.6);
-            letter-spacing: 1.5px; text-transform: uppercase;
-            margin-top: 14px; margin-bottom: 4px; display: block;
+            font-size: 9px; font-weight: 800; color: rgba(255, 0, 115, 0.6);
+            letter-spacing: 1.5px; text-transform: uppercase; margin-top: 14px; margin-bottom: 4px; display: block;
         }
         .cat-label:first-child { margin-top: 0; }
         .exploit-row {
             display: flex; justify-content: space-between; align-items: center;
-            font-size: 10px; font-weight: 600; padding: 3px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.02);
+            font-size: 10px; font-weight: 600; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.02);
             color: rgba(255,255,255,0.55);
         }
-        .s-working      { color: #4ade80; }
-        .s-unknown      { color: #fbbf24; opacity: 0.8; }
-        .s-dead         { color: #ef4444; opacity: 0.7; }
-        .s-discontinued { color: #ef4444; opacity: 0.45; }
-        .s-patched      { color: #ef4444; opacity: 0.7; }
+        .s-working { color: #4ade80; }
+        .s-unknown { color: #fbbf24; opacity: 0.8; }
+        .s-dead, .s-discontinued, .s-patched { color: #f87171; opacity: 0.7; }
 
         /* Projects panel */
         .project-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 14px; border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.05);
-            background: rgba(255,255,255,0.02);
-            margin-bottom: 8px;
+            padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.02); margin-bottom: 8px;
         }
         .project-name { font-size: 12px; font-weight: 700; color: white; }
-        .project-badge {
-            font-size: 10px; font-weight: 700; padding: 3px 12px;
-            border-radius: 6px; letter-spacing: 0.5px;
-        }
+        .project-badge { font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 6px; letter-spacing: 0.5px; }
         .badge-working { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
-        .badge-patched { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
-        .badge-unknown { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+        .badge-patched { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
 
         /* Bottom nav */
         .bottom-nav {
             position: fixed; bottom: 25px; left: 25px;
-            background: rgba(10,11,15,0.6); backdrop-filter: blur(20px);
+            background: rgba(15, 10, 13, 0.434); backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
             padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center;
         }
         .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
         .nav-link:hover { color: white; }
-        .nav-link.active-page { color: rgba(160,140,255,0.8); }
+        .nav-link.active-page { color: rgba(255, 145, 207, 0.8); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        body { animation: fadeIn 0.35s ease forwards; }
-
         .section-fade { animation: fadeIn 0.25s ease forwards; }
     </style>
 </head>
 <body>
 <div class="bg-base"></div>
+<div class="bg-grid"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
 <div class="bg-glow"></div>
-<div class="grid-layer"></div>
 
 <div class="page-header">
     <div>
@@ -143,7 +155,6 @@
 </div>
 
 <div class="main-layout">
-    <!-- Left: Exploits -->
     <div class="glass-panel">
         <div class="panel-title" id="exploitPanelTitle">Executors</div>
         <div class="scroll-area">
@@ -151,7 +162,6 @@
         </div>
     </div>
 
-    <!-- Right: Projects -->
     <div class="glass-panel">
         <div class="panel-title">Our Projects</div>
         <div class="scroll-area">
@@ -293,31 +303,21 @@
         }
     ];
 
-    const STATUS_LABEL = {
-        working: 'Working',
-        unknown: 'Unknown',
-        dead: 'Dead',
-        discontinued: 'Discontinued',
-        patched: 'Patched'
-    };
-    const STATUS_CLASS = {
-        working: 's-working',
-        unknown: 's-unknown',
-        dead: 's-dead',
-        discontinued: 's-discontinued',
-        patched: 's-patched'
+    const STATUS_MAP = {
+        working: { label: 'Working', class: 's-working' },
+        unknown: { label: 'Unknown', class: 's-unknown' },
+        discontinued: { label: 'Discontinued', class: 's-discontinued' },
+        patched: { label: 'Patched', class: 's-patched' }
     };
 
     function renderExploits(data) {
-        var list = document.getElementById('exploitList');
-        var html = '';
-        data.forEach(function(cat) {
-            html += '<span class="cat-label">' + cat.label + '</span>';
-            cat.items.forEach(function(item) {
-                html += '<div class="exploit-row">'
-                    + '<span class="' + (STATUS_CLASS[item.status] || '') + '">' + (STATUS_LABEL[item.status] || item.status) + '</span>'
-                    + '<span>' + item.name + '</span>'
-                    + '</div>';
+        const list = document.getElementById('exploitList');
+        let html = '';
+        data.forEach(cat => {
+            html += `<span class="cat-label">${cat.label}</span>`;
+            cat.items.forEach(item => {
+                const s = STATUS_MAP[item.status] || { label: item.status, class: '' };
+                html += `<div class="exploit-row"><span class="${s.class}">${s.label}</span><span>${item.name}</span></div>`;
             });
         });
         list.innerHTML = html;
@@ -326,19 +326,11 @@
         list.classList.add('section-fade');
     }
 
-    var currentPlatform = 'pc';
-
     function setPlatform(val) {
-        currentPlatform = val;
         document.getElementById('platPC').classList.toggle('active', val === 'pc');
         document.getElementById('platMobile').classList.toggle('active', val === 'mobile');
-        if (val === 'pc') {
-            document.getElementById('exploitPanelTitle').textContent = 'PC & MacOS Executors';
-            renderExploits(PC_DATA);
-        } else {
-            document.getElementById('exploitPanelTitle').textContent = 'Mobile Executors';
-            renderExploits(MOBILE_DATA);
-        }
+        document.getElementById('exploitPanelTitle').textContent = val === 'pc' ? 'PC & MacOS Executors' : 'Mobile Executors';
+        renderExploits(val === 'pc' ? PC_DATA : MOBILE_DATA);
     }
 
     setPlatform('pc');
