@@ -1,4 +1,4 @@
-// Nekoq Obfuscator v4 — Lua 5.1 compatible, no minifier
+// Nekoq Obfuscator v4 — Lua 5.1 compatible, no minifier, chunked payload
 
 function rStr(l) {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -88,8 +88,6 @@ function obfuscate(source) {
     const vKey  = rStr(), vSalt = rStr(), vRev = rStr();
     const vBxor = rStr();
 
-    const payloadStr = toDec(data);
-
     const lines = [];
 
     lines.push(`--[[ Nekoq Obfuscator | wexly.vercel.app/obfuscator ]]`);
@@ -117,8 +115,16 @@ function obfuscate(source) {
     lines.push(deadBlock());
     lines.push(``);
 
-    // Зашифрованный payload
-    lines.push(`local ${vBc} = "${payloadStr}"`);
+    // --- ИЗМЕНЕНИЯ ЗДЕСЬ: Разбиваем данные на чанки ---
+    const chunkSize = 200; // Количество байт в одной строке
+    lines.push(`local ${vBc} = table.concat({`);
+    for (let i = 0; i < data.length; i += chunkSize) {
+        const chunk = data.slice(i, i + chunkSize);
+        lines.push(`    "${toDec(chunk)}",`);
+    }
+    lines.push(`})`);
+    // ------------------------------------------------
+
     lines.push(`local ${vKey}  = ${mNum(key)}`);
     lines.push(`local ${vSalt} = ${mNum(salt)}`);
     lines.push(`local ${vStk}  = {}`);
