@@ -278,6 +278,8 @@ async function obfuscate(source) {
     return minifyLua(raw);
 }
 
+export const config = { api: { bodyParser: { sizeLimit: '200kb' } } };
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -286,7 +288,12 @@ export default async function handler(req, res) {
 
     let code = '';
     if (req.method === 'POST') {
-        code = req.body?.code || '';
+        // Vercel иногда не парсит — читаем вручную если нужно
+        let body = req.body;
+        if (typeof body === 'string') {
+            try { body = JSON.parse(body); } catch {}
+        }
+        code = body?.code || '';
     } else if (req.method === 'GET') {
         code = req.query?.code || '';
     } else {
