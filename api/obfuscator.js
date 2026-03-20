@@ -196,8 +196,7 @@ function minifyLua(code) {
         const next = out[i + 1];
         result += cur;
         if (!next) continue;
-        // Payload чанки — оставляем с 
-        (table.concat)
+        // Payload чанки — оставляем с \n (внутри table.concat)
         if (IS_PAYLOAD(cur) || IS_PAYLOAD(next)) {
             result += '\n';
         } else if (NEEDS_SEP_AFTER.test(cur) || NEEDS_SEP_BEFORE.test(next)) {
