@@ -40,7 +40,7 @@
       "id": "white-polarized-sunglasses",
       "name": "White Polarized Sunglasses",
       "author": "0xSquad",
-      "preview": "site/catalog/wptsglasses/white/preview.png",
+      "preview": "site/catalog/polarizedSG/white/preview.png",
       "command": "_G(\"White Polarized Sunglasses\")",
       "category": "Accessories",
       "type": "Face"
