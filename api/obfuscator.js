@@ -115,18 +115,49 @@ function encrypt(source) {
 
 // ── Минификатор Lua ──────────────────────────────────────────────────────────
 function minifyLua(code) {
-    // Просто удаляем пустые строки — синтаксис не трогаем
     const lines = code.split('\n');
-    const result = [];
-    for (const line of lines) {
-        const t = line.trim();
-        // Пропускаем пустые строки
-        if (!t) continue;
-        // Пропускаем однострочные комментарии -- (но не внутри строк)
-        // Payload строки с \DDD и sym таблица ["x..."] оставляем как есть
-        result.push(t);
+    const out = [];
+    let inMLComment = false;
+
+    for (let line of lines) {
+        // Многострочные комментарии --[[ ]]
+        if (inMLComment) {
+            const end = line.indexOf(']]');
+            if (end !== -1) { inMLComment = false; line = line.slice(end + 2); }
+            else continue;
+        }
+
+        const trimmed = line.trim();
+        if (!trimmed) continue; // пустые строки пропускаем
+
+        // Payload строки и заголовок — без изменений
+        if (/^"\\[0-9]{3}/.test(trimmed) || (trimmed.startsWith('--[[') && trimmed.includes('Nekoq'))) {
+            out.push(trimmed);
+            continue;
+        }
+
+        // Убираем --[[ ... ]] однострочно
+        let processed = line.replace(/--\[\[.*?\]\]/g, '');
+
+        // Начало многострочного --[[
+        const mlStart = processed.indexOf('--[[');
+        if (mlStart !== -1) {
+            const mlEnd = processed.indexOf(']]', mlStart + 4);
+            if (mlEnd !== -1) {
+                processed = processed.slice(0, mlStart) + processed.slice(mlEnd + 2);
+            } else {
+                inMLComment = true;
+                processed = processed.slice(0, mlStart);
+            }
+        }
+
+        const clean = processed.trim();
+        if (clean) out.push(clean);
     }
-    return result.join('\n');
+
+    // Просто join через \n — не склеиваем в одну строку
+    // чтобы не ломать строковые литералы
+    return out.join('\n');
 }
 
 async function obfuscate(source) {
