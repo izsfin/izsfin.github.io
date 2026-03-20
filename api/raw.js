@@ -51,7 +51,7 @@ export default async function handler(req, res) {
     }
     if (rawPath === "api/catalog/info" || rawPath === "api/catalog/verified") {
         try {
-            const fileName = rawPath === "api/catalog/info" ? "info.json" : "verifed.json";
+            const fileName = rawPath === "api/catalog/info" ? "info.json" : "verified.json";
             const { data } = await octokit.repos.getContent({
                 owner: OWNER, repo: REPO,
                 path: "api/catalog/" + fileName, ref: "main"
