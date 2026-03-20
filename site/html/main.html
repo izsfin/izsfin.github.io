@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --primary: #ff0073; /* Основной цвет для блобов (индиго) */
+            --primary: #ff0073; /* Твой новый розовый акцент */
         }
 
         body {
@@ -20,8 +20,8 @@
         }
 
         /* Фоновые слои */
+        .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
 
-        /* Новая сетка с маской */
         .bg-grid {
             position: fixed;
             inset: 0;
@@ -34,7 +34,6 @@
             z-index: -4;
         }
 
-        /* Блобы (плавающие пятна) */
         .blob {
             position: fixed;
             border-radius: 50%;
@@ -82,9 +81,10 @@
         .nav-link.active-page { color: rgba(255, 145, 207, 0.8); }
         .nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
 
+        /* Lang */
         .lang-box { display: flex; gap: 10px; }
         .lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); }
-        .lang-btn.active { color: #6366f1; }
+        .lang-btn.active { color: var(--primary); } /* Исправлено с синего на розовый */
 
         .bottom-credit {
             position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
