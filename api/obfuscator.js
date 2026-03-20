@@ -83,6 +83,65 @@ function encrypt(source) {
     return { data: encrypted, key, salt };
 }
 
+
+// ── Минификатор Lua ──────────────────────────────────────────────────────────
+function minifyLua(code) {
+    const lines = code.split('\n');
+    const out = [];
+    let inMLComment = false;
+
+    for (let line of lines) {
+        // Мультистрочные комментарии --[[ ... ]]
+        if (inMLComment) {
+            const end = line.indexOf(']]');
+            if (end !== -1) { inMLComment = false; line = line.slice(end + 2); }
+            else continue;
+        }
+
+        // Убираем --[[ однострочно
+        line = line.replace(/--\[\[.*?\]\]/g, '');
+
+        // Начало --[[
+        const mlStart = line.indexOf('--[[');
+        if (mlStart !== -1) {
+            const mlEnd = line.indexOf(']]', mlStart + 4);
+            if (mlEnd !== -1) {
+                line = line.slice(0, mlStart) + line.slice(mlEnd + 2);
+            } else {
+                inMLComment = true;
+                line = line.slice(0, mlStart);
+            }
+        }
+
+        // Убираем однострочные комментарии (не внутри строк)
+        let result = '';
+        let inStr = false, strChar = null;
+        for (let i = 0; i < line.length; i++) {
+            const c = line[i];
+            if (inStr) {
+                result += c;
+                if (c === strChar && line[i-1] !== '\\') inStr = false;
+            } else {
+                if (c === '"' || c === "'") { inStr = true; strChar = c; result += c; }
+                else if (c === '-' && line[i+1] === '-') break;
+                else result += c;
+            }
+        }
+
+        const clean = result.trim();
+        if (clean) out.push(clean);
+    }
+
+    // Склеиваем через пробел, схлопываем множественные пробелы
+    // Но добавляем разделители перед ключевыми словами чтобы не слипалось
+    let joined = out.join(' ');
+    joined = joined.replace(/ {2,}/g, ' ');
+
+    // Добавляем ; после end/then/do где нужно чтобы не слипались токены
+    // Лучше просто join через \n чтобы не ломать синтаксис
+    return out.join('\n');
+}
+
 function obfuscate(source) {
     const { data, key, salt } = encrypt(source);
 
@@ -185,7 +244,9 @@ function obfuscate(source) {
     lines.push(`return ${vOut}(table.unpack(_A))`);
     lines.push(`end)(...)`);
 
-    return lines.join('\n');
+    // Применяем минификатор к финальному выводу
+    const raw = lines.join('\n');
+    return minifyLua(raw);
 }
 
 export default async function handler(req, res) {
