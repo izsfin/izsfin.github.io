@@ -8,43 +8,89 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        :root {
+            --primary: #ff0073;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            margin: 0; padding: 0; background-color: #02040a;
+            margin: 0; padding: 0; background-color: #050204;
             color: #d1d1d1; font-family: 'Poppins', sans-serif;
             display: flex; justify-content: flex-start; align-items: center; 
             height: 100vh; overflow: hidden;
+            animation: fadeIn 0.35s ease forwards;
         }
-        .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -3; }
-        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
-        .grid-layer { position: fixed; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; }
-        .content { max-width: 600px; margin-left: 10%; z-index: 2; }
-        h1 { color: white; font-size: 52px; font-weight: 800; letter-spacing: 2px; margin-bottom: 25px; }
-        .text-container { line-height: 1.7; font-size: 15px; margin-bottom: 20px; color: rgba(255,255,255,0.7); }
-        .yellow-warn { color: #ffcc00; font-weight: 600; margin: 20px 0; }
-        .signature { margin-top: 40px; font-size: 15px; color: white; }
+
+        /* Анимированный фон */
+        .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
+        .bg-grid {
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+            z-index: -4;
+        }
+        .blob {
+            position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08;
+            animation: floatBlob 20s infinite alternate ease-in-out; z-index: -3;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 40vw; height: 40vw; background: var(--primary); }
+        .blob-2 { bottom: -10%; right: 10%; width: 35vw; height: 35vw; background: var(--primary); animation-delay: -7s; }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(5%, 5%) scale(1.1); }
+        }
+
+        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 150px at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.04) 0%, transparent 100%); z-index: -2; pointer-events: none; }
+
+        /* Content */
+        .content { max-width: 650px; margin-left: 10%; z-index: 2; position: relative; }
+        h1 { 
+            color: white; font-size: 64px; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; 
+            background: linear-gradient(to bottom, #fff, #999); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .text-container { line-height: 1.8; font-size: 16px; color: rgba(255,255,255,0.6); }
+        .yellow-warn { 
+            color: #ffcc00; font-weight: 600; margin: 25px 0; padding-left: 15px; 
+            border-left: 3px solid #ffcc00; background: rgba(255, 204, 0, 0.05); padding: 10px 15px; border-radius: 0 8px 8px 0;
+        }
+        .signature { margin-top: 45px; font-size: 16px; color: white; opacity: 0.9; }
+
+        /* Navigation */
         .bottom-nav {
             position: fixed; bottom: 25px; left: 25px;
-            background: rgba(10, 11, 15, 0.6); backdrop-filter: blur(20px);
+            background: rgba(15, 10, 13, 0.5); backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px; padding: 10px 20px;
             display: flex; gap: 25px; z-index: 10; align-items: center;
         }
         .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
         .nav-link:hover { color: white; }
-        .nav-link.active-page { color: rgba(160,140,255,0.8); }
         .nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
-        .lang-box { display: flex; gap: 10px; }
+        
+        .lang-box { display: flex; gap: 12px; }
         .lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); }
-        .lang-btn.active { color: #6366f1; }
-        .bottom-credit { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.15); text-transform: uppercase; z-index: 10; white-space: nowrap; }
-            @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        body { animation: fadeIn 0.35s ease forwards; }
-</style>
+        .lang-btn.active { color: var(--primary); }
+
+        .bottom-credit { 
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); 
+            font-size: 9px; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.1); 
+            text-transform: uppercase; z-index: 5; 
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
 </head>
 <body>
     <div class="bg-base"></div>
+    <div class="bg-grid"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
     <div id="glow" class="bg-glow"></div>
-    <div class="grid-layer"></div>
 
     <div class="content">
         <h1>Nekoq</h1>
@@ -55,16 +101,16 @@
     <div class="bottom-credit" id="bottomCredit"></div>
 
     <div class="bottom-nav">
-    <span onclick="window.location.href='/'" class="nav-link">Home</span>
-    <span onclick="window.location.href='/catalog'" class="nav-link">Catalog</span>
-    <span onclick="window.location.href='/obfuscator'" class="nav-link">Obfuscator</span>
-    <span onclick="window.location.href='/getkey'" class="nav-link">Authentication</span>
-    <span onclick="window.location.href='/status'" class="nav-link">Status</span>
-    <span onclick="window.open('https://discord.gg/FGXGdVxbue','_blank')" class="nav-link">Discord</span>
-    <div class="nav-divider"></div>
+        <span onclick="window.location.href='/'" class="nav-link">Home</span>
+        <span onclick="window.location.href='/catalog'" class="nav-link">Catalog</span>
+        <span onclick="window.location.href='/obfuscator'" class="nav-link">Obfuscator</span>
+        <span onclick="window.location.href='/getkey'" class="nav-link">Authentication</span>
+        <span onclick="window.location.href='/status'" class="nav-link">Status</span>
+        <span onclick="window.open('https://discord.gg/FGXGdVxbue','_blank')" class="nav-link">Discord</span>
+        <div class="nav-divider"></div>
         <div class="lang-box">
-          <span onclick="setLang('RU')" id="lang-RU" class="lang-btn">RU</span>
-          <span onclick="setLang('EN')" id="lang-EN" class="lang-btn">EN</span>
+            <span onclick="setLang('RU')" id="lang-RU" class="lang-btn">RU</span>
+            <span onclick="setLang('EN')" id="lang-EN" class="lang-btn">EN</span>
         </div>
     </div>
 
@@ -80,17 +126,17 @@
             window.location.href = url.href;
         }
 
-        const currentLang = "{{LANG}}".trim();
+        const currentLang = "{{LANG}}".trim() || 'RU';
         const content = {
             RU: {
                 text: `<p>Домен для теста скриптов.</p><p class="yellow-warn">Если вы не укажете автора нашего скрипта, мы будем вынуждены занести вас в черный список проекта!</p><p>Если вы хотите вступить в группу тестеров, перейдите в наш Discord!</p>`,
                 sign: `<strong>Команда NilletMS</strong>`,
-                credit: `Написанно ellyMS`
+                credit: `Написано ellyMS`
             },
             EN: {
                 text: `<p>Domain for script testing.</p><p class="yellow-warn">If you do not credit the author of our script, we will be forced to blacklist you from the project!</p><p>If you want to join the tester group, head over to our Discord!</p>`,
-                sign: `<strong>NilletMS</strong>`,
-                credit: `Writed by ellyMS`
+                sign: `<strong>NilletMS Team</strong>`,
+                credit: `Written by ellyMS`
             }
         };
 
@@ -99,9 +145,8 @@
         document.getElementById('test-sign').innerHTML = data.sign;
         document.getElementById('bottomCredit').textContent = data.credit;
 
-        const btn = document.getElementById('lang-' + (currentLang || 'RU'));
-        if (btn) btn.classList.add('active');
-        function goTo(url) { window.open(url, '_blank'); }
+        const activeBtn = document.getElementById('lang-' + currentLang);
+        if (activeBtn) activeBtn.classList.add('active');
     </script>
 </body>
 </html>
