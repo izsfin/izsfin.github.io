@@ -185,25 +185,22 @@ function minifyLua(code) {
         if (clean) out.push(clean);
     }
 
-    // Склеиваем в одну строку через ; где нужно
+    // Склеиваем всё в одну строку
     const NEEDS_SEP_AFTER  = /^(then|do|else|repeat|elseif\b)\s*$/;
     const NEEDS_SEP_BEFORE = /^(end|else|elseif|until|then|do)\b/;
-    const IS_PAYLOAD = (s) => /^"\\[0-9]{3}/.test(s);
 
     let result = '';
     for (let i = 0; i < out.length; i++) {
         const cur  = out[i];
         const next = out[i + 1];
         result += cur;
-        if (!next) continue;
-        // Payload чанки — оставляем с \n (внутри table.concat)
-        if (IS_PAYLOAD(cur) || IS_PAYLOAD(next)) {
-            result += '\n';
-        } else if (NEEDS_SEP_AFTER.test(cur) || NEEDS_SEP_BEFORE.test(next)) {
+        if (!next) break;
+        if (NEEDS_SEP_AFTER.test(cur) || NEEDS_SEP_BEFORE.test(next)) {
             result += ' ';
-        } else {
-            result += '; ';
+        } else if (/[a-zA-Z0-9_")}]$/.test(cur) && /^[a-zA-Z0-9_"({]/.test(next)) {
+            result += ';';
         }
+        // строки таблицы заканчиваются на , — ничего не добавляем
     }
     return result;
 }
@@ -271,7 +268,7 @@ async function obfuscate(source) {
     lines.push(`local ${vBc} = table.concat({`);
     for (let i = 0; i < data.length; i += chunkSize) {
         const chunk = data.slice(i, i + chunkSize);
-        lines.push(`    "${toDec(chunk)}",`);
+        lines.push(`"${toDec(chunk)}",`);
     }
     lines.push(`})`);
     lines.push(``);
@@ -327,7 +324,7 @@ async function obfuscate(source) {
     const rawLines = raw.split('\n');
     const header = rawLines[0]; // --[[ Nekoq ... ]]
     const body = rawLines.slice(1).join('\n');
-    return header + '\n' + minifyLua(body);
+    return header + ' ' + minifyLua(body);
 }
 
 export const config = { api: { bodyParser: { sizeLimit: '200kb' } } };
