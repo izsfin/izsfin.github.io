@@ -186,8 +186,10 @@ function minifyLua(code) {
     }
 
     // Склеиваем всё в одну строку
-    const NEEDS_SEP_AFTER  = /^(then|do|else|repeat|elseif\b)\s*$/;
-    const NEEDS_SEP_BEFORE = /^(end|else|elseif|until|then|do)\b/;
+    // После этих конструкций ; нельзя — только пробел
+    const NO_SEMI_AFTER  = /^(then|do|else|repeat|elseif\b.*|.*\)\s*$|.*\(\.\.\.)\s*$|local function \w+\(.*\)\s*$)/;
+    // Перед этими ; нельзя
+    const NO_SEMI_BEFORE = /^(end|else|elseif|until|then|do|,|\)|\]|\})/;
 
     let result = '';
     for (let i = 0; i < out.length; i++) {
@@ -195,12 +197,14 @@ function minifyLua(code) {
         const next = out[i + 1];
         result += cur;
         if (!next) break;
-        if (NEEDS_SEP_AFTER.test(cur) || NEEDS_SEP_BEFORE.test(next)) {
+        // После открывающих конструкций и перед закрывающими — пробел
+        if (NO_SEMI_AFTER.test(cur) || NO_SEMI_BEFORE.test(next)) {
             result += ' ';
-        } else if (/[a-zA-Z0-9_")}]$/.test(cur) && /^[a-zA-Z0-9_"({]/.test(next)) {
+        } else if (/[a-zA-Z0-9_"')}\]]$/.test(cur) && /^[a-zA-Z0-9_"'({\[]/.test(next)) {
             result += ';';
+        } else {
+            result += ' ';
         }
-        // строки таблицы заканчиваются на , — ничего не добавляем
     }
     return result;
 }
