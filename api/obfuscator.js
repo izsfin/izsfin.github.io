@@ -90,8 +90,8 @@ function obfuscate(source) {
 
     const lines = [];
 
-    lines.push(`--[[ Nekoq Obfuscator | wexly.vercel.app/obfuscator ]]`);
-    lines.push(`return (function(...)`);
+    lines.push(`--[[ Nekoq Obfuscator 2 | wexly.vercel.app/obfuscator ]]`);
+    lines.push(`return (function()`);
 
     // bxor совместимость
     lines.push(`local function ${vBxor}(a,b)`);
@@ -170,9 +170,8 @@ function obfuscate(source) {
     lines.push(`assert(${vFn}, "loadstring unavailable")`);
     lines.push(`local ${vFn}, ${vErr} = ${vFn}(${vRes})`);
     lines.push(`assert(${vFn}, ${vErr})`);
-    lines.push(`return ${vFn}(...)`);
-    lines.push(`end)(...)`);
-
+    lines.push(`return ${vFn}()`);
+    lines.push(`end)()`);
     return lines.join('\n');
 }
 
