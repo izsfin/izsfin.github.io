@@ -96,7 +96,7 @@ function obfuscate(source) {
     lines.push(`return (function(...)`);
 
     // bxor совместимость
-    lines.push(`local ${vBxor} = bit and bit.bxor or bit32 and bit32.bxor or function(a,b)`);
+    lines.push(`local function ${vBxor}(a,b)`);
     lines.push(`    local r,m = 0,1`);
     lines.push(`    while a > 0 or b > 0 do`);
     lines.push(`        if a % 2 ~= b % 2 then r = r + m end`);
@@ -105,6 +105,9 @@ function obfuscate(source) {
     lines.push(`        m = m * 2`);
     lines.push(`    end`);
     lines.push(`    return r`);
+    lines.push(`end`);
+    lines.push(`if bit then ${vBxor} = bit.bxor`);
+    lines.push(`elseif bit32 then ${vBxor} = bit32.bxor`);
     lines.push(`end`);
     lines.push(``);
 
