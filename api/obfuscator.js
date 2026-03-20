@@ -185,32 +185,8 @@ function minifyLua(code) {
         if (clean) out.push(clean);
     }
 
-    // Склеиваем всё в одну строку
-    // Определяем нужен ли ; между двумя строками
-    function needsSemi(cur, nxt) {
-        // После этих — только пробел
-        if (/^(then|do|else|repeat)$/.test(cur)) return false;
-        if (/elseif\b/.test(cur)) return false;
-        if (cur.endsWith('(')) return false;
-        if (cur.endsWith(',')) return false;
-        if (/\(\.\.\.)$/.test(cur)) return false;       // (function(...)
-        if (/\)$/.test(cur) && /^local\b/.test(nxt)) return false; // )\nlocal
-        if (/^local function\b/.test(cur) && cur.endsWith(')')) return false;
-        // Перед этими — только пробел
-        if (/^(end|else|elseif|until|then|do)\b/.test(nxt)) return false;
-        if (/^[,)\]\}]/.test(nxt)) return false;
-        return true;
-    }
-
-    let result = '';
-    for (let i = 0; i < out.length; i++) {
-        const cur  = out[i];
-        const next = out[i + 1];
-        result += cur;
-        if (!next) break;
-        result += needsSemi(cur, next) ? ';' : ' ';
-    }
-    return result;
+    // Склеиваем всё в одну строку через пробел
+    return out.join(' ');
 }
 
 async function obfuscate(source) {
