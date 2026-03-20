@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     // --- 1. ОПРЕДЕЛЕНИЕ КЛИЕНТА ---
     const ua = userAgent.toLowerCase();
-    const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || req.headers['Wexly-access'] === 'true';
+    const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || req.headers['Nekoq-access'] === 'true';
     const isOwner = ip === MY_IP;
 
     // --- 2. ФИЛЬТР БОТОВ ---
@@ -26,11 +26,11 @@ export default async function handler(req, res) {
     // --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
-    if (host.includes("wexly-testing"))  { codeBranch = "test"; fallbackFile = "test.html"; }
-    else if (host.includes("wexly-api")) { codeBranch = "api"; }
-    else if (host.includes("wexly-raw")) { codeBranch = "raw"; }
-    else if (host.includes("wexly-cdn")) { codeBranch = "cdn"; }
-    else if (host.includes("wexly"))     { codeBranch = "off"; }
+    if (host.includes("nekoq-testing"))  { codeBranch = "test"; fallbackFile = "test.html"; }
+    else if (host.includes("nekoq-api")) { codeBranch = "api"; }
+    else if (host.includes("nekoq-raw")) { codeBranch = "raw"; }
+    else if (host.includes("nekoq-cdn")) { codeBranch = "cdn"; }
+    else if (host.includes("nekoq"))     { codeBranch = "off"; }
 
     // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     if (rawPath === "obfuscator") return serveFallback(res, "obfuscator.html", selectedLang);
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     if (rawPath.startsWith("ximeax/")) {
     const xmsUA = req.headers['user-agent'] || "";
     if (!xmsUA.includes("ximeax/software")) {
-        if (isRoblox) return res.status(403).send("-- Wexly Error: Access Denied");
+        if (isRoblox) return res.status(403).send("-- Nekoq Error: Access Denied");
         return res.status(403).send("Forbidden");
       }
     }
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
     }
 
     // --- 4. STATUS ДОМЕН ---
-    if (host.includes("wexly-status")) {
+    if (host.includes("Nekoq-status")) {
         return serveFallback(res, "status.html", selectedLang);
     }
 
@@ -166,7 +166,7 @@ export default async function handler(req, res) {
         });
 
         if (!target) {
-            if (isRoblox) return res.status(404).send("-- Wexly Error: File not found");
+            if (isRoblox) return res.status(404).send("-- Nekoq Error: File not found");
             return serveFallback(res, fallbackFile, selectedLang);
         }
 
@@ -175,19 +175,19 @@ export default async function handler(req, res) {
         const isApp = appExts.includes(ext);
 
         if ((isArchive || isApp) && isRoblox) {
-            return res.status(403).send("-- Wexly Error: Access Denied");
+            return res.status(403).send("-- Nekoq Error: Access Denied");
         }
 
         // --- 9. ПРОВЕРКА ДОСТУПА ---
         if (matchedRule) {
             if (!matchedRule.extensions.includes(ext)) {
-                if (isRoblox) return res.status(403).send("-- Wexly Error: Wrong file type for this secret");
+                if (isRoblox) return res.status(403).send("-- Nekoq Error: Wrong file type for this secret");
                 return serveFallback(res, fallbackFile, selectedLang);
             }
         } else if (!isSecretValid) {
             if (!isOwner) {
                 await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked");
-                if (isRoblox) return res.status(403).send("-- Wexly Error: Access Denied. Use @secret");
+                if (isRoblox) return res.status(403).send("-- Nekoq Error: Access Denied. Use @secret");
                 return serveFallback(res, fallbackFile, selectedLang);
             }
         }
@@ -228,7 +228,7 @@ export default async function handler(req, res) {
 
     } catch (e) {
         console.error("Fetch Error:", e.message);
-        if (isRoblox) return res.status(500).send("-- Wexly Error: " + e.message);
+        if (isRoblox) return res.status(500).send("-- Nekoq Error: " + e.message);
         return serveFallback(res, fallbackFile, selectedLang);
     }
 }
