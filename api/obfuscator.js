@@ -158,8 +158,7 @@ function minifyLua(code) {
         const clean = result.trim();
         if (clean) out.push(clean);
     }
-    return out.join('
-');
+    return out.join('');
 }
 
 function obfuscate(source) {
