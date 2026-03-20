@@ -1,4 +1,14 @@
+import crypto from 'crypto';
 // Nekoq Obfuscator v5 — Lua 5.1 compatible
+
+// Symbol table — та же логика что в sym.js
+const SYM_SEED = process.env.SYM_SEED || 'nekoq-2025-H1';
+function numToSym(n) {
+    const hash = crypto.createHash('sha256')
+        .update(SYM_SEED + ':' + n.toString())
+        .digest('hex');
+    return 'x' + hash.slice(0, 5).toUpperCase();
+}
 
 function rStr(l) {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -42,11 +52,13 @@ const SYM_CACHE = new Map();
 async function fetchSym(n) {
     if (SYM_CACHE.has(n)) return SYM_CACHE.get(n);
     try {
-        const base = process.env.VERCEL_URL
-            ? `https://${process.env.VERCEL_URL}`
-            : 'https://nekoq.vercel.app';
-        const r = await fetch(`${base}/api/sym?n=${n}`);
+        // Всегда используем продакшн URL для sym API
+        const r = await fetch(`https://nekoq.vercel.app/api/sym?n=${n}`, {
+            headers: { 'nekoq-access': 'true' }
+        });
+        if (!r.ok) return null;
         const d = await r.json();
+        if (!d.sym) return null;
         SYM_CACHE.set(n, d.sym);
         return d.sym;
     } catch {
@@ -190,7 +202,7 @@ async function obfuscate(source) {
 
     const lines = [];
 
-    lines.push(`--[[ Nekoq Obfuscator | wexly.vercel.app/obfuscator ]]`);
+    lines.push(`--[[ Nekoq || https://nekoq.vercel.app ]]`);
     lines.push(`return (function(...)`);
     lines.push(`local _A = {...}`);
     lines.push(`local ${vSym} = loadstring(game:HttpGet("https://nekoq.vercel.app/api/sym?loader=1"))()`);
@@ -273,9 +285,12 @@ async function obfuscate(source) {
     lines.push(`return ${vOut}(table.unpack(_A))`);
     lines.push(`end)(...)`);
 
-    // Применяем минификатор к финальному выводу
+    // Применяем минификатор к финальному выводу (кроме первой строки-заголовка)
     const raw = lines.join('\n');
-    return minifyLua(raw);
+    const rawLines = raw.split('\n');
+    const header = rawLines[0]; // --[[ Nekoq ... ]]
+    const body = rawLines.slice(1).join('\n');
+    return header + '\n' + minifyLua(body);
 }
 
 export const config = { api: { bodyParser: { sizeLimit: '200kb' } } };
