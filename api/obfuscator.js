@@ -37,6 +37,23 @@ function mNum(n) {
     return `(${r + n}-${r})`;
 }
 
+// Symbol table: число → символ через API
+const SYM_CACHE = new Map();
+async function fetchSym(n) {
+    if (SYM_CACHE.has(n)) return SYM_CACHE.get(n);
+    try {
+        const base = process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : 'https://nekoq.vercel.app';
+        const r = await fetch(`${base}/api/sym?n=${n}`);
+        const d = await r.json();
+        SYM_CACHE.set(n, d.sym);
+        return d.sym;
+    } catch {
+        return null; // fallback к mNum
+    }
+}
+
 function condFalse() {
     const k = ri(0, 4);
     if (k === 0) return 'math.pi < 3';
@@ -142,7 +159,7 @@ function minifyLua(code) {
     return out.join('\n');
 }
 
-function obfuscate(source) {
+async function obfuscate(source) {
     const { data, key, salt } = encrypt(source);
 
     const vBxor = rStr();
@@ -159,12 +176,24 @@ function obfuscate(source) {
     const vFn   = rStr();
     const vOut  = rStr();
     const vErr  = rStr();
+    const vSym  = rStr(); // имя таблицы символов
+
+    // Предзагружаем символы для key, salt, 1, 256, 0
+    const symKey  = await fetchSym(key)  || null;
+    const symSalt = await fetchSym(salt) || null;
+
+    // Вспомогательная функция: число → sym выражение или fallback
+    const S = (n) => {
+        const cached = SYM_CACHE.get(n);
+        return cached ? `${vSym}["${cached}"]` : mNum(n);
+    };
 
     const lines = [];
 
     lines.push(`--[[ Nekoq Obfuscator | wexly.vercel.app/obfuscator ]]`);
     lines.push(`return (function(...)`);
     lines.push(`local _A = {...}`);
+    lines.push(`local ${vSym} = loadstring(game:HttpGet("https://nekoq.vercel.app/api/sym/loader"))()`);
     lines.push(``);
 
     // bxor функция
@@ -198,8 +227,8 @@ function obfuscate(source) {
     lines.push(`})`);
     lines.push(``);
 
-    lines.push(`local ${vKey}  = ${mNum(key)}`);
-    lines.push(`local ${vSalt} = ${mNum(salt)}`);
+    lines.push(`local ${vKey}  = ${symKey ? `${vSym}["${symKey}"]` : mNum(key)}`);
+    lines.push(`local ${vSalt} = ${symSalt ? `${vSym}["${symSalt}"]` : mNum(salt)}`);
     lines.push(`local ${vStk}  = {}`);
     lines.push(`local ${vPc}   = ${mNum(1)}`);
     lines.push(``);
@@ -268,7 +297,7 @@ export default async function handler(req, res) {
     if (code.length > 100000) return res.status(400).json({ error: 'Code too large (max 100KB)' });
 
     try {
-        const result = obfuscate(code.trim());
+        const result = await obfuscate(code.trim());
         return res.status(200).json({ success: true, result, size: result.length });
     } catch (e) {
         return res.status(500).json({ error: 'Obfuscation failed: ' + e.message });
