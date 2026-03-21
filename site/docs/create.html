@@ -390,7 +390,7 @@ async function doPublish() {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
         username: currentUser.username,
-        password: currentUser.password || '',
+        token: currentUser.token || '',
         name, desc, text,
         img: imgBase64 || null
       })

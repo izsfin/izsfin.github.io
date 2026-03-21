@@ -133,6 +133,21 @@ body {
 }
 .auth-msg.err { color: rgba(248,113,113,0.8); }
 .auth-msg.ok { color: rgba(74,222,128,0.8); }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 25px; left: 25px;
+  background: rgba(15,10,13,0.434); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
+  padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center;
+}
+.nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; text-decoration: none; }
+.nav-link:hover { color: white; }
+.nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
+.lang-box { display: flex; gap: 10px; }
+.lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); background: none; border: none; font-family: 'Poppins',sans-serif; }
+.lang-btn.active { color: var(--primary); }
+.bottom-credit { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.15); text-transform: uppercase; z-index: 10; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -251,7 +266,7 @@ async function doSubmit() {
     const d = await r.json();
     if (d.ok) {
       // Сохраняем сессию
-      localStorage.setItem('nq-docs-user', JSON.stringify({ username: u }));
+      localStorage.setItem('nq-docs-user', JSON.stringify({ username: u, token: d.token }));
       setMsg(currentTab === 'register' ? 'Account created!' : 'Welcome back!', 'ok');
       setTimeout(() => { window.location.href = '/docs'; }, 800);
     } else {
