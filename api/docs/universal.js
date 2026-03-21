@@ -146,9 +146,9 @@ async function handleAuth(req, res) {
             JoinDate: [joinDate, joinTime]
         };
         await createGHFile(uPath, ui, `docs: register ${username}`);
-        const token = crypto.randomBytes(24).toString('hex');
-        await redis.set(`docs:session:${token}`, username, 'EX', 60 * 60 * 24 * 30).catch(()=>{});
-        return res.json({ ok: true, username, token });
+        const regToken = crypto.randomBytes(24).toString('hex');
+        await redis.set(`docs:session:${regToken}`, username, 'EX', 60 * 60 * 24 * 30).catch(()=>{});
+        return res.json({ ok: true, username, token: regToken });
     }
 
     if (subAction === 'login') {
@@ -168,6 +168,7 @@ async function handleAuth(req, res) {
             file.content.IPlogins = ips;
             await putGHFile(uPath, file.content, file.sha, `docs: login ${username}`).catch(()=>{});
         }
+        console.log('Login success, token:', token.slice(0,8));
         return res.json({ ok: true, username, token });
     }
 
@@ -242,8 +243,6 @@ async function handleCreate(req, res) {
     }
 
     // Проверяем сессию по token
-    const token = req.body.token || '';
-    if (!token) return res.status(401).json({ error: 'Not authorized' });
     let sessionUser = null;
     try { sessionUser = await redis.get(`docs:session:${token}`); } catch(e) {}
     // Fallback: если Redis недоступен — проверяем пароль напрямую
