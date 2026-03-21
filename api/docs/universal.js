@@ -114,65 +114,52 @@ export default async function handler(req, res) {
 async function handleAuth(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-    let body = req.body || {};
-    // Принудительный парсинг если body пришёл строкой
-    if (typeof body === 'string') { try { body = JSON.parse(body); } catch(e) {} }
-    if (typeof body !== 'object' || body === null) body = {};
+    const data = req.body || {};
+    const username = data.username || '';
+    const password = data.password || '';
+    
+    // Пытаемся достать тип действия из всех возможных мест
+    const subAction = data.subaction || data.action || req.query.subaction || '';
 
-    const username = body.username || '';
-    const password = body.password || '';
-    const subAction = body.action || req.query.subaction || '';
-
-    // Debug: логируем что получили
-    console.log('handleAuth body:', JSON.stringify({username: !!username, password: !!password, action: subAction}));
-
-    if (!username || !password) return res.status(400).json({ error: 'Missing fields', debug: {username: !!username, password: !!password, bodyType: typeof req.body} });
-    if (!isValidUsername(username)) return res.status(400).json({ error: 'Invalid username (3-32 chars, no arabic/etc)' });
-    if (!isValidPassword(password)) return res.status(400).json({ error: 'Password too weak or too short (min 8)' });
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Missing fields' });
+    }
 
     const uPath = `docs/users/${username}/ui.json`;
-    const hash  = hashPassword(password);
+    const hash = hashPassword(password);
 
+    // РЕГИСТРАЦИЯ
     if (subAction === 'register') {
         const existing = await getGHFile(uPath);
-        if (existing) return res.status(409).json({ error: 'Username already taken' });
+        if (existing) return res.status(409).json({ error: 'Username taken' });
 
-        const joinDate = nowDate();
-        const joinTime = new Date().toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
         const ui = {
             Username: username,
             Password: hash,
-            IPlogins: [],
-            JoinDate: [joinDate, joinTime]
+            JoinDate: [nowDate(), new Date().toLocaleTimeString()]
         };
-        await createGHFile(uPath, ui, `docs: register ${username}`);
-        const regToken = crypto.randomBytes(24).toString('hex');
-        await redis.set(`docs:session:${regToken}`, username, 'EX', 60 * 60 * 24 * 30).catch(()=>{});
-        return res.json({ ok: true, username, token: regToken });
+        
+        await createGHFile(uPath, ui, `docs: reg ${username}`);
+        
+        const token = crypto.randomBytes(24).toString('hex');
+        await redis.set(`docs:session:${token}`, username, 'EX', 2592000).catch(()=>{});
+        
+        return res.json({ ok: true, username, token });
     }
 
+    // ЛОГИН
     if (subAction === 'login') {
         const file = await getGHFile(uPath);
         if (!file) return res.status(404).json({ error: 'User not found' });
         if (file.content.Password !== hash) return res.status(401).json({ error: 'Wrong password' });
 
-        // Генерируем session token
         const token = crypto.randomBytes(24).toString('hex');
-        await redis.set(`docs:session:${token}`, username, 'EX', 60 * 60 * 24 * 30).catch(()=>{});
+        await redis.set(`docs:session:${token}`, username, 'EX', 2592000).catch(()=>{});
 
-        // Логируем IP
-        const ip = req.headers['x-forwarded-for']?.split(',')[0] || 'unknown';
-        const ips = file.content.IPlogins || [];
-        if (!ips.includes(ip)) {
-            ips.push(ip);
-            file.content.IPlogins = ips;
-            await putGHFile(uPath, file.content, file.sha, `docs: login ${username}`).catch(()=>{});
-        }
-        console.log('Login success, token:', token.slice(0,8));
         return res.json({ ok: true, username, token });
     }
 
-    return res.status(400).json({ error: 'Unknown auth action' });
+    return res.status(400).json({ error: 'Invalid subaction: ' + subAction });
 }
 
 // ── POSTS LIST ────────────────────────────────────────────────────────────────
