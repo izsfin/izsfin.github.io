@@ -113,24 +113,32 @@ function junkVars(count) {
     return lines.join('\n');
 }
 
-// Простое XOR шифрование с одним байтовым ключом (без накопления)
+// Двойное шифрование: XOR layer 1 → shuffle → XOR layer 2
 function encrypt(source) {
     const data = strToBytes(source);
-    const key = ri(1, 127);
+    const key  = ri(1, 127);
     const salt = ri(1, 50);
+    const key2 = ri(1, 127);  // второй ключ
+    const salt2 = ri(1, 50);  // второй salt
 
-    const encrypted = data.map((b, i) => {
-        // XOR с key XOR с (i % 256) чтобы не выходить за байт
+    // Слой 1: XOR + salt + позиционный XOR
+    let layer1 = data.map((b, i) => {
         let x = (b ^ key ^ (i % 256)) & 0xff;
-        // ADD salt
         x = (x + salt) & 0xff;
         return x;
     });
 
-    // Реверс
-    encrypted.reverse();
+    // Реверс после первого слоя
+    layer1.reverse();
 
-    return { data: encrypted, key, salt };
+    // Слой 2: ещё один XOR с другим ключом
+    let layer2 = layer1.map((b, i) => {
+        let x = (b ^ key2) & 0xff;
+        x = (x + salt2 + (i % 13)) & 0xff;
+        return x;
+    });
+
+    return { data: layer2, key, salt, key2, salt2 };
 }
 
 
@@ -181,7 +189,7 @@ function minifyLua(code) {
 }
 
 async function obfuscate(source) {
-    const { data, key, salt } = encrypt(source);
+    const { data, key, salt, key2, salt2 } = encrypt(source);
 
     const vBxor = rStr();
     const vBc   = rStr();
@@ -197,11 +205,15 @@ async function obfuscate(source) {
     const vFn   = rStr();
     const vOut  = rStr();
     const vErr  = rStr();
-    const vSym  = rStr(); // имя таблицы символов
+    const vSym   = rStr(); // имя таблицы символов
+    const vKey2  = rStr();
+    const vSalt2 = rStr();
 
     // Предзагружаем символы для key, salt, 1, 256, 0
-    const symKey  = fetchSym(key) || null;
-    const symSalt = fetchSym(salt) || null;
+    const symKey   = fetchSym(key)  || null;
+    const symSalt  = fetchSym(salt) || null;
+    const symKey2  = fetchSym(key2)  || null;
+    const symSalt2 = fetchSym(salt2) || null;
 
     // Вспомогательная функция: число → sym выражение или fallback
     const S = (n) => {
@@ -214,7 +226,7 @@ async function obfuscate(source) {
     const vOrigLoad = rStr(); // сохраняем оригинальный load ДО любых хуков
     const vHttpGet  = rStr();
 
-    lines.push(`--[[ Nekoq v1.1.4 || https://nekoq.vercel.app ]]`);
+    lines.push(`--[[ Nekoq v1.1.5 || https://nekoq.vercel.app ]]`);
     lines.push(`return (function(...)`);
     // Первое что делаем — захватываем оригинальный load через debug.getinfo
     // чтобы обойти любой hook установленный ДО нашего скрипта
@@ -266,8 +278,10 @@ async function obfuscate(source) {
     lines.push(`})`);
     lines.push(``);
 
-    lines.push(`local ${vKey}  = ${symKey ? `${vSym}["${symKey}"]` : mNum(key)}`);
-    lines.push(`local ${vSalt} = ${symSalt ? `${vSym}["${symSalt}"]` : mNum(salt)}`);
+    lines.push(`local ${vKey}   = ${symKey   ? `${vSym}["${symKey}"]`   : mNum(key)}`);
+    lines.push(`local ${vSalt}  = ${symSalt  ? `${vSym}["${symSalt}"]`  : mNum(salt)}`);
+    lines.push(`local ${vKey2}  = ${symKey2  ? `${vSym}["${symKey2}"]`  : mNum(key2)}`);
+    lines.push(`local ${vSalt2} = ${symSalt2 ? `${vSym}["${symSalt2}"]` : mNum(salt2)}`);
     lines.push(`local ${vStk}  = {}`);
     lines.push(`local ${vPc}   = ${mNum(1)}`);
     lines.push(``);
@@ -290,10 +304,15 @@ async function obfuscate(source) {
     lines.push(`end`);
     lines.push(``);
 
-    // Декодирование — ключ XOR с (i-1) % 256
+    // Декодирование: сначала снимаем слой 2, потом слой 1
+    const vTmp = rStr();
     lines.push(`local ${vRes} = ""`);
     lines.push(`for ${vI} = 1, #${vRev} do`);
-    lines.push(`    local ${vB} = (${vRev}[${vI}] - ${vSalt}) % 256`);
+    // Снимаем слой 2
+    lines.push(`    local ${vTmp} = (${vRev}[${vI}] - ${vSalt2} - ((${vI} - 1) % 13)) % 256`);
+    lines.push(`    ${vTmp} = ${vBxor}(${vTmp}, ${vKey2})`);
+    // Снимаем слой 1
+    lines.push(`    local ${vB} = (${vTmp} - ${vSalt}) % 256`);
     lines.push(`    ${vB} = ${vBxor}(${vB}, ${vKey})`);
     lines.push(`    ${vB} = ${vBxor}(${vB}, (${vI} - 1) % 256)`);
     lines.push(`    ${vRes} = ${vRes} .. string.char(${vB})`);
