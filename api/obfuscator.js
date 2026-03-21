@@ -226,7 +226,7 @@ async function obfuscate(source) {
     const vOrigLoad = rStr(); // сохраняем оригинальный load ДО любых хуков
     const vHttpGet  = rStr();
 
-    lines.push(`--[[ Nekoq v1.1.5 || https://nekoq.vercel.app ]]`);
+    lines.push(`--[[ Nekoq v1.1.6 || https://nekoq.vercel.app ]]`);
     lines.push(`return (function(...)`);
     // Первое что делаем — захватываем оригинальный load через debug.getinfo
     // чтобы обойти любой hook установленный ДО нашего скрипта
@@ -304,14 +304,17 @@ async function obfuscate(source) {
     lines.push(`end`);
     lines.push(``);
 
-    // Декодирование: сначала снимаем слой 2, потом слой 1
+    // Декодирование: снимаем слой 2 (с оригинальным индексом), потом слой 1
+    // rev[i] = layer2[n-i+1], оригинальный индекс layer2 = n - i
     const vTmp = rStr();
+    const vN   = rStr();
+    lines.push(`local ${vN} = #${vRev}`);
     lines.push(`local ${vRes} = ""`);
-    lines.push(`for ${vI} = 1, #${vRev} do`);
-    // Снимаем слой 2
-    lines.push(`    local ${vTmp} = (${vRev}[${vI}] - ${vSalt2} - ((${vI} - 1) % 13)) % 256`);
-    lines.push(`    ${vTmp} = ${vBxor}(${vTmp}, ${vKey2})`);
-    // Снимаем слой 1
+    lines.push(`for ${vI} = 1, ${vN} do`);
+    // Снимаем слой 2: оригинальный индекс = vN - vI (0-based)
+    lines.push(`    local ${vTmp} = ${vBxor}(${vRev}[${vI}], ${vKey2})`);
+    lines.push(`    ${vTmp} = (${vTmp} - ${vSalt2} - ((${vN} - ${vI}) % 13)) % 256`);
+    // Снимаем слой 1: после реверса индекс i соответствует оригинальному i-1
     lines.push(`    local ${vB} = (${vTmp} - ${vSalt}) % 256`);
     lines.push(`    ${vB} = ${vBxor}(${vB}, ${vKey})`);
     lines.push(`    ${vB} = ${vBxor}(${vB}, (${vI} - 1) % 256)`);
