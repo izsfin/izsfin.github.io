@@ -256,26 +256,39 @@ async function doSubmit() {
   if (currentTab === 'register' && p.length < 8) { setMsg('Password min 8 chars', 'err'); return; }
 
   setMsg('wait...', '');
-  document.getElementById('submitBtn').disabled = true;
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
 
   try {
+    // Отправляем запрос. Обрати внимание: в теле теперь subaction
     const r = await fetch('/api/docs/universal?action=auth', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ action: currentTab, username: u, password: p })
+      method: 'POST', 
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ 
+        subaction: currentTab, // ИСПРАВЛЕНО: было action
+        username: u, 
+        password: p 
+      })
     });
+    
     const d = await r.json();
-    if (d.ok) {
-      // Сохраняем сессию
-      localStorage.setItem('nq-docs-user', JSON.stringify({ username: u, token: d.token }));
+    
+    if (d.ok && d.token) {
+      // Сохраняем сессию. Убеждаемся, что токен пришел.
+      localStorage.setItem('nq-docs-user', JSON.stringify({ 
+        username: d.username, 
+        token: d.token 
+      }));
+      
       setMsg(currentTab === 'register' ? 'Account created!' : 'Welcome back!', 'ok');
       setTimeout(() => { window.location.href = '/docs'; }, 800);
     } else {
       setMsg(d.error || 'Something went wrong', 'err');
-      document.getElementById('submitBtn').disabled = false;
+      btn.disabled = false;
     }
   } catch(e) {
     setMsg('Network error', 'err');
-    document.getElementById('submitBtn').disabled = false;
+    btn.disabled = false;
   }
 }
 
