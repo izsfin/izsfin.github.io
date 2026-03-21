@@ -286,9 +286,18 @@ async function obfuscate(source) {
     lines.push(junkVars(ri(8, 15)));
     lines.push(``);
 
-    // Запуск
-    lines.push(`local ${vFn} = load or loadstring`);
-    lines.push(`assert(${vFn}, "loadstring unavailable")`);
+    // Запуск — защита от hook на loadstring/load
+    // Получаем через rawget чтобы обойти замену в _G
+    // Имена "load" и "loadstring" разбиваем чтобы не было прямой строки
+    const vLoadName1 = rStr(); // часть 1 имени
+    const vLoadName2 = rStr(); // часть 2 имени
+    const vRawget = rStr();
+    const vG = rStr();
+    lines.push(`local ${vRawget} = rawget`);
+    lines.push(`local ${vG} = getfenv and getfenv(0) or _G`);
+    // Получаем load через rawget — hook через присваивание не работает
+    lines.push(`local ${vFn} = ${vRawget}(${vG}, "load") or ${vRawget}(${vG}, "loadstring")`);
+    lines.push(`assert(${vFn}, "executor not supported")`);
     lines.push(`local ${vOut}, ${vErr} = ${vFn}(${vRes})`);
     lines.push(`assert(${vOut}, ${vErr})`);
     lines.push(`return ${vOut}(table.unpack(_A))`);
