@@ -211,7 +211,7 @@ async function obfuscate(source) {
 
     const lines = [];
 
-    lines.push(`--[[ Nekoq || https://nekoq.vercel.app ]]`);
+    lines.push(`--[[ Nekoq v1.1.1 || https://nekoq.vercel.app ]]`);
     lines.push(`return (function(...)`);
     lines.push(`local _A = {...}`);
     lines.push(`local ${vSym} = loadstring(game:HttpGet("https://nekoq.vercel.app/api/sym?loader=1"))()`);
