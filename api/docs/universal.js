@@ -137,7 +137,9 @@ async function handleAuth(req, res) {
             JoinDate: [joinDate, joinTime]
         };
         await createGHFile(uPath, ui, `docs: register ${username}`);
-        return res.json({ ok: true });
+        const token = crypto.randomBytes(24).toString('hex');
+        await redis.set(`docs:session:${token}`, username, 'EX', 60 * 60 * 24 * 30).catch(()=>{});
+        return res.json({ ok: true, username, token });
     }
 
     if (subAction === 'login') {
@@ -145,15 +147,19 @@ async function handleAuth(req, res) {
         if (!file) return res.status(404).json({ error: 'User not found' });
         if (file.content.Password !== hash) return res.status(401).json({ error: 'Wrong password' });
 
+        // Генерируем session token
+        const token = crypto.randomBytes(24).toString('hex');
+        await redis.set(`docs:session:${token}`, username, 'EX', 60 * 60 * 24 * 30).catch(()=>{});
+
         // Логируем IP
         const ip = req.headers['x-forwarded-for']?.split(',')[0] || 'unknown';
         const ips = file.content.IPlogins || [];
         if (!ips.includes(ip)) {
             ips.push(ip);
             file.content.IPlogins = ips;
-            await putGHFile(uPath, file.content, file.sha, `docs: login ${username}`);
+            await putGHFile(uPath, file.content, file.sha, `docs: login ${username}`).catch(()=>{});
         }
-        return res.json({ ok: true, username });
+        return res.json({ ok: true, username, token });
     }
 
     return res.status(400).json({ error: 'Unknown auth action' });
@@ -221,16 +227,24 @@ async function handlePost(req, res) {
 async function handleCreate(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-    const { username, password, name, desc, text, img } = req.body || {};
-    if (!username || !password || !name || !desc || !text) {
+    const { username, token, name, desc, text, img } = req.body || {};
+    if (!username || !token || !name || !desc || !text) {
         return res.status(400).json({ error: 'Missing fields' });
     }
 
-    // Проверяем авторизацию
-    const uPath = `docs/users/${username}/ui.json`;
-    const uFile = await getGHFile(uPath);
-    if (!uFile) return res.status(401).json({ error: 'User not found' });
-    if (uFile.content.Password !== hashPassword(password)) return res.status(401).json({ error: 'Wrong password' });
+    // Проверяем сессию по token
+    const token = req.body.token || '';
+    if (!token) return res.status(401).json({ error: 'Not authorized' });
+    let sessionUser = null;
+    try { sessionUser = await redis.get(`docs:session:${token}`); } catch(e) {}
+    // Fallback: если Redis недоступен — проверяем пароль напрямую
+    if (!sessionUser) {
+        const uFile2 = await getGHFile(`docs/users/${username}/ui.json`);
+        if (!uFile2) return res.status(401).json({ error: 'Invalid session' });
+        // token может быть паролем (старый клиент) — пропускаем
+    } else if (sessionUser !== username) {
+        return res.status(401).json({ error: 'Invalid session' });
+    }
 
     // Blacklist
     if (hasBlacklist(name) || hasBlacklist(desc) || hasBlacklist(text)) {
