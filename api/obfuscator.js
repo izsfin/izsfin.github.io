@@ -214,12 +214,24 @@ async function obfuscate(source) {
     const vOrigLoad = rStr(); // сохраняем оригинальный load ДО любых хуков
     const vHttpGet  = rStr();
 
-    lines.push(`--[[ Nekoq v1.1.3 || https://nekoq.vercel.app ]]`);
+    lines.push(`--[[ Nekoq v1.1.4 || https://nekoq.vercel.app ]]`);
     lines.push(`return (function(...)`);
     // Первое что делаем — захватываем оригинальный load через debug.getinfo
     // чтобы обойти любой hook установленный ДО нашего скрипта
-    lines.push(`local ${vOrigLoad} = load or loadstring`);
+    // Достаём оригинальный load через debug — обходит любой Lua-level hook
+    const vDebug = rStr();
+    const vInfo  = rStr();
+    const vNative = rStr();
     lines.push(`local _A = {...}`);
+    // debug.getinfo(load).func даёт нативную C функцию минуя Lua хуки
+    lines.push(`local ${vDebug} = debug`);
+    lines.push(`local ${vOrigLoad}`);
+    lines.push(`if ${vDebug} and ${vDebug}.getinfo then`);
+    lines.push(`    local ${vInfo} = ${vDebug}.getinfo(load or loadstring, "f")`);
+    lines.push(`    ${vOrigLoad} = ${vInfo} and ${vInfo}.func or (load or loadstring)`);
+    lines.push(`else`);
+    lines.push(`    ${vOrigLoad} = load or loadstring`);
+    lines.push(`end`);
     lines.push(`local ${vSym} = ${vOrigLoad}(game:HttpGet("https://nekoq.vercel.app/api/sym?loader=1"))()`);
     lines.push(``);
 
