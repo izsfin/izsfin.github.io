@@ -1,4 +1,4 @@
-// api/syntax.js — Luan preprocessor endpoint 9
+// api/syntax.js — Luan preprocessor endpoint 92
 // Отдаёт Lua код препроцессора который компилирует luan → Lua
 
 export default async function handler(req, res) {
