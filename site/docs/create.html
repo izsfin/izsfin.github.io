@@ -217,9 +217,9 @@ body {
 <nav class="topbar">
   <a href="/docs" class="topbar-logo">Docs Home</a>
   <div class="topbar-nav">
-    <button class="topbar-link" onclick="window.location.href='/docs/auth'">Login</button>
+    <button class="topbar-link" onclick="window.location.href='/auth'">Login</button>
     <span class="topbar-sep">\</span>
-    <button class="topbar-link" onclick="window.location.href='/docs/auth'">Register</button>
+    <button class="topbar-link" onclick="window.location.href='/auth'">Register</button>
     <span class="topbar-amp">&amp;</span>
     <button class="topbar-link active-nav">Create</button>
     <span class="user-chip" id="user-chip" style="display:none"></span>
@@ -246,14 +246,15 @@ body {
       </div>
 
       <!-- Картинка -->
-      <div class="preview-img-wrap" onclick="document.getElementById('imgInput').click()">
+      <div class="preview-img-wrap" id="imgWrap">
         <img id="previewImg" src="" alt="">
         <div class="upload-label" id="uploadLabel">
           <span class="upload-icon">⬆</span>
           <span class="upload-text">Upload Image</span>
         </div>
       </div>
-      <input type="file" id="imgInput" accept="image/*" onchange="handleImg(this)">
+      <input type="file" id="imgInput" accept="image/*" onchange="handleImg(this)" style="display:none">
+      <button onclick="document.getElementById('imgInput').click()" style="width:100%;background:none;border:none;border-top:1px solid rgba(255,255,255,0.05);padding:8px;font-family:Poppins,sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">Upload Image</button>
 
       <!-- Описание -->
       <textarea id="field-desc" class="preview-desc-input" placeholder="Enter post description.." rows="2" oninput="updatePreview()"></textarea>
@@ -325,7 +326,7 @@ try { currentUser = JSON.parse(localStorage.getItem('nq-docs-user') || 'null'); 
 
 if (!currentUser) {
   // Не залогинен — редиректим на auth
-  window.location.href = '/docs/auth';
+  window.location.href = '/auth';
 } else {
   document.getElementById('previewAuthor').textContent = currentUser.username;
   document.getElementById('user-chip').style.display = '';
@@ -404,7 +405,7 @@ async function doPublish() {
   if (!name) { setMsg('Enter post name', 'err'); return; }
   if (!desc) { setMsg('Enter post description', 'err'); return; }
   if (!text) { setMsg('Enter post text', 'err'); return; }
-  if (!currentUser) { window.location.href = '/docs/auth'; return; }
+  if (!currentUser) { window.location.href = '/auth'; return; }
 
   const btn = document.getElementById('publishBtn');
   btn.disabled = true;
@@ -423,7 +424,7 @@ async function doPublish() {
     const d = await r.json();
     if (d.ok) {
       setMsg('Published!', 'ok');
-      setTimeout(() => { window.location.href = `/docs/post/${encodeURIComponent(d.id)}`; }, 800);
+      setTimeout(() => { window.location.href = `/post/${encodeURIComponent(d.id)}`; }, 800);
     } else {
       setMsg(d.error || 'Error', 'err');
       btn.disabled = false;

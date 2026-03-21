@@ -109,7 +109,9 @@ export default async function handler(req, res) {
 async function handleAuth(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-    const { action: subAction, username, password } = req.body || {};
+    const body = req.body || {};
+    const { username, password } = body;
+    const subAction = body.action || req.query.subaction;
     if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
     if (!isValidUsername(username)) return res.status(400).json({ error: 'Invalid username (3-32 chars, no arabic/etc)' });
     if (!isValidPassword(password)) return res.status(400).json({ error: 'Password too weak or too short (min 8)' });
