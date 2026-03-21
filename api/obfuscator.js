@@ -211,7 +211,7 @@ async function obfuscate(source) {
 
     const lines = [];
 
-    lines.push(`--[[ Nekoq v1.1.1 || https://nekoq.vercel.app ]]`);
+    lines.push(`--[[ Nekoq v1.1.2 || https://nekoq.vercel.app ]]`);
     lines.push(`return (function(...)`);
     lines.push(`local _A = {...}`);
     lines.push(`local ${vSym} = loadstring(game:HttpGet("https://nekoq.vercel.app/api/sym?loader=1"))()`);
@@ -286,17 +286,17 @@ async function obfuscate(source) {
     lines.push(junkVars(ri(8, 15)));
     lines.push(``);
 
-    // Запуск — защита от hook на loadstring/load
-    // Получаем через rawget чтобы обойти замену в _G
-    // Имена "load" и "loadstring" разбиваем чтобы не было прямой строки
-    const vLoadName1 = rStr(); // часть 1 имени
-    const vLoadName2 = rStr(); // часть 2 имени
-    const vRawget = rStr();
-    const vG = rStr();
-    lines.push(`local ${vRawget} = rawget`);
+    // Запуск — получаем load/loadstring до того как его могут захукать
+    // Строки "load" и "loadstring" разбиваем на части чтобы не было прямого совпадения
+    const vP1 = rStr(); // "lo"
+    const vP2 = rStr(); // "ad"  
+    const vP3 = rStr(); // "string"
+    const vG  = rStr();
+    // Собираем имя функции из частей — хукер ищет строку "loadstring" целиком
     lines.push(`local ${vG} = getfenv and getfenv(0) or _G`);
-    // Получаем load через rawget — hook через присваивание не работает
-    lines.push(`local ${vFn} = ${vRawget}(${vG}, "load") or ${vRawget}(${vG}, "loadstring")`);
+    lines.push(`local ${vP1} = "lo".."ad"`);
+    lines.push(`local ${vP2} = ${vP1}.."st".."ri".."ng"`);
+    lines.push(`local ${vFn} = ${vG}[${vP1}] or ${vG}[${vP2}]`);
     lines.push(`assert(${vFn}, "executor not supported")`);
     lines.push(`local ${vOut}, ${vErr} = ${vFn}(${vRes})`);
     lines.push(`assert(${vOut}, ${vErr})`);
