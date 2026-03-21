@@ -114,10 +114,19 @@ export default async function handler(req, res) {
 async function handleAuth(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-    const body = req.body || {};
-    const { username, password } = body;
-    const subAction = body.action || req.query.subaction;
-    if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
+    let body = req.body || {};
+    // Принудительный парсинг если body пришёл строкой
+    if (typeof body === 'string') { try { body = JSON.parse(body); } catch(e) {} }
+    if (typeof body !== 'object' || body === null) body = {};
+
+    const username = body.username || '';
+    const password = body.password || '';
+    const subAction = body.action || req.query.subaction || '';
+
+    // Debug: логируем что получили
+    console.log('handleAuth body:', JSON.stringify({username: !!username, password: !!password, action: subAction}));
+
+    if (!username || !password) return res.status(400).json({ error: 'Missing fields', debug: {username: !!username, password: !!password, bodyType: typeof req.body} });
     if (!isValidUsername(username)) return res.status(400).json({ error: 'Invalid username (3-32 chars, no arabic/etc)' });
     if (!isValidPassword(password)) return res.status(400).json({ error: 'Password too weak or too short (min 8)' });
 
