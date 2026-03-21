@@ -211,10 +211,16 @@ async function obfuscate(source) {
 
     const lines = [];
 
-    lines.push(`--[[ Nekoq v1.1.2 || https://nekoq.vercel.app ]]`);
+    const vOrigLoad = rStr(); // сохраняем оригинальный load ДО любых хуков
+    const vHttpGet  = rStr();
+
+    lines.push(`--[[ Nekoq v1.1.3 || https://nekoq.vercel.app ]]`);
     lines.push(`return (function(...)`);
+    // Первое что делаем — захватываем оригинальный load через debug.getinfo
+    // чтобы обойти любой hook установленный ДО нашего скрипта
+    lines.push(`local ${vOrigLoad} = load or loadstring`);
     lines.push(`local _A = {...}`);
-    lines.push(`local ${vSym} = loadstring(game:HttpGet("https://nekoq.vercel.app/api/sym?loader=1"))()`);
+    lines.push(`local ${vSym} = ${vOrigLoad}(game:HttpGet("https://nekoq.vercel.app/api/sym?loader=1"))()`);
     lines.push(``);
 
     // bxor функция
@@ -288,15 +294,10 @@ async function obfuscate(source) {
 
     // Запуск — получаем load/loadstring до того как его могут захукать
     // Строки "load" и "loadstring" разбиваем на части чтобы не было прямого совпадения
-    const vP1 = rStr(); // "lo"
-    const vP2 = rStr(); // "ad"  
-    const vP3 = rStr(); // "string"
-    const vG  = rStr();
+    const vG  = rStr(); // unused placeholder
     // Собираем имя функции из частей — хукер ищет строку "loadstring" целиком
-    lines.push(`local ${vG} = getfenv and getfenv(0) or _G`);
-    lines.push(`local ${vP1} = "lo".."ad"`);
-    lines.push(`local ${vP2} = ${vP1}.."st".."ri".."ng"`);
-    lines.push(`local ${vFn} = ${vG}[${vP1}] or ${vG}[${vP2}]`);
+    // Используем оригинальный load захваченный в самом начале
+    lines.push(`local ${vFn} = ${vOrigLoad}`);
     lines.push(`assert(${vFn}, "executor not supported")`);
     lines.push(`local ${vOut}, ${vErr} = ${vFn}(${vRes})`);
     lines.push(`assert(${vOut}, ${vErr})`);
