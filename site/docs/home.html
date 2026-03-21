@@ -348,7 +348,7 @@ async function doLogin() {
   if (!u || !p) { msg.textContent = 'Fill all fields'; return; }
   msg.textContent = 'wait...';
   try {
-    const r = await fetch('/api/docs/auth', {
+    const r = await fetch('/api/docs/universal?action=auth', {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({action:'login', username:u, password:p})
     });
@@ -369,7 +369,7 @@ async function doRegister() {
   if (p.length < 8) { msg.textContent = 'Password min 8 chars'; return; }
   msg.textContent = 'wait...';
   try {
-    const r = await fetch('/api/docs/auth', {
+    const r = await fetch('/api/docs/universal?action=auth', {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({action:'register', username:u, password:p})
     });
@@ -389,7 +389,7 @@ function goCreate() { window.location.href = '/docs/create'; }
 let allPosts = [];
 async function loadPosts() {
   try {
-    const r = await fetch('/api/docs/posts');
+    const r = await fetch('/api/docs/universal?action=posts');
     const d = await r.json();
     allPosts = d.posts || [];
     renderPosts(allPosts);
