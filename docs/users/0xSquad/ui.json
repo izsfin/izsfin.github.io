@@ -1,7 +1,9 @@
 {
   "Username": "0xSquad",
   "Password": "5d2eea7ea712de8a701d1b9021723cd70a6a1227e959c5db486ea25ddda19bef",
-  "IPlogins": [],
+  "IPlogins": [
+    "77.52.212.190"
+  ],
   "JoinDate": [
     "21.03.2026",
     "20:12"
