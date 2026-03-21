@@ -23,7 +23,17 @@ export default async function handler(req, res) {
     const isBotCrawler = ua.includes("discordbot") || ua.includes("telegrambot") || ua.includes("twitterbot") || ua.includes("facebookexternalhit") || ua.includes("linkedinbot");
     if (isBotCrawler) return res.status(200).send("OK");
 
-    // --- 3. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
+    // --- 3. DOCS ДОМЕН ---
+    if (host.includes("nekoq-docs")) {
+        if (!rawPath || rawPath === "index") return serveDocsFallback(res, "home.html", selectedLang);
+        if (rawPath === "auth")              return serveDocsFallback(res, "auth.html", selectedLang);
+        if (rawPath === "create")            return serveDocsFallback(res, "create.html", selectedLang);
+        if (rawPath.startsWith("post"))      return serveDocsFallback(res, "post.html", selectedLang);
+        // Всё остальное — тоже home
+        return serveDocsFallback(res, "home.html", selectedLang);
+    }
+
+    // --- 4. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
     if (host.includes("nekoq-testing"))  { codeBranch = "test"; fallbackFile = "test.html"; }
@@ -32,7 +42,7 @@ export default async function handler(req, res) {
     else if (host.includes("nekoq-cdn")) { codeBranch = "cdn"; }
     else if (host.includes("nekoq"))     { codeBranch = "off"; }
 
-    // --- 3.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
+    // --- 4.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     if (rawPath === "obfuscator") return serveFallback(res, "obfuscator.html", selectedLang);
     if (rawPath === "getkey")     return serveFallback(res, "getkey.html", selectedLang);
     if (rawPath === "api/gen") { /* pass through to Vercel function directly */ }
@@ -41,14 +51,15 @@ export default async function handler(req, res) {
     if (rawPath === "auth")       return serveFallback(res, "authSS.html", selectedLang);
     if (rawPath === "auth/cmd")   return serveFallback(res, "authCS.html", selectedLang);
     if (rawPath.startsWith("catalog/")) return serveFallback(res, "catalog-item.html", selectedLang);
-    
+
     if (rawPath.startsWith("ximeax/")) {
-    const xmsUA = req.headers['user-agent'] || "";
-    if (!xmsUA.includes("ximeax/software")) {
-        if (isRoblox) return res.status(403).send("-- Nekoq Error: Access Denied");
-        return res.status(403).send("Forbidden");
-      }
+        const xmsUA = req.headers['user-agent'] || "";
+        if (!xmsUA.includes("ximeax/software")) {
+            if (isRoblox) return res.status(403).send("-- Nekoq Error: Access Denied");
+            return res.status(403).send("Forbidden");
+        }
     }
+
     if (rawPath === "api/catalog/info" || rawPath === "api/catalog/verified") {
         try {
             const fileName = rawPath === "api/catalog/info" ? "info.json" : "verified.json";
@@ -65,12 +76,12 @@ export default async function handler(req, res) {
         }
     }
 
-    // --- 4. STATUS ДОМЕН ---
+    // --- 5. STATUS ДОМЕН ---
     if (host.includes("Nekoq-status")) {
         return serveFallback(res, "status.html", selectedLang);
     }
 
-    // --- 5. ЗАГРУЗКА СЕКРЕТОВ ---
+    // --- 6. ЗАГРУЗКА СЕКРЕТОВ ---
     let secretWord = "sosi";
     let secretRules = [];
     let aliases = {};
@@ -84,7 +95,7 @@ export default async function handler(req, res) {
         aliases = secrets.aliases || {};
     } catch (e) {}
 
-    // --- 6. ПАРСИНГ СЕКРЕТА ---
+    // --- 7. ПАРСИНГ СЕКРЕТА ---
     let isSecretValid = false;
     let matchedRule = null;
 
@@ -102,7 +113,7 @@ export default async function handler(req, res) {
         }
     }
 
-    // --- 7. АЛИАСЫ ---
+    // --- 8. АЛИАСЫ ---
     const cleanPath = rawPath.toLowerCase().trim();
     const domainKey = Object.keys(aliases).find(k => host.includes(k));
     if (domainKey && aliases[domainKey][cleanPath]) {
@@ -111,7 +122,7 @@ export default async function handler(req, res) {
 
     if (!rawPath || rawPath === "index") return serveFallback(res, fallbackFile, selectedLang);
 
-    // --- 8. MIME ТИПЫ ---
+    // --- 9. MIME ТИПЫ ---
     const mimeTypes = {
         "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "jpe": "image/jpeg",
         "gif": "image/gif", "bmp": "image/bmp", "webp": "image/webp", "avif": "image/avif",
@@ -178,7 +189,7 @@ export default async function handler(req, res) {
             return res.status(403).send("-- Nekoq Error: Access Denied");
         }
 
-        // --- 9. ПРОВЕРКА ДОСТУПА ---
+        // --- 10. ПРОВЕРКА ДОСТУПА ---
         if (matchedRule) {
             if (!matchedRule.extensions.includes(ext)) {
                 if (isRoblox) return res.status(403).send("-- Nekoq Error: Wrong file type for this secret");
@@ -192,12 +203,12 @@ export default async function handler(req, res) {
             }
         }
 
-        // --- 10. ЛОГГИРОВАНИЕ ---
+        // --- 11. ЛОГГИРОВАНИЕ ---
         if (!isOwner && !isRoblox) {
             await sendToLogger(ip, target.name, host, userAgent, "✅ File Loaded");
         }
 
-        // --- 11. ПОЛУЧЕНИЕ ФАЙЛА ---
+        // --- 12. ПОЛУЧЕНИЕ ФАЙЛА ---
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
@@ -233,10 +244,23 @@ export default async function handler(req, res) {
     }
 }
 
+// HTML из site/html/
 async function serveFallback(res, file, lang) {
     try {
         const { data: fb } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: `site/html/${file}`, ref: "main"
+        });
+        const html = Buffer.from(fb.content, 'base64').toString('utf-8');
+        res.setHeader('Content-Type', 'text/html');
+        return res.status(200).send(html.replace(/{{LANG}}/g, lang));
+    } catch { return res.status(404).send("Not Found"); }
+}
+
+// HTML из site/docs/
+async function serveDocsFallback(res, file, lang) {
+    try {
+        const { data: fb } = await octokit.repos.getContent({
+            owner: OWNER, repo: REPO, path: `site/docs/${file}`, ref: "main"
         });
         const html = Buffer.from(fb.content, 'base64').toString('utf-8');
         res.setHeader('Content-Type', 'text/html');
