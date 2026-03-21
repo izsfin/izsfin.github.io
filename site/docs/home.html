@@ -256,7 +256,7 @@ body {
 
 <!-- TOPBAR -->
 <nav class="topbar">
-  <a href="/docs" class="topbar-logo">Docs Home</a>
+  <a href="/" class="topbar-logo">Docs Home</a>
   <div class="topbar-nav">
     <button class="topbar-link" id="btn-login" onclick="openAuth('login')">Login</button>
     <span class="topbar-sep">\</span>
@@ -423,7 +423,7 @@ function renderPosts(posts) {
   document.getElementById('postCount').textContent = posts.length + ' post' + (posts.length !== 1 ? 's' : '');
   if (!posts.length) { grid.innerHTML = '<div class="empty">No posts yet</div>'; return; }
   grid.innerHTML = posts.map((p, i) => `
-    <a class="post-card" href="/docs/post/${encodeURIComponent(p.id)}" style="animation-delay:${i*0.04}s">
+    <a class="post-card" href="/post/${encodeURIComponent(p.id)}" style="animation-delay:${i*0.04}s">
       <div class="card-preview">
         ${p.img ? `<img src="${p.img}" alt="" loading="lazy">` : `<span class="card-no-preview">No preview</span>`}
       </div>

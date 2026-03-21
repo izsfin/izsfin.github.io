@@ -254,17 +254,17 @@ body {
 
 <!-- TOPBAR -->
 <nav class="topbar">
-  <a href="/docs" class="topbar-logo">Docs Home</a>
+  <a href="/" class="topbar-logo">Docs Home</a>
   <div class="topbar-nav">
     <button class="topbar-link" id="btn-login" onclick="openAuth()">Login</button>
     <span class="topbar-sep">\</span>
     <button class="topbar-link" id="btn-register" onclick="openAuth()">Register</button>
     <span class="topbar-amp">&amp;</span>
-    <button class="topbar-link" id="btn-create" style="display:none" onclick="window.location.href='/docs/create'">Create</button>
+    <button class="topbar-link" id="btn-create" style="display:none" onclick="window.location.href='/create'">Create</button>
     <span class="user-chip" id="user-chip" style="display:none"></span>
   </div>
   <div class="topbar-right">
-    <a href="/docs" class="btn-go">← Back</a>
+    <a href="/" class="btn-go">← Back</a>
   </div>
 </nav>
 
@@ -334,12 +334,12 @@ function updateUI() {
   }
 }
 updateUI();
-function openAuth() { window.location.href = '/docs'; }
+function openAuth() { window.location.href = ''; }
 
 // ── POST ID из URL ──
 function getPostId() {
   const p = window.location.pathname;
-  const m = p.match(/\/docs\/post\/(.+)/);
+  const m = p.match(/\/post\/(.+)/);
   return m ? decodeURIComponent(m[1]) : null;
 }
 
@@ -466,7 +466,7 @@ async function loadOtherPosts(author, currentId) {
 
 function miniCard(p) {
   return `
-    <a class="mini-card" href="/docs/post/${encodeURIComponent(p.id)}">
+    <a class="mini-card" href="/post/${encodeURIComponent(p.id)}">
       <div class="mini-preview">
         ${p.img ? `<img src="${p.img}" alt="">` : `<span class="mini-no-prev">No img</span>`}
       </div>
