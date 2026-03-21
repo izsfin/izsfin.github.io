@@ -232,44 +232,88 @@ async function handlePost(req, res) {
     return res.json({ ok: true, post: file.content.Post });
 }
 
-// ── CREATE POST ───────────────────────────────────────────────────────────────
-
 async function handleCreate(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-    const { username, token, name, desc, text, img } = req.body || {};
-    if (!username || !token || !name || !desc || !text) {
-        return res.status(400).json({ error: 'Missing fields' });
+    // 1. Умный парсинг body (фикс для Vercel/Next.js)
+    let data = req.body;
+    if (typeof data === 'string') {
+        try {
+            data = JSON.parse(data);
+        } catch (e) {
+            return res.status(400).json({ error: 'Invalid JSON format in body' });
+        }
     }
 
-    // Проверяем сессию по token
+    // 2. Деструктуризация с защитой от null
+    const { 
+        username = '', 
+        token = '', 
+        name = '', 
+        desc = '', 
+        text = '', 
+        img = null 
+    } = data || {};
+
+    // 3. Валидация с подробным логом (увидишь в Vercel Dashboard)
+    const missing = [];
+    if (!username) missing.push('username');
+    if (!token) missing.push('token');
+    if (!name) missing.push('name');
+    if (!desc) missing.push('desc');
+    if (!text) missing.push('text');
+
+    if (missing.length > 0) {
+        console.error(`[Docs] Create failed. Missing: ${missing.join(', ')}`);
+        return res.status(400).json({ 
+            error: 'Missing fields', 
+            fields: missing,
+            received: { 
+                hasUser: !!username, 
+                hasToken: !!token, 
+                bodyType: typeof req.body 
+            } 
+        });
+    }
+
+    // 4. Проверка сессии (Redis или Fallback)
     let sessionUser = null;
-    try { sessionUser = await redis.get(`docs:session:${token}`); } catch(e) {}
-    // Fallback: если Redis недоступен — проверяем пароль напрямую
-    if (!sessionUser) {
-        const uFile2 = await getGHFile(`docs/users/${username}/ui.json`);
-        if (!uFile2) return res.status(401).json({ error: 'Invalid session' });
-        // token может быть паролем (старый клиент) — пропускаем
-    } else if (sessionUser !== username) {
-        return res.status(401).json({ error: 'Invalid session' });
+    try { 
+        sessionUser = await redis.get(`docs:session:${token}`); 
+    } catch(e) {
+        console.warn("Redis error, falling back to GH check");
     }
 
-    // Blacklist
+    if (sessionUser && sessionUser !== username) {
+        return res.status(401).json({ error: 'Invalid session (user mismatch)' });
+    }
+
+    // Если Redis пуст, проверяем наличие юзера в принципе
+    if (!sessionUser) {
+        const uFile = await getGHFile(`docs/users/${username}/ui.json`);
+        if (!uFile) return res.status(401).json({ error: 'User not found or session expired' });
+    }
+
+    // 5. Проверка на мат/запрещенку
     if (hasBlacklist(name) || hasBlacklist(desc) || hasBlacklist(text)) {
         return res.status(400).json({ error: 'Content contains forbidden words' });
     }
 
-    // Лимит: 10 постов в день
+    // 6. Лимиты и КД (через Redis)
     const dayKey = `docs:posts:${username}:${nowDate()}`;
-    const todayCount = parseInt(await redis.get(dayKey).catch(()=>'0') || '0');
-    if (todayCount >= 10) return res.status(429).json({ error: 'Daily post limit reached (10/day)' });
-
-    // КД: 2 минуты между постами
     const cdKey = `docs:cd:${username}`;
-    const cdVal = await redis.get(cdKey).catch(()=>null);
-    if (cdVal) return res.status(429).json({ error: 'Wait 2 minutes between posts' });
+    
+    try {
+        const [todayCount, isOnCD] = await Promise.all([
+            redis.get(dayKey),
+            redis.get(cdKey)
+        ]);
 
-    // Сохраняем
+        if (parseInt(todayCount || '0') >= 10) return res.status(429).json({ error: 'Daily limit reached' });
+        if (isOnCD) return res.status(429).json({ error: 'Wait 2 minutes between posts' });
+    } catch(e) {}
+
+    // 7. Сохранение
     const stamp = nowStamp();
     const safeName = name.replace(/[^a-zA-Zа-яА-Я0-9\s\-]/g, '').trim().replace(/\s+/g, '_').slice(0, 40);
     const filename = `${safeName}-${stamp}`;
@@ -281,23 +325,25 @@ async function handleCreate(req, res) {
             PostName: name,
             PostDesc: desc,
             PostText: text,
-            PostImg: img || null,
+            PostImg: img,
             Date: nowDate(),
             Timestamp: stamp
         }
     };
 
-    await createGHFile(postPath, postData, `docs: post by ${username}`);
+    try {
+        await createGHFile(postPath, postData, `docs: post by ${username}`);
+        
+        // Обновляем метрики
+        await redis.incr(dayKey).catch(()=>{});
+        await redis.expire(dayKey, 86400).catch(()=>{});
+        await redis.set(cdKey, '1', 'EX', 120).catch(()=>{});
+        await redis.del('docs:posts:index').catch(()=>{});
 
-    // Обновляем счётчики
-    await redis.incr(dayKey).catch(()=>{});
-    await redis.expire(dayKey, 86400).catch(()=>{});
-    await redis.set(cdKey, '1', 'EX', 120).catch(()=>{});
-
-    // Инвалидируем кеш постов
-    await redis.del('docs:posts:index').catch(()=>{});
-
-    return res.json({ ok: true, id: `${username}/${filename}` });
+        return res.json({ ok: true, id: `${username}/${filename}` });
+    } catch(e) {
+        return res.status(500).json({ error: 'GitHub Save Error: ' + e.message });
+    }
 }
 
 // ── COMMENTS ──────────────────────────────────────────────────────────────────
