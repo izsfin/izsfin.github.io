@@ -7,6 +7,7 @@
     { "source": "/api/stats", "destination": "/api/stats" },
     { "source": "/api/logger", "destination": "/api/logger" },
     { "source": "/api/obfuscator", "destination": "/api/obfuscator" },
+    { "source": "/api/syntax", "destination": "/api/syntax" },
     { "source": "/api/hwid/auth/v1/start", "destination": "/api/hwid/auth/v1/start" },
     { "source": "/api/hwid/auth/v1/poll", "destination": "/api/hwid/auth/v1/poll" },
     { "source": "/api/hwid/auth/v1/bot-confirm", "destination": "/api/hwid/auth/v1/bot-confirm" },
