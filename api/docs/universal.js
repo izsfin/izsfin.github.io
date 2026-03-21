@@ -86,6 +86,11 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') return res.status(200).end();
 
+    // Явный парсинг body если Vercel не распарсил
+    if (req.method === 'POST' && typeof req.body === 'string') {
+        try { req.body = JSON.parse(req.body); } catch(e) {}
+    }
+
     const action = req.query.action;
 
     try {

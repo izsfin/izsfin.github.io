@@ -191,19 +191,7 @@ body {
 }
 
 /* ── BOTTOM NAV ── */
-.bottom-nav {
-  position: fixed; bottom: 25px; left: 25px;
-  background: rgba(15,10,13,0.434); backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
-  padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center;
-}
-.nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; text-decoration: none; }
-.nav-link:hover { color: white; }
-.nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
-.lang-box { display: flex; gap: 10px; }
-.lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); background: none; border: none; font-family: 'Poppins',sans-serif; }
-.lang-btn.active { color: var(--primary); }
-.bottom-credit { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.15); text-transform: uppercase; z-index: 10; white-space: nowrap; }
+
 </style>
 </head>
 <body>
@@ -298,21 +286,7 @@ body {
 
 </div>
 
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <a href="/" class="nav-link">Home</a>
-  <a href="/catalog" class="nav-link">Catalog</a>
-  <a href="/obfuscator" class="nav-link">Obfuscator</a>
-  <a href="/getkey" class="nav-link">Authentication</a>
-  <a href="/status" class="nav-link">Status</a>
-  <a href="https://discord.gg/TRPZg4Xfkq" class="nav-link" target="_blank">Discord</a>
-  <div class="nav-divider"></div>
-  <div class="lang-box">
-    <button class="lang-btn active">RU</button>
-    <button class="lang-btn">EN</button>
-  </div>
-</nav>
-<div class="bottom-credit">© 2026 Nekoq. All rights reserved.</div>
+
 
 <script>
 window.addEventListener('mousemove', e => {
