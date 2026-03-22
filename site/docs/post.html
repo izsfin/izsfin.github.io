@@ -3,162 +3,118 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nekoq | Docs</title>
+<title>Nekoq Docs</title>
 <link rel="icon" type="image/png" href="/site/html/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root { 
-    --primary: #ff0073; 
-    --bg-dark: #0a0608;
-    --card-bg: rgba(15, 10, 13, 0.7);
-    --border-color: rgba(255, 255, 255, 0.05);
-}
+:root { --primary: #ff0073; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-    background-color: var(--bg-dark); color: #d1d1d1;
-    font-family: 'Poppins', sans-serif;
-    min-height: 100vh; overflow-x: hidden;
-    animation: fadeIn 0.35s ease forwards;
-}
+body { background-color: #050204; color: #d1d1d1; font-family: 'Poppins',sans-serif; min-height: 100vh; overflow-x: hidden; animation: fadeIn 0.35s ease forwards; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-/* Скроллбар */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-.bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -5; opacity: 0.5; }
-.bg-grid {
-    position: fixed; inset: 0;
-    background-image: linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
-    background-size: 50px 50px;
-    mask-image: radial-gradient(circle at center,black 40%,transparent 90%);
-    -webkit-mask-image: radial-gradient(circle at center,black 40%,transparent 90%);
-    z-index: -4;
-}
-.blob { position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08; will-change: transform; animation: floatBlob 20s infinite alternate cubic-bezier(0.4,0,0.2,1); z-index: -3; }
+.bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; z-index: -5; }
+.bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px); background-size: 50px 50px; mask-image: radial-gradient(circle at center,black 30%,transparent 80%); -webkit-mask-image: radial-gradient(circle at center,black 30%,transparent 80%); z-index: -4; }
+.blob { position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08; animation: floatBlob 20s infinite alternate cubic-bezier(0.4,0,0.2,1); z-index: -3; }
 .blob-1 { top:-10%; left:-10%; width:50vw; height:50vw; background: radial-gradient(circle,var(--primary),transparent 70%); }
 .blob-2 { bottom:-10%; right:-10%; width:60vw; height:60vw; background: radial-gradient(circle,var(--primary),transparent 70%); animation-delay:-5s; }
 @keyframes floatBlob { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(10%,10%) scale(1.1)} }
+.bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%),rgba(255,255,255,0.05) 0%,transparent 100%); z-index: -2; pointer-events: none; }
 
 /* ── TOPBAR ── */
-.topbar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    height: 60px;
-    background: rgba(8, 5, 7, 0.8); backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border-color);
-    display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
-}
-.topbar-logo { font-size: 12px; font-weight: 800; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; text-decoration: none; }
-.topbar-center { display: flex; align-items: center; gap: 8px; }
-.topbar-link { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: white; text-decoration: none; padding: 6px 12px; cursor: pointer; border: none; background: none; transition: 0.2s; }
-.topbar-link:hover { color: var(--primary); }
-.topbar-sep { color: rgba(255,255,255,0.3); font-size: 12px; margin: 0 4px; font-weight: 300; }
-.topbar-amp { color: rgba(255,255,255,0.3); font-size: 11px; margin: 0 10px; }
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: rgba(15,10,13,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; padding: 0 28px; gap: 8px; }
+.topbar-logo { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; text-decoration: none; margin-right: 24px; }
+.topbar-nav { display: flex; align-items: center; gap: 2px; flex: 1; justify-content: center; }
+.topbar-link { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.35); padding: 6px 12px; border-radius: 8px; transition: color 0.2s,background 0.2s; cursor: pointer; border: none; background: none; font-family: 'Poppins',sans-serif; }
+.topbar-link:hover { color: white; background: rgba(255,255,255,0.05); }
+.topbar-sep { color: rgba(255,255,255,0.15); font-size: 12px; margin: 0 2px; }
+.topbar-amp { color: rgba(255,255,255,0.15); font-size: 11px; margin: 0 4px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: 24px; }
+.btn-back { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 7px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: none; color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s; text-decoration: none; }
+.btn-back:hover { color: white; border-color: rgba(255,255,255,0.2); }
+.user-chip { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: rgba(255,145,207,0.8); text-transform: uppercase; }
 
-.topbar-right { display: flex; align-items: center; gap: 10px; }
-.search-go { background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 10px; font-weight: 700; padding: 6px 14px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-.search-go:hover { background: rgba(255,255,255,0.05); }
-.search-box { 
-    display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); 
-    border-radius: 8px; padding: 4px 12px; height: 32px;
-}
-.search-box input { background: transparent; border: none; outline: none; color: white; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; width: 100px; }
-.search-box input::placeholder { color: rgba(255,255,255,0.3); }
-.search-icon { width: 14px; height: 14px; fill: rgba(255,255,255,0.5); margin-left: 8px; cursor: pointer; }
+/* ── MAIN ── */
+.main { padding-top: 52px; max-width: 860px; margin: 0 auto; padding-left: 24px; padding-right: 24px; position: relative; z-index: 2; }
 
-/* ── LAYOUT ── */
-.main-wrapper {
-    padding-top: 80px; padding-bottom: 100px;
-    width: 100%; overflow-x: auto;
-}
-.columns-container {
-    display: flex; gap: 20px; padding: 0 30px;
-    min-width: max-content; /* Чтобы скроллилось, а не сжималось */
-    align-items: flex-start;
-}
-
-/* ── CARD COLUMNS (LEFT & RIGHT) ── */
-.col-cards { width: 280px; display: flex; flex-direction: column; gap: 16px; }
-.col-cards-title { font-size: 12px; font-weight: 700; color: white; text-align: center; margin-bottom: 8px; }
-
-.post-card {
-    background: var(--card-bg); border: 1px solid var(--border-color);
-    border-radius: 12px; padding: 16px; display: flex; flex-direction: column;
-    text-decoration: none; color: inherit; transition: 0.2s;
-}
-.post-card:hover { border-color: rgba(255,0,115,0.3); transform: translateY(-2px); }
-.card-title { font-size: 14px; font-weight: 700; color: white; text-align: center; margin-bottom: 6px; }
-.card-desc { font-size: 10px; color: rgba(255,255,255,0.4); text-align: center; margin-bottom: 16px; }
-.card-preview {
-    height: 120px; background: rgba(0,0,0,0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.15); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;
-    overflow: hidden;
-}
-.card-preview img { width: 100%; height: 100%; object-fit: cover; }
-.card-footer { display: flex; justify-content: space-between; align-items: center; }
-.card-view { font-size: 14px; font-weight: 800; color: white; text-transform: uppercase; }
-.card-meta { font-size: 8px; font-weight: 600; color: rgba(255,255,255,0.3); text-align: right; }
-
-/* ── POST META COLUMN (CENTER-LEFT) ── */
-.col-meta { width: 260px; display: flex; flex-direction: column; gap: 16px; }
-.meta-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
-.meta-img { width: 100%; height: 200px; background: rgba(0,0,0,0.5); border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.meta-img img { width: 100%; height: 100%; object-fit: cover; }
-.meta-img span { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.1); text-transform: uppercase; }
-.meta-title { font-size: 16px; font-weight: 800; color: white; margin-bottom: 8px; }
-.meta-desc { font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.5; }
-
-/* ── POST CONTENT (CENTER MAIN) ── */
-.col-content {
-    flex: 1; min-width: 600px; max-width: 800px;
-    background: var(--card-bg); border: 1px solid var(--border-color);
-    border-radius: 12px; padding: 30px;
-}
-.post-text { font-size: 12px; line-height: 1.9; color: rgba(255,255,255,0.7); text-align: center; }
-.post-text h1 { font-size: 18px; font-weight: 800; color: white; margin: 20px 0 10px; }
-.post-text h2 { font-size: 15px; font-weight: 700; color: white; margin: 16px 0 8px; }
+/* ── POST ── */
+.post-meta { display: flex; align-items: center; justify-content: space-between; padding: 28px 0 16px; }
+.post-author { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: rgba(255,145,207,0.8); text-transform: uppercase; }
+.post-date { font-size: 9px; color: rgba(255,255,255,0.2); }
+.post-title { font-size: 26px; font-weight: 800; color: white; line-height: 1.25; margin-bottom: 10px; }
+.post-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.6; margin-bottom: 22px; }
+.post-img { width: 100%; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); margin-bottom: 28px; }
+.post-img img { width: 100%; display: block; }
+.post-img-placeholder { height: 200px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.08); }
+.post-text { font-size: 13px; line-height: 1.85; color: rgba(255,255,255,0.7); padding-bottom: 40px; }
+.post-text h1 { font-size: 22px; font-weight: 800; color: white; margin: 28px 0 12px; }
+.post-text h2 { font-size: 17px; font-weight: 700; color: white; margin: 22px 0 10px; }
+.post-text h3 { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.85); margin: 18px 0 8px; }
+.post-text h4 { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 1.5px; text-transform: uppercase; margin: 14px 0 6px; }
 .post-text strong { color: white; font-weight: 700; }
-.post-text em { color: var(--primary); font-style: normal; font-weight: 700; } /* Highlight for bullet emojis/tags */
-.post-text ul { padding-left: 0; margin: 12px 0; list-style: none; }
-.post-text ul li { margin: 6px 0; }
+.post-text em { font-style: italic; color: rgba(255,255,255,0.55); }
+.post-text u { text-decoration: underline; text-decoration-color: rgba(255,0,115,0.5); }
 .post-text a { color: var(--primary); text-decoration: none; }
-.post-text code { background: rgba(255,255,255,0.06); border-radius: 4px; padding: 2px 6px; font-family: monospace; }
-.post-text pre { background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; overflow-x: auto; text-align: left; margin: 15px 0; }
+.post-text a:hover { text-decoration: underline; }
+.post-text ul { padding-left: 20px; margin: 8px 0; }
+.post-text ul li { margin: 5px 0; }
+.post-text code { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 5px; padding: 2px 7px; font-size: 11px; font-family: 'Courier New',monospace; color: rgba(255,145,207,0.9); }
+.post-text pre { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px 18px; margin: 14px 0; overflow-x: auto; }
+.post-text pre code { background: none; border: none; padding: 0; font-size: 12px; color: rgba(255,255,255,0.75); }
+.post-text blockquote { border-left: 3px solid rgba(255,0,115,0.4); padding: 8px 16px; margin: 14px 0; background: rgba(255,0,115,0.04); border-radius: 0 8px 8px 0; color: rgba(255,255,255,0.5); font-style: italic; }
+.spoiler-wrap { margin: 10px 0; }
+.spoiler-toggle { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 14px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; font-family: 'Poppins',sans-serif; }
+.spoiler-toggle:hover { border-color: rgba(255,0,115,0.3); color: rgba(255,255,255,0.7); }
+.spoiler-icon { font-size: 9px; transition: transform 0.2s; }
+.spoiler-toggle.open .spoiler-icon { transform: rotate(90deg); }
+.spoiler-content { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-top: none; border-radius: 0 0 8px 8px; padding: 12px 14px; font-size: 12px; display: none; }
+.spoiler-content.open { display: block; }
 
-/* ── COMMENTS COLUMN (CENTER-RIGHT) ── */
-.col-comments { width: 280px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; }
-.comments-title { font-size: 14px; font-weight: 800; color: white; text-align: center; margin-bottom: 16px; }
+/* ── DIVIDER ── */
+.section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 0; }
 
-.comment-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.03); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
-.comment-author { font-size: 10px; font-weight: 700; color: white; margin-bottom: 4px; display: block; text-align: center; }
-.comment-text { font-size: 11px; color: rgba(255,255,255,0.6); text-align: center; }
-
-.comment-form { margin-top: auto; padding-top: 15px; }
-.comment-input { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; font-family: 'Poppins',sans-serif; font-size: 11px; color: white; resize: none; min-height: 60px; outline: none; margin-bottom: 8px; }
-.comment-send { width: 100%; font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,0,115,0.3); background: rgba(255,0,115,0.1); color: var(--primary); cursor: pointer; transition: 0.2s; }
+/* ── COMMENTS ── */
+.comments-section { padding: 28px 0 32px; }
+.section-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.2); margin-bottom: 16px; }
+.comment-form { display: flex; gap: 10px; margin-bottom: 20px; }
+.comment-input { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 14px; font-family: 'Poppins',sans-serif; font-size: 12px; color: rgba(255,255,255,0.8); outline: none; transition: border-color 0.2s; resize: none; }
+.comment-input:focus { border-color: rgba(255,0,115,0.3); }
+.comment-input::placeholder { color: rgba(255,255,255,0.15); }
+.comment-send { flex-shrink: 0; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,0,115,0.35); background: rgba(255,0,115,0.08); color: var(--primary); font-family: 'Poppins',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; align-self: flex-end; }
 .comment-send:hover { background: var(--primary); color: white; }
+.comment-msg { font-size: 10px; color: rgba(255,145,207,0.8); font-weight: 600; margin-bottom: 12px; min-height: 14px; }
+.comment-list { display: flex; flex-direction: column; gap: 8px; }
+.comment-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 12px 14px; }
+.comment-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.comment-author { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,145,207,0.7); }
+.comment-date { font-size: 8px; color: rgba(255,255,255,0.15); }
+.comment-text { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.5; }
+.no-comments { font-size: 10px; color: rgba(255,255,255,0.12); padding: 20px 0; letter-spacing: 1px; }
+
+/* ── OTHER POSTS — горизонтальный скролл снизу ── */
+.other-posts-section { padding: 0 0 120px; }
+.other-posts-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+.other-posts-scroll::-webkit-scrollbar { height: 3px; }
+.other-posts-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+.mini-card { flex-shrink: 0; width: 180px; background: rgba(15,10,13,0.5); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; text-decoration: none; color: inherit; transition: border-color 0.2s,transform 0.2s; }
+.mini-card:hover { border-color: rgba(255,0,115,0.25); transform: translateY(-2px); }
+.mini-preview { width: 100%; height: 100px; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
+.mini-preview img { width: 100%; height: 100%; object-fit: cover; }
+.mini-no-prev { font-size: 7px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
+.mini-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
+.mini-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.85); }
+.mini-author { font-size: 8px; font-weight: 700; color: rgba(255,145,207,0.7); text-transform: uppercase; letter-spacing: 1px; }
+.mini-desc { font-size: 10px; color: rgba(255,255,255,0.3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ── BOTTOM NAV ── */
-.bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    height: 50px; background: rgba(8, 5, 7, 0.9); backdrop-filter: blur(10px);
-    border-top: 1px solid var(--border-color);
-    display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 100;
-}
-.bottom-links { display: flex; gap: 20px; align-items: center; }
-.nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); text-decoration: none; transition: 0.2s; }
-.nav-link.active { color: var(--primary); }
+.bottom-nav { position: fixed; bottom: 25px; left: 25px; background: rgba(15,10,13,0.434); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center; }
+.nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; text-decoration: none; }
 .nav-link:hover { color: white; }
-
-.bottom-center { position: absolute; left: 50%; transform: translateX(-50%); font-size: 9px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,0.2); text-transform: uppercase; }
-
-.bottom-right { display: flex; gap: 10px; align-items: center; }
-.lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; color: rgba(255,255,255,0.3); background: none; border: none; font-family: inherit; transition: 0.2s; }
+.nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
+.lang-box { display: flex; gap: 10px; }
+.lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); background: none; border: none; font-family: 'Poppins',sans-serif; }
 .lang-btn.active { color: var(--primary); }
-
-.loading { padding: 40px; text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.2); width: 100%; }
+.bottom-credit { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.15); text-transform: uppercase; z-index: 10; white-space: nowrap; }
+.loading { padding: 60px 0; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
 </style>
 </head>
 <body>
@@ -166,233 +122,192 @@ body {
 <div class="bg-grid"></div>
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
+<div class="bg-glow"></div>
 
 <nav class="topbar">
-    <a href="/docs" class="topbar-logo">DOCS HOME</a>
-    <div class="topbar-center">
-        <button class="topbar-link" id="btn-login" onclick="openAuth()">LOGIN</button>
-        <span class="topbar-sep">\</span>
-        <button class="topbar-link" id="btn-register" onclick="openAuth()">REGISTER</button>
-        <span class="topbar-amp">&amp;</span>
-        <button class="topbar-link" id="btn-create" onclick="window.location.href='/docs/create'">CREATE</button>
-        <span class="topbar-link" id="user-chip" style="display:none; color: var(--primary);"></span>
-    </div>
-    <div class="topbar-right">
-        <button class="search-go">GO</button>
-        <div class="search-box">
-            <input type="text" placeholder="SEARCH">
-            <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        </div>
-    </div>
+  <a href="/" class="topbar-logo">Docs Home</a>
+  <div class="topbar-nav">
+    <button class="topbar-link" id="btn-login" onclick="window.location.href='/auth'">Login</button>
+    <span class="topbar-sep">\</span>
+    <button class="topbar-link" id="btn-register" onclick="window.location.href='/auth'">Register</button>
+    <span class="topbar-amp">&amp;</span>
+    <button class="topbar-link" id="btn-create" style="display:none" onclick="window.location.href='/create'">Create</button>
+    <span class="user-chip" id="user-chip" style="display:none"></span>
+  </div>
+  <div class="topbar-right">
+    <a href="/" class="btn-back">← Back</a>
+  </div>
 </nav>
 
-<div class="main-wrapper">
-    <div class="columns-container">
-        <div class="col-cards" id="otherPosts">
-            <div class="loading">Loading...</div>
-        </div>
-
-        <div class="col-meta" id="postMeta">
-            </div>
-
-        <div class="col-content" id="postTextContent">
-            <div class="loading">Loading post...</div>
-        </div>
-
-        <div class="col-comments">
-            <div class="comments-title">Comments</div>
-            <div id="commentList" style="flex: 1; overflow-y: auto;">
-                <div class="loading" style="padding: 10px;">...</div>
-            </div>
-            <div class="comment-form">
-                <textarea class="comment-input" id="commentText" placeholder="Write a comment..."></textarea>
-                <button class="comment-send" onclick="sendComment()">Send</button>
-                <div id="commentMsg" style="font-size: 9px; text-align:center; color: var(--primary); margin-top: 5px;"></div>
-            </div>
-        </div>
-
-        <div class="col-cards">
-            <div class="col-cards-title" id="authorPostsLabel" style="display:none">Another OxSquad post's</div>
-            <div id="authorPosts"></div>
-        </div>
+<div class="main">
+  <div id="postArea"><div class="loading">Loading post...</div></div>
+  <hr class="section-divider" id="divComments" style="display:none">
+  <div class="comments-section" id="commentsSection" style="display:none">
+    <div class="section-label">Comments</div>
+    <div class="comment-form">
+      <textarea class="comment-input" id="commentText" placeholder="Leave a comment..." rows="2"></textarea>
+      <button class="comment-send" onclick="sendComment()">Send →</button>
     </div>
+    <div class="comment-msg" id="commentMsg"></div>
+    <div class="comment-list" id="commentList"><div class="no-comments">No comments yet</div></div>
+  </div>
+  <hr class="section-divider" id="divOther" style="display:none">
+  <div class="other-posts-section" id="otherSection" style="display:none">
+    <div class="section-label" id="otherLabel">Other Posts</div>
+    <div class="other-posts-scroll" id="otherScroll"></div>
+  </div>
 </div>
 
 <nav class="bottom-nav">
-    <div class="bottom-links">
-        <a href="/" class="nav-link active">HOME</a>
-        <a href="/catalog" class="nav-link">CATALOG</a>
-        <a href="/obfuscator" class="nav-link">OBFUSCATOR</a>
-        <a href="/getkey" class="nav-link">AUTHENTICATION</a>
-        <a href="/status" class="nav-link">STATUS</a>
-        <a href="https://discord.gg/TRPZg4Xfkq" class="nav-link" target="_blank">DISCORD</a>
-    </div>
-    <div class="bottom-center">© 2026 Nekoq. ALL RIGHTS RESERVED</div>
-    <div class="bottom-right">
-        <button class="lang-btn active" onclick="setLang('RU')">RU</button>
-        <button class="lang-btn" onclick="setLang('EN')">EN</button>
-    </div>
+  <a href="/" class="nav-link">Home</a>
+  <a href="/catalog" class="nav-link">Catalog</a>
+  <a href="/obfuscator" class="nav-link">Obfuscator</a>
+  <a href="/getkey" class="nav-link">Authentication</a>
+  <a href="/status" class="nav-link">Status</a>
+  <a href="https://discord.gg/TRPZg4Xfkq" class="nav-link" target="_blank">Discord</a>
+  <div class="nav-divider"></div>
+  <div class="lang-box">
+    <button class="lang-btn active">RU</button>
+    <button class="lang-btn">EN</button>
+  </div>
 </nav>
+<div class="bottom-credit">© 2026 Nekoq. All rights reserved.</div>
 
 <script>
-// ── SESSION ──
+window.addEventListener('mousemove', e => {
+  document.body.style.setProperty('--x', e.clientX+'px');
+  document.body.style.setProperty('--y', e.clientY+'px');
+});
+
 let currentUser = null;
-try { currentUser = JSON.parse(localStorage.getItem('nq-docs-user') || 'null'); } catch(e) {}
-function updateUI() {
-    if (currentUser) {
-        document.getElementById('btn-login').style.display = 'none';
-        document.getElementById('btn-register').style.display = 'none';
-        document.getElementById('user-chip').style.display = 'inline-block';
-        document.getElementById('user-chip').textContent = currentUser.username;
-    }
+try { currentUser = JSON.parse(localStorage.getItem('nq-docs-user')||'null'); } catch(e){}
+if (currentUser) {
+  document.getElementById('btn-login').style.display='none';
+  document.getElementById('btn-register').style.display='none';
+  document.getElementById('btn-create').style.display='';
+  document.getElementById('user-chip').style.display='';
+  document.getElementById('user-chip').textContent=currentUser.username;
 }
-updateUI();
-function openAuth() { window.location.href = '/docs'; }
 
-// ── ID ──
 function getPostId() {
-    const m = window.location.pathname.match(/\/docs\/post\/(.+)/);
-    return m ? decodeURIComponent(m[1]) : null;
+  const m = window.location.pathname.match(/\/post\/(.+)/);
+  return m ? decodeURIComponent(m[1]) : null;
 }
 
-// ── PARSER ──
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 function parseText(raw) {
-    if (!raw) return '';
-    let s = String(raw);
-    s = s.replace(/```([\s\S]*?)```/g, (_, c) => `<pre><code>${esc(c.trim())}</code></pre>`);
-    s = s.replace(/`([^`]+)`/g, (_, c) => `<code>${esc(c)}</code>`);
-    s = s.replace(/^###([^\n]+)/gm, (_,t) => `<h3>${t.trim()}</h3>`);
-    s = s.replace(/^##([^\n]+)/gm, (_,t) => `<h2>${t.trim()}</h2>`);
-    s = s.replace(/^#([^\n]+)/gm, (_,t) => `<h1>${t.trim()}</h1>`);
-    s = s.replace(/\*\*(.+?)\*\*/g, (_,t) => `<strong>${t}</strong>`);
-    s = s.replace(/\*(.+?)\*/g, (_,t) => `<em>${t}</em>`); /* For Emojis/Highlights */
-    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_,t,u) => `<a href="${u}" target="_blank">${t}</a>`);
-    s = s.replace(/^(\s*)[*\-] (.+)/gm, (_, i, item) => `<li>${item}</li>`);
-    s = s.replace(/(<li>[\s\S]*?<\/li>)/g, m => `<ul>${m}</ul>`);
-    s = s.replace(/\n/g, '<br>');
-    return s;
+  if (!raw) return '';
+  let s = String(raw);
+  s = s.replace(/\|\|(.+?)\|\|/gs,(_,t)=>{
+    const id='sp'+Math.random().toString(36).slice(2);
+    return `<div class="spoiler-wrap"><button class="spoiler-toggle" onclick="toggleSpoiler('${id}')"><span class="spoiler-icon">▶</span> Spoiler</button><div class="spoiler-content" id="${id}">${t.trim()}</div></div>`;
+  });
+  s=s.replace(/```([\s\S]*?)```/g,(_,c)=>`<pre><code>${esc(c.trim())}</code></pre>`);
+  s=s.replace(/`([^`]+)`/g,(_,c)=>`<code>${esc(c)}</code>`);
+  s=s.replace(/^###([^\n]+)/gm,(_,t)=>`<h3>${t.trim()}</h3>`);
+  s=s.replace(/^##([^\n]+)/gm,(_,t)=>`<h2>${t.trim()}</h2>`);
+  s=s.replace(/^#-([^\n]+)/gm,(_,t)=>`<h4>${t.trim()}</h4>`);
+  s=s.replace(/^#([^\n]+)/gm,(_,t)=>`<h1>${t.trim()}</h1>`);
+  s=s.replace(/^>{1,3}([^\n]+)/gm,(_,t)=>`<blockquote>${t.trim()}</blockquote>`);
+  s=s.replace(/\*\*(.+?)\*\*/g,(_,t)=>`<strong>${t}</strong>`);
+  s=s.replace(/\*(.+?)\*/g,(_,t)=>`<em>${t}</em>`);
+  s=s.replace(/__(.+?)__/g,(_,t)=>`<u>${t}</u>`);
+  s=s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,(_,t,u)=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`);
+  s=s.replace(/^(\s*)[*\-] (.+)/gm,(_,ind,item)=>`<li style="margin-left:${ind.length*12}px">${item}</li>`);
+  s=s.replace(/(<li[\s\S]*?<\/li>)+/g,m=>`<ul>${m}</ul>`);
+  s=s.replace(/\n{2,}/g,'</p><p>');
+  s=s.replace(/\n/g,'<br>');
+  s=`<p>${s}</p>`;
+  s=s.replace(/<p>\s*<\/p>/g,'');
+  return s;
 }
 
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toggleSpoiler(id){
+  const c=document.getElementById(id);
+  c.classList.toggle('open');
+  c.previousElementSibling.classList.toggle('open');
+}
 
-// ── LOAD POST ──
 async function loadPost() {
-    const id = getPostId();
-    if (!id) { 
-        document.getElementById('postTextContent').innerHTML = '<div class="loading">Mock Mode (No ID)</div>'; 
-        // Если чисто визуально проверяете (без бекенда), закомментируйте return и добавьте мок-данные.
-        return; 
-    }
-    try {
-        const r = await fetch(`/api/docs/universal?action=post&id=${encodeURIComponent(id)}`);
-        const d = await r.json();
-        if (d.post) {
-            renderPostMeta(d.post);
-            renderPostContent(d.post);
-            loadComments(id);
-            loadOtherPosts(d.post.Author, id);
-        }
-    } catch(e) {
-        document.getElementById('postTextContent').innerHTML = '<div class="loading">Failed to load</div>';
-    }
-}
-
-function renderPostMeta(p) {
-    document.getElementById('postMeta').innerHTML = `
-        <div class="meta-box">
-            <div class="meta-img">
-                ${p.PostImg ? `<img src="${p.PostImg}">` : `<span>No Preview</span>`}
-            </div>
-            <div class="meta-title">${esc(p.PostName)}</div>
-            <div class="meta-desc">${esc(p.PostDesc)}</div>
-        </div>
-    `;
-}
-
-function renderPostContent(p) {
-    document.getElementById('postTextContent').innerHTML = `
-        <div class="post-text">${parseText(p.PostText)}</div>
-    `;
-}
-
-// ── OTHER POSTS ──
-async function loadOtherPosts(author, currentId) {
-    try {
-        const r = await fetch('/api/docs/universal?action=posts');
-        const d = await r.json();
-        const posts = d.posts || [];
-
-        const others = posts.filter(p => p.id !== currentId);
-        document.getElementById('otherPosts').innerHTML = others.length
-            ? others.slice(0, 4).map(p => genCard(p)).join('')
-            : '<div class="loading">Empty</div>';
-
-        const byAuthor = posts.filter(p => p.author === author && p.id !== currentId);
-        if (byAuthor.length) {
-            document.getElementById('authorPostsLabel').style.display = 'block';
-            document.getElementById('authorPosts').innerHTML = byAuthor.slice(0, 4).map(p => genCard(p)).join('');
-        }
-    } catch(e) {}
-}
-
-function genCard(p) {
-    return `
-        <a class="post-card" href="/docs/post/${encodeURIComponent(p.id)}">
-            <div class="card-title">${esc(p.name || 'Example text')}</div>
-            <div class="card-desc">${esc(p.desc || 'Example description')}</div>
-            <div class="card-preview">${p.img ? `<img src="${p.img}">` : 'No preview'}</div>
-            <div class="card-footer">
-                <span class="card-view">View</span>
-                <span class="card-meta">author<br>Create: ${p.date || '00.00.00'}</span>
-            </div>
-        </a>
-    `;
-}
-
-// ── COMMENTS ──
-async function loadComments(postId) {
-    try {
-        const r = await fetch(`/api/docs/universal?action=comments&id=${encodeURIComponent(postId)}`);
-        const d = await r.json();
-        const list = document.getElementById('commentList');
-        if (!d.comments || !d.comments.length) {
-            list.innerHTML = '<div class="loading">No comments</div>';
-            return;
-        }
-        list.innerHTML = d.comments.map(c => `
-            <div class="comment-item">
-                <span class="comment-author">${esc(c.author)}</span>
-                <div class="comment-text">${esc(c.text)}</div>
-            </div>
-        `).join('');
-    } catch(e) {}
-}
-
-  const text = document.getElementById('commentText').value.trim();
-  const msg = document.getElementById('commentMsg');
-  if (!text) { msg.textContent = 'Write something'; return; }
-  msg.textContent = 'Sending...';
-
-  const postId = getPostId();
-  const body = { postId, text };
-  if (currentUser) { body.username = currentUser.username; body.password = currentUser.password || ''; }
-
+  const id = getPostId();
+  if (!id) { document.getElementById('postArea').innerHTML='<div class="loading">Post not found</div>'; return; }
   try {
-    const r = await fetch('/api/docs/universal?action=comment', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(body)
-    });
+    const r = await fetch(`/api/docs/universal?action=post&id=${encodeURIComponent(id)}`);
     const d = await r.json();
-    if (d.ok) {
-      document.getElementById('commentText').value = '';
-      msg.textContent = 'Sent!';
-      await loadComments(postId);
-      setTimeout(() => { msg.textContent = ''; }, 2000);
-    } else { msg.textContent = d.error || 'Error'; }
-  } catch(e) { msg.textContent = 'Network error'; }
+    if (!d.ok||!d.post) { document.getElementById('postArea').innerHTML='<div class="loading">Post not found</div>'; return; }
+    const p = d.post;
+    document.title = `${p.PostName} — Nekoq Docs`;
+    document.getElementById('postArea').innerHTML=`
+      <div class="post-meta">
+        <span class="post-author">${esc(p.Author)}</span>
+        <span class="post-date">${p.Date||''}</span>
+      </div>
+      <div class="post-title">${esc(p.PostName)}</div>
+      <div class="post-desc">${esc(p.PostDesc)}</div>
+      <div class="post-img">
+        ${p.PostImg?`<img src="${p.PostImg}" alt="">`:`<div class="post-img-placeholder">No preview</div>`}
+      </div>
+      <div class="post-text">${parseText(p.PostText)}</div>
+    `;
+    document.getElementById('divComments').style.display='';
+    document.getElementById('commentsSection').style.display='';
+    loadComments(id);
+    loadOtherPosts(p.Author, id);
+  } catch(e) {
+    document.getElementById('postArea').innerHTML='<div class="loading">Failed to load</div>';
+  }
+}
 
-function setLang(l) {
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === l));
+async function loadComments(postId) {
+  try {
+    const r=await fetch(`/api/docs/universal?action=comments&id=${encodeURIComponent(postId)}`);
+    const d=await r.json();
+    const list=document.getElementById('commentList');
+    const comments=d.comments||[];
+    if (!comments.length){list.innerHTML='<div class="no-comments">No comments yet</div>';return;}
+    list.innerHTML=comments.map(c=>`
+      <div class="comment-item">
+        <div class="comment-top"><span class="comment-author">${esc(c.author)}</span><span class="comment-date">${c.date||''}</span></div>
+        <div class="comment-text">${esc(c.text)}</div>
+      </div>`).join('');
+  } catch(e){}
+}
+
+async function sendComment(){
+  const text=document.getElementById('commentText').value.trim();
+  const msg=document.getElementById('commentMsg');
+  if(!text){msg.textContent='Write something';return;}
+  msg.textContent='Sending...';
+  const postId=getPostId();
+  const body={postId,text};
+  if(currentUser){body.username=currentUser.username;body.token=currentUser.token||'';}
+  try{
+    const r=await fetch('/api/docs/universal?action=comment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(d.ok){document.getElementById('commentText').value='';msg.textContent='Sent!';await loadComments(postId);setTimeout(()=>{msg.textContent='';},2000);}
+    else msg.textContent=d.error||'Error';
+  }catch(e){msg.textContent='Network error';}
+}
+
+async function loadOtherPosts(author,currentId){
+  try{
+    const r=await fetch('/api/docs/universal?action=posts&fresh=1');
+    const d=await r.json();
+    const posts=(d.posts||[]).filter(p=>p.id!==currentId);
+    if(!posts.length)return;
+    document.getElementById('divOther').style.display='';
+    document.getElementById('otherSection').style.display='';
+    document.getElementById('otherScroll').innerHTML=posts.map(p=>`
+      <a class="mini-card" href="/post/${encodeURIComponent(p.id)}">
+        <div class="mini-preview">${p.img?`<img src="${p.img}" alt="">`:`<span class="mini-no-prev">No preview</span>`}</div>
+        <div class="mini-body">
+          <div class="mini-title">${esc(p.name)}</div>
+          <div class="mini-author">${esc(p.author)}</div>
+          <div class="mini-desc">${esc(p.desc)}</div>
+        </div>
+      </a>`).join('');
+  }catch(e){}
 }
 
 loadPost();
