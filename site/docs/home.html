@@ -3,203 +3,470 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nekoq Docs | Post</title>
+<title>Nekoq | Docs</title>
 <link rel="icon" type="image/png" href="/site/html/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-    :root { 
-        --primary: #ff0073; 
-        --bg-dark: #050204;
-        --card-bg: rgba(15, 10, 13, 0.6);
-        --inner-bg: rgba(255, 255, 255, 0.03);
-    }
+:root { --primary: #ff0073; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background-color: #050204; color: #d1d1d1;
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh; overflow-x: hidden;
+  animation: fadeIn 0.35s ease forwards;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── BG ── */
+.bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
+.bg-grid {
+  position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(circle at center,black 30%,transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center,black 30%,transparent 80%);
+  z-index: -4;
+}
+.blob { position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08; will-change: transform; animation: floatBlob 20s infinite alternate cubic-bezier(0.4,0,0.2,1); z-index: -3; }
+.blob-1 { top:-10%; left:-10%; width:50vw; height:50vw; background: radial-gradient(circle,var(--primary),transparent 70%); }
+.blob-2 { bottom:-10%; right:-10%; width:60vw; height:60vw; background: radial-gradient(circle,var(--primary),transparent 70%); animation-delay:-5s; }
+@keyframes floatBlob { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(10%,10%) scale(1.1)} }
+.bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%),rgba(255,255,255,0.05) 0%,transparent 100%); z-index: -2; pointer-events: none; }
 
-    body { 
-        background-color: var(--bg-dark); 
-        color: #d1d1d1; 
-        font-family: 'Poppins', sans-serif; 
-        min-height: 100vh; 
-        overflow-x: hidden; /* Убирает горизонтальный скролл от блобов */
-        animation: fadeIn 0.35s ease forwards;
-    }
+/* ── TOPBAR ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 52px;
+  background: rgba(15,10,13,0.6);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex; align-items: center;
+  padding: 0 28px; gap: 8px;
+}
+.topbar-logo {
+  font-size: 11px; font-weight: 800; color: var(--primary);
+  letter-spacing: 2px; text-transform: uppercase;
+  text-decoration: none; margin-right: 24px; white-space: nowrap;
+}
+.topbar-nav { display: flex; align-items: center; gap: 2px; flex: 1; justify-content: center; }
+.topbar-link {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: rgba(255,255,255,0.35);
+  text-decoration: none; padding: 6px 12px; border-radius: 8px;
+  transition: color 0.2s, background 0.2s; cursor: pointer; border: none; background: none;
+}
+.topbar-link:hover { color: white; background: rgba(255,255,255,0.05); }
+.topbar-sep { color: rgba(255,255,255,0.15); font-size: 12px; margin: 0 2px; }
+.topbar-amp { color: rgba(255,255,255,0.15); font-size: 11px; margin: 0 4px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: 24px; }
 
-    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.btn-go {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  padding: 7px 18px; border-radius: 8px;
+  border: 1px solid rgba(255,0,115,0.35);
+  background: rgba(255,0,115,0.08); color: var(--primary);
+  cursor: pointer; transition: all 0.2s; text-decoration: none;
+}
+.btn-go:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
-    /* ── ФОНОВЫЕ СЛОИ (КАК НА МЕЙНЕ) ── */
-    .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; z-index: -5; }
-    .bg-grid { 
-        position: fixed; inset: 0; 
-        background-image: linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px); 
-        background-size: 50px 50px; 
-        mask-image: radial-gradient(circle at center,black 30%,transparent 80%);
-        -webkit-mask-image: radial-gradient(circle at center,black 30%,transparent 80%);
-        z-index: -4; 
-    }
-    .blob { 
-        position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08; 
-        animation: floatBlob 20s infinite alternate cubic-bezier(0.4,0,0.2,1); 
-        z-index: -3; pointer-events: none; /* Чтобы не мешали кликам */
-    }
-    .blob-1 { top:-10%; left:-10%; width:50vw; height:50vw; background: radial-gradient(circle,var(--primary),transparent 70%); }
-    .blob-2 { bottom:-10%; right:-10%; width:60vw; height:60vw; background: radial-gradient(circle,var(--primary),transparent 70%); animation-delay:-5s; }
-    @keyframes floatBlob { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(10%,10%) scale(1.1)} }
-    
-    .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%),rgba(255,255,255,0.05) 0%,transparent 100%); z-index: -2; pointer-events: none; }
+.search-wrap {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(15,10,13,0.6); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px; padding: 6px 12px; transition: border-color 0.2s;
+}
+.search-wrap:focus-within { border-color: rgba(255,0,115,0.3); }
+.search-input {
+  background: none; border: none; outline: none;
+  font-family: 'Poppins',sans-serif; font-size: 11px;
+  color: rgba(255,255,255,0.7); width: 130px;
+}
+.search-input::placeholder { color: rgba(255,255,255,0.2); }
+.search-icon { color: rgba(255,255,255,0.2); font-size: 15px; cursor: pointer; transition: color 0.2s; }
+.search-icon:hover { color: var(--primary); }
 
-    /* ── TOPBAR ── */
-    .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: rgba(15,10,13,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; padding: 0 28px; }
-    .topbar-logo { font-size: 11px; font-weight: 800; color: white; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; flex: 1; }
-    .topbar-nav { display: flex; align-items: center; gap: 4px; flex: 2; justify-content: center; }
-    .topbar-link { font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.3); border: none; background: none; cursor: pointer; font-family: inherit; transition: 0.2s; }
-    .topbar-link:hover { color: white; }
-    .topbar-right { flex: 1; display: flex; justify-content: flex-end; }
-    .btn-back { font-size: 10px; font-weight: 700; padding: 7px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: none; color: rgba(255,255,255,0.4); text-decoration: none; transition: 0.2s; }
-    .btn-back:hover { color: white; border-color: rgba(255,255,255,0.2); }
+.user-chip {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  color: rgba(255,145,207,0.8); text-transform: uppercase;
+}
 
-    /* ── MAIN ── */
-    .main { padding: 90px 24px 150px; max-width: 1000px; margin: 0 auto; position: relative; z-index: 2; }
+/* ── MAIN ── */
+.main { padding: 72px 28px 80px; position: relative; z-index: 2; }
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-header-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(255,255,255,0.2);
+}
+.page-header-count {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  color: rgba(255,255,255,0.2); text-transform: uppercase;
+}
 
-    /* ── POST CARD (FRAME 175 STYLE) ── */
-    .post-card { 
-        background: var(--card-bg); 
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.05); 
-        border-radius: 16px; 
-        padding: 40px; 
-    }
-    .post-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-    .post-author { color: var(--primary); }
-    .post-sep { color: rgba(255,255,255,0.1); font-weight: 400; }
-    .post-date { color: rgba(255,255,255,0.25); }
+/* ── GRID ── */
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media(max-width:960px){ .posts-grid{grid-template-columns:repeat(2,1fr)} }
+@media(max-width:600px){ .posts-grid{grid-template-columns:1fr} }
 
-    .post-title { font-size: 32px; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 8px; }
-    .post-desc { font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 35px; max-width: 600px; }
+/* ── CARD ── */
+.post-card {
+  background: rgba(15,10,13,0.434);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px; overflow: hidden;
+  display: flex; cursor: pointer;
+  text-decoration: none; color: inherit;
+  transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+  animation: cardIn 0.4s ease both;
+}
+.post-card:hover {
+  border-color: rgba(255,0,115,0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(255,0,115,0.06);
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-    /* Layout: Text Left, Image Right */
-    .post-flex { display: flex; gap: 40px; align-items: flex-start; }
-    .post-text { flex: 1; font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.6); }
-    
-    .post-img-side { width: 300px; flex-shrink: 0; }
-    .post-preview { 
-        width: 100%; aspect-ratio: 1/1; 
-        background: rgba(255,255,255,0.02); 
-        border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 4px; 
-        display: flex; align-items: center; justify-content: center; 
-    }
-    .no-preview { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.1); text-transform: lowercase; }
-    .post-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+.card-preview {
+  width: 120px; min-width: 120px; height: 155px;
+  background: rgba(255,255,255,0.03);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+.card-preview img { width: 100%; height: 100%; object-fit: cover; }
+.card-no-preview {
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: rgba(255,255,255,0.12);
+}
+.card-body { padding: 14px 15px; flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.card-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; color: rgba(255,255,255,0.9); }
+.card-author { font-size: 9px; font-weight: 700; letter-spacing: 1px; color: rgba(255,145,207,0.8); text-transform: uppercase; white-space: nowrap; }
+.card-desc { font-size: 10px; color: rgba(255,255,255,0.4); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card-footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; }
+.card-date { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.18); }
+.card-view { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,0,115,0.7); }
 
-    /* Skeleton lines for the "no-text" effect */
-    .line { height: 7px; background: rgba(255,255,255,0.03); border-radius: 4px; margin-bottom: 14px; }
-    .line.w-full { width: 100%; }
-    .line.w-mid { width: 85%; }
-    .line.w-short { width: 60%; }
+.empty {
+  grid-column: 1/-1; padding: 80px 0; text-align: center;
+  font-size: 10px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(255,255,255,0.1);
+}
 
-    /* ── COMMENTS ── */
-    .comments-wrap { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); }
-    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); margin-bottom: 20px; }
-    .comment-box { display: flex; gap: 15px; }
-    .comment-input { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 15px; color: white; font-family: inherit; font-size: 12px; outline: none; }
-    .comment-btn { border: 1px solid var(--primary); background: none; color: var(--primary); padding: 0 30px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-    .comment-btn:hover { background: var(--primary); color: white; }
+/* ── BOTTOM ── */
+.bottom-nav {
+  position: fixed; bottom: 25px; left: 25px;
+  background: rgba(15,10,13,0.434);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px; padding: 10px 20px;
+  display: flex; gap: 25px; z-index: 10; align-items: center;
+}
+.nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; text-decoration: none; }
+.nav-link:hover { color: white; }
+.nav-link.active-page { color: rgba(255,145,207,0.8); }
+.nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
+.lang-box { display: flex; gap: 10px; }
+.lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); background: none; border: none; font-family: 'Poppins',sans-serif; }
+.lang-btn.active { color: var(--primary); }
+.bottom-credit { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.15); text-transform: uppercase; z-index: 10; white-space: nowrap; }
 
-    /* ── BOTTOM NAV (SAME AS MAIN) ── */
-    .bottom-nav {
-        position: fixed; bottom: 25px; left: 25px;
-        background: rgba(15, 10, 13, 0.5); backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 12px; padding: 10px 20px;
-        display: flex; gap: 25px; z-index: 10; align-items: center;
-    }
-    .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); text-decoration: none; transition: 0.3s; }
-    .nav-link:hover { color: white; }
-    .nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
-    .lang-btn { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.2); cursor: pointer; }
-    .lang-btn.active { color: var(--primary); }
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: #0e090c; border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px; padding: 32px; width: 100%; max-width: 360px;
+  position: relative;
+  transform: translateY(10px); transition: transform 0.2s;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.modal-tab {
+  font-family: 'Poppins',sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 8px 16px; border: none; background: none;
+  color: rgba(255,255,255,0.25); cursor: pointer; transition: color 0.2s;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.modal-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.modal-label { display: block; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 6px; }
+.modal-input {
+  width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 10px 12px;
+  font-family: 'Poppins',sans-serif; font-size: 12px; color: white; outline: none;
+  transition: border-color 0.2s; margin-bottom: 12px;
+}
+.modal-input:focus { border-color: rgba(255,0,115,0.35); }
+.modal-btn {
+  width: 100%; padding: 11px; border-radius: 10px; border: none;
+  background: var(--primary); color: white;
+  font-family: 'Poppins',sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s;
+}
+.modal-btn:hover { opacity: 0.85; }
+.modal-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 26px; height: 26px; border-radius: 7px;
+  border: 1px solid rgba(255,255,255,0.08); background: none;
+  color: rgba(255,255,255,0.3); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.modal-close:hover { color: white; border-color: rgba(255,255,255,0.2); }
+.modal-msg { font-size: 10px; color: rgba(255,145,207,0.8); margin-top: 10px; min-height: 14px; font-weight: 600; }
 
-    .bottom-credit { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.15); text-transform: uppercase; z-index: 10; }
+/* ── AUTH PANEL (inline) ── */
+.auth-panel {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
+}
+.auth-card {
+  background: #0e090c; border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px; padding: 28px; width: 100%; max-width: 340px;
+  position: relative;
+}
+.auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.auth-close {
+  display: block; width: 100%; margin-top: 14px;
+  background: none; border: none; cursor: pointer;
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: rgba(255,255,255,0.2);
+  font-family: 'Poppins',sans-serif; transition: color 0.2s;
+}
+.auth-close:hover { color: rgba(255,255,255,0.5); }
 </style>
 </head>
 <body>
-    <div class="bg-base"></div>
-    <div class="bg-grid"></div>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div id="glow" class="bg-glow"></div>
+<div class="bg-base"></div>
+<div class="bg-grid"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="bg-glow" id="glow"></div>
 
-    <nav class="topbar">
-        <a href="/" class="topbar-logo">Docs Home</a>
-        <div class="topbar-nav">
-            <button class="topbar-link">Login</button>
-            <span style="color:rgba(255,255,255,0.1); margin: 0 5px;">\</span>
-            <button class="topbar-link">Register & Create</button>
-        </div>
-        <div class="topbar-right">
-            <a href="/" class="btn-back">← Back</a>
-        </div>
-    </nav>
-
-    <div class="main">
-        <div id="postArea">
-            <div class="post-card">
-                <div class="post-meta">
-                    <span class="post-author">0XSQUAD</span>
-                    <span class="post-sep">|</span>
-                    <span class="post-date">21.03.2026</span>
-                </div>
-                <div class="post-title">Post title here</div>
-                <div class="post-desc">Short description of the post goes here. This area is for a brief summary.</div>
-                
-                <div class="post-flex">
-                    <div class="post-text">
-                        <div class="line w-full"></div><div class="line w-full"></div><div class="line w-mid"></div>
-                        <div class="line w-full"></div><div class="line w-full"></div><div class="line w-short"></div>
-                        <div class="line w-full"></div><div class="line w-mid"></div><div class="line w-full"></div>
-                        <div class="line w-full"></div><div class="line w-short"></div><div class="line w-full"></div>
-                    </div>
-                    <div class="post-img-side">
-                        <div class="post-preview">
-                            <span class="no-preview">no preview</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="comments-wrap">
-            <div class="section-label">Comments</div>
-            <div class="comment-box">
-                <textarea class="comment-input" placeholder="Leave a comment..." rows="1"></textarea>
-                <button class="comment-btn">Send →</button>
-            </div>
-        </div>
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a href="/" class="topbar-logo">Docs Home</a>
+  <div class="topbar-nav">
+    <button class="topbar-link" id="btn-login" onclick="openAuth('login')">Login</button>
+    <span class="topbar-sep">\</span>
+    <button class="topbar-link" id="btn-register" onclick="openAuth('register')">Register</button>
+    <span class="topbar-amp">&amp;</span>
+    <button class="topbar-link" id="btn-create" style="display:none" onclick="goCreate()">Create</button>
+    <span class="user-chip" id="user-chip" style="display:none"></span>
+  </div>
+  <div class="topbar-right">
+    <a href="#" class="btn-go" id="btn-go">Go</a>
+    <div class="search-wrap">
+      <input class="search-input" placeholder="Search..." id="searchInput" oninput="handleSearch()">
+      <span class="search-icon" onclick="handleSearch()">⌕</span>
     </div>
+  </div>
+</nav>
 
-    <nav class="bottom-nav">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/catalog" class="nav-link">Catalog</a>
-        <a href="/obfuscator" class="nav-link">Obfuscator</a>
-        <a href="/getkey" class="nav-link">Authentication</a>
-        <a href="/status" class="nav-link">Status</a>
-        <a href="/discord" class="nav-link" target="_blank">Discord</a>
-        <div class="nav-divider"></div>
-        <div class="lang-box">
-            <span class="lang-btn active">RU</span>
-            <span class="lang-btn">EN</span>
+<!-- MAIN -->
+<main class="main">
+  <div class="page-header">
+    <span class="page-header-title">All Posts</span>
+    <span class="page-header-count" id="postCount">— posts</span>
+  </div>
+  <div class="posts-grid" id="postsGrid">
+    <div class="empty">Loading...</div>
+  </div>
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/catalog" class="nav-link">Catalog</a>
+  <a href="/obfuscator" class="nav-link">Obfuscator</a>
+  <a href="/getkey" class="nav-link">Authentication</a>
+  <a href="/status" class="nav-link">Status</a>
+  <a href="https://discord.gg/TRPZg4Xfkq" class="nav-link" target="_blank">Discord</a>
+  <div class="nav-divider"></div>
+  <div class="lang-box">
+    <button class="lang-btn active" onclick="setLang('RU')">RU</button>
+    <button class="lang-btn" onclick="setLang('EN')">EN</button>
+  </div>
+</nav>
+<div class="bottom-credit">© 2026 Nekoq. All rights reserved.</div>
+
+<!-- AUTH PANEL — встроенный, не модал -->
+<div class="auth-panel" id="authPanel" style="display:none">
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+      <button class="modal-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+    </div>
+    <div id="form-login">
+      <label class="modal-label">Username</label>
+      <input class="modal-input" id="login-user" placeholder="your_username" autocomplete="username">
+      <label class="modal-label">Password</label>
+      <input class="modal-input" type="password" id="login-pass" placeholder="••••••••">
+      <button class="modal-btn" onclick="doLogin()">Login</button>
+      <div class="modal-msg" id="login-msg"></div>
+    </div>
+    <div id="form-register" style="display:none">
+      <label class="modal-label">Username</label>
+      <input class="modal-input" id="reg-user" placeholder="your_username" autocomplete="username">
+      <label class="modal-label">Password</label>
+      <input class="modal-input" type="password" id="reg-pass" placeholder="min 8 chars">
+      <button class="modal-btn" onclick="doRegister()">Create Account</button>
+      <div class="modal-msg" id="reg-msg"></div>
+    </div>
+    <button class="auth-close" onclick="closeAuth()">✕ close</button>
+  </div>
+</div>
+
+<script>
+window.addEventListener('mousemove', e => {
+  document.body.style.setProperty('--x', e.clientX + 'px');
+  document.body.style.setProperty('--y', e.clientY + 'px');
+});
+
+// ── SESSION ──
+let currentUser = null;
+try { currentUser = JSON.parse(localStorage.getItem('nq-docs-user') || 'null'); } catch(e) {}
+
+function updateUI() {
+  if (currentUser) {
+    document.getElementById('btn-login').style.display = 'none';
+    document.getElementById('btn-register').style.display = 'none';
+    document.getElementById('topbar-sep') && (document.getElementById('topbar-sep').style.display = 'none');
+    document.getElementById('btn-create').style.display = '';
+    document.getElementById('user-chip').style.display = '';
+    document.getElementById('user-chip').textContent = currentUser.username;
+  }
+}
+updateUI();
+
+// ── MODAL ──
+function openAuth(tab) { document.getElementById('authPanel').style.display='flex'; switchTab(tab||'login'); }
+function closeAuth() { document.getElementById('authPanel').style.display='none'; }
+function switchTab(tab) {
+  document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+}
+
+// ── AUTH ──
+async function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const msg = document.getElementById('login-msg');
+  if (!u || !p) { msg.textContent = 'Fill all fields'; return; }
+  msg.textContent = 'wait...';
+  try {
+    const r = await fetch('/api/docs/universal?action=auth', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({action:'login', username:u, password:p})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      currentUser = {username: u};
+      localStorage.setItem('nq-docs-user', JSON.stringify(currentUser));
+      closeModal('authModal'); updateUI();
+    } else { msg.textContent = d.error || 'Error'; }
+  } catch(e) { msg.textContent = 'Network error'; }
+}
+
+async function doRegister() {
+  const u = document.getElementById('reg-user').value.trim();
+  const p = document.getElementById('reg-pass').value;
+  const msg = document.getElementById('reg-msg');
+  if (!u || !p) { msg.textContent = 'Fill all fields'; return; }
+  if (p.length < 8) { msg.textContent = 'Password min 8 chars'; return; }
+  msg.textContent = 'wait...';
+  try {
+    const r = await fetch('/api/docs/universal?action=auth', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({action:'register', username:u, password:p})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      currentUser = {username: u};
+      localStorage.setItem('nq-docs-user', JSON.stringify(currentUser));
+      msg.textContent = 'Done!';
+      setTimeout(() => { closeModal('authModal'); updateUI(); }, 600);
+    } else { msg.textContent = d.error || 'Error'; }
+  } catch(e) { msg.textContent = 'Network error'; }
+}
+
+function goCreate() { window.location.href = '/create'; }
+
+// ── POSTS ──
+let allPosts = [];
+async function loadPosts() {
+  try {
+    const r = await fetch('/api/docs/universal?action=posts');
+    const d = await r.json();
+    allPosts = d.posts || [];
+    renderPosts(allPosts);
+  } catch(e) {
+    document.getElementById('postsGrid').innerHTML = '<div class="empty">Failed to load posts</div>';
+  }
+}
+
+function renderPosts(posts) {
+  const grid = document.getElementById('postsGrid');
+  document.getElementById('postCount').textContent = posts.length + ' post' + (posts.length !== 1 ? 's' : '');
+  if (!posts.length) { grid.innerHTML = '<div class="empty">No posts yet</div>'; return; }
+  grid.innerHTML = posts.map((p, i) => `
+    <a class="post-card" href="/post/${encodeURIComponent(p.id)}" style="animation-delay:${i*0.04}s">
+      <div class="card-preview">
+        ${p.img ? `<img src="${p.img}" alt="" loading="lazy">` : `<span class="card-no-preview">No preview</span>`}
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="card-title">${esc(p.name)}</span>
+          <span class="card-author">${esc(p.author)}</span>
         </div>
-    </nav>
+        <div class="card-desc">${esc(p.desc)}</div>
+        <div class="card-footer">
+          <span class="card-date">${p.date || ''}</span>
+          <span class="card-view">View →</span>
+        </div>
+      </div>
+    </a>
+  `).join('');
+}
 
-    <div class="bottom-credit">0xSquad © 2026</div>
+// ── SEARCH ──
+function handleSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if (!q) { renderPosts(allPosts); return; }
+  if (q.startsWith('@')) {
+    const a = q.slice(1);
+    renderPosts(allPosts.filter(p => p.author.toLowerCase().includes(a)));
+  } else {
+    renderPosts(allPosts.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.desc.toLowerCase().includes(q) ||
+      (p.text||'').toLowerCase().includes(q)
+    ));
+  }
+}
 
-    <script>
-        // Движение свечения за мышью
-        window.addEventListener('mousemove', (e) => {
-            document.body.style.setProperty('--x', e.clientX + 'px');
-            document.body.style.setProperty('--y', e.clientY + 'px');
-        });
-    </script>
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setLang(l) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === l));
+}
+
+loadPosts();
+</script>
 </body>
 </html>

@@ -3,154 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nekoq Docs</title>
+<title>Nekoq Docs | Post</title>
+<link rel="icon" type="image/png" href="/site/html/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root { --primary: #ff0073; --bg: #0a0a0a; --card-bg: #111111; --inner-bg: #161616; }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans-serif; min-height: 100vh; overflow-x: hidden; }
+    :root { 
+        --primary: #ff0073; 
+        --bg-dark: #050204;
+        --card-bg: rgba(15, 10, 13, 0.6);
+        --inner-bg: rgba(255, 255, 255, 0.03);
+    }
 
-/* ── TOPBAR ── */
-.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: rgba(10,10,10,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; align-items: center; padding: 0 28px; }
-.topbar-logo { font-size: 11px; font-weight: 800; color: white; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; flex: 1; }
-.topbar-nav { display: flex; align-items: center; gap: 10px; flex: 2; justify-content: center; }
-.topbar-link { font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.4); border: none; background: none; cursor: pointer; font-family: inherit; }
-.topbar-right { flex: 1; display: flex; justify-content: flex-end; }
-.btn-back { font-size: 10px; font-weight: 700; padding: 6px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: none; color: rgba(255,255,255,0.5); text-decoration: none; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── MAIN CONTAINER ── */
-.main { padding: 80px 24px 120px; max-width: 1000px; margin: 0 auto; }
+    body { 
+        background-color: var(--bg-dark); 
+        color: #d1d1d1; 
+        font-family: 'Poppins', sans-serif; 
+        min-height: 100vh; 
+        overflow-x: hidden; /* Убирает горизонтальный скролл от блобов */
+        animation: fadeIn 0.35s ease forwards;
+    }
 
-/* ── POST STYLE (Frame 175) ── */
-.post-card { background: var(--card-bg); border-radius: 16px; padding: 32px; border: 1px solid rgba(255,255,255,0.03); }
-.post-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-.post-author { color: var(--primary); letter-spacing: 1px; }
-.post-sep { color: rgba(255,255,255,0.1); }
-.post-date { color: rgba(255,255,255,0.2); }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-.post-title { font-size: 28px; font-weight: 800; color: white; margin-bottom: 6px; }
-.post-desc { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 30px; }
+    /* ── ФОНОВЫЕ СЛОИ (КАК НА МЕЙНЕ) ── */
+    .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; z-index: -5; }
+    .bg-grid { 
+        position: fixed; inset: 0; 
+        background-image: linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px); 
+        background-size: 50px 50px; 
+        mask-image: radial-gradient(circle at center,black 30%,transparent 80%);
+        -webkit-mask-image: radial-gradient(circle at center,black 30%,transparent 80%);
+        z-index: -4; 
+    }
+    .blob { 
+        position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08; 
+        animation: floatBlob 20s infinite alternate cubic-bezier(0.4,0,0.2,1); 
+        z-index: -3; pointer-events: none; /* Чтобы не мешали кликам */
+    }
+    .blob-1 { top:-10%; left:-10%; width:50vw; height:50vw; background: radial-gradient(circle,var(--primary),transparent 70%); }
+    .blob-2 { bottom:-10%; right:-10%; width:60vw; height:60vw; background: radial-gradient(circle,var(--primary),transparent 70%); animation-delay:-5s; }
+    @keyframes floatBlob { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(10%,10%) scale(1.1)} }
+    
+    .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%),rgba(255,255,255,0.05) 0%,transparent 100%); z-index: -2; pointer-events: none; }
 
-/* Двухколоночный контент */
-.post-content-layout { display: flex; gap: 40px; }
-.post-text-side { flex: 1; color: rgba(255,255,255,0.5); line-height: 1.8; font-size: 13px; }
+    /* ── TOPBAR ── */
+    .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: rgba(15,10,13,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; padding: 0 28px; }
+    .topbar-logo { font-size: 11px; font-weight: 800; color: white; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; flex: 1; }
+    .topbar-nav { display: flex; align-items: center; gap: 4px; flex: 2; justify-content: center; }
+    .topbar-link { font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.3); border: none; background: none; cursor: pointer; font-family: inherit; transition: 0.2s; }
+    .topbar-link:hover { color: white; }
+    .topbar-right { flex: 1; display: flex; justify-content: flex-end; }
+    .btn-back { font-size: 10px; font-weight: 700; padding: 7px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: none; color: rgba(255,255,255,0.4); text-decoration: none; transition: 0.2s; }
+    .btn-back:hover { color: white; border-color: rgba(255,255,255,0.2); }
 
-.post-img-side { width: 280px; flex-shrink: 0; }
-.post-preview-box { width: 100%; aspect-ratio: 1/1; background: var(--inner-bg); border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.02); }
-.post-preview-box img { width: 100%; height: 100%; object-fit: cover; }
-.no-preview-text { font-size: 10px; color: rgba(255,255,255,0.1); text-transform: lowercase; font-weight: 600; }
+    /* ── MAIN ── */
+    .main { padding: 90px 24px 150px; max-width: 1000px; margin: 0 auto; position: relative; z-index: 2; }
 
-/* ── COMMENTS ── */
-.comments-section { margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 30px; }
-.section-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
-.comment-form { display: flex; gap: 12px; align-items: flex-end; }
-.comment-input { flex: 1; background: var(--inner-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 14px; color: white; font-family: inherit; font-size: 12px; outline: none; resize: none; }
-.comment-send { background: none; border: 1px solid var(--primary); color: var(--primary); padding: 12px 24px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-.comment-send:hover { background: var(--primary); color: white; }
+    /* ── POST CARD (FRAME 175 STYLE) ── */
+    .post-card { 
+        background: var(--card-bg); 
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.05); 
+        border-radius: 16px; 
+        padding: 40px; 
+    }
+    .post-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .post-author { color: var(--primary); }
+    .post-sep { color: rgba(255,255,255,0.1); font-weight: 400; }
+    .post-date { color: rgba(255,255,255,0.25); }
 
-/* ── OTHER POSTS ── */
-.other-posts { margin-top: 50px; }
-.other-scroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; align-items: center; }
-.mini-card { width: 200px; flex-shrink: 0; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; text-decoration: none; transition: 0.2s; }
-.mini-card:hover { transform: translateY(-4px); border-color: var(--primary); }
-.mini-prev { height: 100px; background: var(--inner-bg); display: flex; align-items: center; justify-content: center; }
-.mini-body { padding: 12px; background: #181818; }
-.mini-title { font-size: 11px; font-weight: 700; color: #eee; margin-bottom: 2px; }
-.mini-author { font-size: 9px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+    .post-title { font-size: 32px; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 8px; }
+    .post-desc { font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 35px; max-width: 600px; }
 
-/* ── BOTTOM NAV ── */
-.bottom-nav { position: fixed; bottom: 25px; left: 25px; background: #161616; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 20px; display: flex; gap: 20px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.4); text-decoration: none; }
-.nav-link:hover { color: white; }
+    /* Layout: Text Left, Image Right */
+    .post-flex { display: flex; gap: 40px; align-items: flex-start; }
+    .post-text { flex: 1; font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.6); }
+    
+    .post-img-side { width: 300px; flex-shrink: 0; }
+    .post-preview { 
+        width: 100%; aspect-ratio: 1/1; 
+        background: rgba(255,255,255,0.02); 
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 4px; 
+        display: flex; align-items: center; justify-content: center; 
+    }
+    .no-preview { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.1); text-transform: lowercase; }
+    .post-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
 
-.bottom-credit { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 9px; color: rgba(255,255,255,0.15); text-transform: uppercase; letter-spacing: 1px; }
+    /* Skeleton lines for the "no-text" effect */
+    .line { height: 7px; background: rgba(255,255,255,0.03); border-radius: 4px; margin-bottom: 14px; }
+    .line.w-full { width: 100%; }
+    .line.w-mid { width: 85%; }
+    .line.w-short { width: 60%; }
 
-/* Skeleton placeholder lines */
-.line { height: 8px; background: rgba(255,255,255,0.04); border-radius: 4px; margin-bottom: 12px; width: 100%; }
-.line.short { width: 60%; }
-.line.mid { width: 85%; }
+    /* ── COMMENTS ── */
+    .comments-wrap { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); margin-bottom: 20px; }
+    .comment-box { display: flex; gap: 15px; }
+    .comment-input { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 15px; color: white; font-family: inherit; font-size: 12px; outline: none; }
+    .comment-btn { border: 1px solid var(--primary); background: none; color: var(--primary); padding: 0 30px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .comment-btn:hover { background: var(--primary); color: white; }
+
+    /* ── BOTTOM NAV (SAME AS MAIN) ── */
+    .bottom-nav {
+        position: fixed; bottom: 25px; left: 25px;
+        background: rgba(15, 10, 13, 0.5); backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px; padding: 10px 20px;
+        display: flex; gap: 25px; z-index: 10; align-items: center;
+    }
+    .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); text-decoration: none; transition: 0.3s; }
+    .nav-link:hover { color: white; }
+    .nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
+    .lang-btn { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.2); cursor: pointer; }
+    .lang-btn.active { color: var(--primary); }
+
+    .bottom-credit { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.15); text-transform: uppercase; z-index: 10; }
 </style>
 </head>
 <body>
+    <div class="bg-base"></div>
+    <div class="bg-grid"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div id="glow" class="bg-glow"></div>
 
-<nav class="topbar">
-    <a href="/" class="topbar-logo">Docs Home</a>
-    <div class="topbar-nav">
-        <button class="topbar-link">Login</button>
-        <span style="color:rgba(255,255,255,0.1)">\</span>
-        <button class="topbar-link">Register & Create</button>
-    </div>
-    <div class="topbar-right">
-        <a href="/" class="btn-back">← Back</a>
-    </div>
-</nav>
+    <nav class="topbar">
+        <a href="/" class="topbar-logo">Docs Home</a>
+        <div class="topbar-nav">
+            <button class="topbar-link">Login</button>
+            <span style="color:rgba(255,255,255,0.1); margin: 0 5px;">\</span>
+            <button class="topbar-link">Register & Create</button>
+        </div>
+        <div class="topbar-right">
+            <a href="/" class="btn-back">← Back</a>
+        </div>
+    </nav>
 
-<div class="main">
-    <div id="postArea">
-        <div class="post-card">
-            <div class="post-meta">
-                <span class="post-author">0XSQUAD</span>
-                <span class="post-sep">|</span>
-                <span class="post-date">21.03.2026</span>
-            </div>
-            <div class="post-title">Post title here</div>
-            <div class="post-desc">Short description of the post goes here.</div>
-            
-            <div class="post-content-layout">
-                <div class="post-text-side">
-                    <div class="line"></div><div class="line"></div><div class="line mid"></div><div class="line"></div>
-                    <div class="line short"></div><div class="line"></div><div class="line mid"></div><div class="line"></div>
-                    <div class="line"></div><div class="line mid"></div><div class="line"></div><div class="line short"></div>
+    <div class="main">
+        <div id="postArea">
+            <div class="post-card">
+                <div class="post-meta">
+                    <span class="post-author">0XSQUAD</span>
+                    <span class="post-sep">|</span>
+                    <span class="post-date">21.03.2026</span>
                 </div>
-                <div class="post-img-side">
-                    <div class="post-preview-box">
-                        <span class="no-preview-text">no preview</span>
+                <div class="post-title">Post title here</div>
+                <div class="post-desc">Short description of the post goes here. This area is for a brief summary.</div>
+                
+                <div class="post-flex">
+                    <div class="post-text">
+                        <div class="line w-full"></div><div class="line w-full"></div><div class="line w-mid"></div>
+                        <div class="line w-full"></div><div class="line w-full"></div><div class="line w-short"></div>
+                        <div class="line w-full"></div><div class="line w-mid"></div><div class="line w-full"></div>
+                        <div class="line w-full"></div><div class="line w-short"></div><div class="line w-full"></div>
+                    </div>
+                    <div class="post-img-side">
+                        <div class="post-preview">
+                            <span class="no-preview">no preview</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="comments-section">
-        <div class="section-label">Comments</div>
-        <div class="comment-form">
-            <textarea class="comment-input" placeholder="Leave a comment..." rows="1"></textarea>
-            <button class="comment-send">Send →</button>
+        <div class="comments-wrap">
+            <div class="section-label">Comments</div>
+            <div class="comment-box">
+                <textarea class="comment-input" placeholder="Leave a comment..." rows="1"></textarea>
+                <button class="comment-btn">Send →</button>
+            </div>
         </div>
     </div>
 
-    <div class="other-posts">
-        <div class="section-label">Other Posts</div>
-        <div class="other-scroll">
-            <a href="#" class="mini-card">
-                <div class="mini-prev"></div>
-                <div class="mini-body">
-                    <div class="mini-title">Post name</div>
-                    <div class="mini-author">Author</div>
-                </div>
-            </a>
-            <a href="#" class="mini-card">
-                <div class="mini-prev"></div>
-                <div class="mini-body">
-                    <div class="mini-title">Post name</div>
-                    <div class="mini-author">Author</div>
-                </div>
-            </a>
-            <div style="color:rgba(255,255,255,0.2); margin-left:10px;">→</div>
+    <nav class="bottom-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/catalog" class="nav-link">Catalog</a>
+        <a href="/obfuscator" class="nav-link">Obfuscator</a>
+        <a href="/getkey" class="nav-link">Authentication</a>
+        <a href="/status" class="nav-link">Status</a>
+        <a href="/discord" class="nav-link" target="_blank">Discord</a>
+        <div class="nav-divider"></div>
+        <div class="lang-box">
+            <span class="lang-btn active">RU</span>
+            <span class="lang-btn">EN</span>
         </div>
-    </div>
-</div>
+    </nav>
 
-<nav class="bottom-nav">
-    <a href="/" class="nav-link">Home</a>
-    <a href="/catalog" class="nav-link">Catalog</a>
-    <a href="/obfuscator" class="nav-link">Obfuscator</a>
-    <a href="/auth" class="nav-link">Authentication</a>
-    <a href="/status" class="nav-link">Status</a>
-    <a href="/discord" class="nav-link">Discord</a>
-</nav>
-
-<div class="bottom-credit">© 2026 Nekoq. All rights reserved.</div>
+    <div class="bottom-credit">0xSquad © 2026</div>
 
 <script>
 window.addEventListener('mousemove', e => {
