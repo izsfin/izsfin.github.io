@@ -55,7 +55,7 @@ body {
 .main {
   padding-top: 52px;
   display: grid;
-  grid-template-columns: 1fr 380px 1fr;
+  grid-template-columns: 160px 1fr 160px;
   grid-template-rows: auto;
   min-height: 100vh;
   position: relative; z-index: 2;
@@ -63,8 +63,8 @@ body {
 
 /* Левая колонка — другие посты */
 .col-left {
-  padding: 32px 20px 100px 28px;
-  display: flex; flex-direction: column; gap: 12px;
+  padding: 16px 12px 100px 16px;
+  display: flex; flex-direction: column; gap: 8px;
 }
 .col-label {
   font-size: 9px; font-weight: 700; letter-spacing: 3px;
@@ -74,15 +74,15 @@ body {
 
 /* Центр — пост */
 .col-center {
-  padding: 32px 0 100px;
+  padding: 24px 0 100px;
   border-left: 1px solid rgba(255,255,255,0.05);
   border-right: 1px solid rgba(255,255,255,0.05);
 }
 
 /* Правая колонка — комменты + другие посты автора */
 .col-right {
-  padding: 32px 28px 100px 20px;
-  display: flex; flex-direction: column; gap: 20px;
+  padding: 16px 16px 100px 12px;
+  display: flex; flex-direction: column; gap: 16px;
 }
 
 /* ── POST ── */
@@ -163,24 +163,24 @@ body {
 /* ── MINI CARD ── */
 .mini-card {
   background: rgba(15,10,13,0.434); backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
-  overflow: hidden; display: flex; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 8px;
+  overflow: hidden; display: flex; flex-direction: column; cursor: pointer;
   text-decoration: none; color: inherit;
   transition: border-color 0.2s, transform 0.2s;
 }
 .mini-card:hover { border-color: rgba(255,0,115,0.25); transform: translateY(-1px); }
 .mini-preview {
-  width: 70px; min-width: 70px; height: 80px;
+  width: 100%; height: 80px;
   background: rgba(255,255,255,0.03);
   display: flex; align-items: center; justify-content: center;
-  border-right: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 .mini-preview img { width: 100%; height: 100%; object-fit: cover; }
 .mini-no-prev { font-size: 7px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
-.mini-body { padding: 10px 12px; flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.mini-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.85); }
-.mini-author { font-size: 9px; font-weight: 700; color: rgba(255,145,207,0.7); text-transform: uppercase; letter-spacing: 1px; }
-.mini-desc { font-size: 10px; color: rgba(255,255,255,0.3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mini-title { font-size: 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.85); }
+.mini-author { font-size: 8px; font-weight: 700; color: rgba(255,145,207,0.7); text-transform: uppercase; letter-spacing: 1px; }
+.mini-desc { display: none; }
 
 /* ── COMMENTS ── */
 .comments-label {
@@ -235,11 +235,11 @@ body {
 /* ── LOADING ── */
 .loading { padding: 60px 24px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
 
-@media(max-width:1100px) {
-  .main { grid-template-columns: 1fr 340px; }
+@media(max-width:900px) {
+  .main { grid-template-columns: 0 1fr 160px; }
   .col-left { display: none; }
 }
-@media(max-width:700px) {
+@media(max-width:600px) {
   .main { grid-template-columns: 1fr; }
   .col-right { display: none; }
 }
@@ -254,17 +254,17 @@ body {
 
 <!-- TOPBAR -->
 <nav class="topbar">
-  <a href="/" class="topbar-logo">Docs Home</a>
+  <a href="/docs" class="topbar-logo">Docs Home</a>
   <div class="topbar-nav">
     <button class="topbar-link" id="btn-login" onclick="openAuth()">Login</button>
     <span class="topbar-sep">\</span>
     <button class="topbar-link" id="btn-register" onclick="openAuth()">Register</button>
     <span class="topbar-amp">&amp;</span>
-    <button class="topbar-link" id="btn-create" style="display:none" onclick="window.location.href='/create'">Create</button>
+    <button class="topbar-link" id="btn-create" style="display:none" onclick="window.location.href='/docs/create'">Create</button>
     <span class="user-chip" id="user-chip" style="display:none"></span>
   </div>
   <div class="topbar-right">
-    <a href="/" class="btn-go">← Back</a>
+    <a href="/docs" class="btn-go">← Back</a>
   </div>
 </nav>
 
@@ -334,12 +334,12 @@ function updateUI() {
   }
 }
 updateUI();
-function openAuth() { window.location.href = ''; }
+function openAuth() { window.location.href = '/docs'; }
 
 // ── POST ID из URL ──
 function getPostId() {
   const p = window.location.pathname;
-  const m = p.match(/\/post\/(.+)/);
+  const m = p.match(/\/docs\/post\/(.+)/);
   return m ? decodeURIComponent(m[1]) : null;
 }
 
@@ -466,7 +466,7 @@ async function loadOtherPosts(author, currentId) {
 
 function miniCard(p) {
   return `
-    <a class="mini-card" href="/post/${encodeURIComponent(p.id)}">
+    <a class="mini-card" href="/docs/post/${encodeURIComponent(p.id)}">
       <div class="mini-preview">
         ${p.img ? `<img src="${p.img}" alt="">` : `<span class="mini-no-prev">No img</span>`}
       </div>
