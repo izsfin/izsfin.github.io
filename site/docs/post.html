@@ -4,173 +4,152 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nekoq Docs</title>
-<link rel="icon" type="image/png" href="/site/html/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root { --primary: #ff0073; }
+:root { --primary: #ff0073; --bg: #0a0a0a; --card-bg: #111111; --inner-bg: #161616; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background-color: #050204; color: #d1d1d1; font-family: 'Poppins',sans-serif; min-height: 100vh; overflow-x: hidden; animation: fadeIn 0.35s ease forwards; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-.bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; z-index: -5; }
-.bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px); background-size: 50px 50px; mask-image: radial-gradient(circle at center,black 30%,transparent 80%); -webkit-mask-image: radial-gradient(circle at center,black 30%,transparent 80%); z-index: -4; }
-.blob { position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08; animation: floatBlob 20s infinite alternate cubic-bezier(0.4,0,0.2,1); z-index: -3; }
-.blob-1 { top:-10%; left:-10%; width:50vw; height:50vw; background: radial-gradient(circle,var(--primary),transparent 70%); }
-.blob-2 { bottom:-10%; right:-10%; width:60vw; height:60vw; background: radial-gradient(circle,var(--primary),transparent 70%); animation-delay:-5s; }
-@keyframes floatBlob { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(10%,10%) scale(1.1)} }
-.bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%),rgba(255,255,255,0.05) 0%,transparent 100%); z-index: -2; pointer-events: none; }
+body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
 /* ── TOPBAR ── */
-.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: rgba(15,10,13,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; padding: 0 28px; gap: 8px; }
-.topbar-logo { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; text-decoration: none; margin-right: 24px; }
-.topbar-nav { display: flex; align-items: center; gap: 2px; flex: 1; justify-content: center; }
-.topbar-link { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.35); padding: 6px 12px; border-radius: 8px; transition: color 0.2s,background 0.2s; cursor: pointer; border: none; background: none; font-family: 'Poppins',sans-serif; }
-.topbar-link:hover { color: white; background: rgba(255,255,255,0.05); }
-.topbar-sep { color: rgba(255,255,255,0.15); font-size: 12px; margin: 0 2px; }
-.topbar-amp { color: rgba(255,255,255,0.15); font-size: 11px; margin: 0 4px; }
-.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: 24px; }
-.btn-back { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 7px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: none; color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s; text-decoration: none; }
-.btn-back:hover { color: white; border-color: rgba(255,255,255,0.2); }
-.user-chip { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: rgba(255,145,207,0.8); text-transform: uppercase; }
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: rgba(10,10,10,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; align-items: center; padding: 0 28px; }
+.topbar-logo { font-size: 11px; font-weight: 800; color: white; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; flex: 1; }
+.topbar-nav { display: flex; align-items: center; gap: 10px; flex: 2; justify-content: center; }
+.topbar-link { font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.4); border: none; background: none; cursor: pointer; font-family: inherit; }
+.topbar-right { flex: 1; display: flex; justify-content: flex-end; }
+.btn-back { font-size: 10px; font-weight: 700; padding: 6px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: none; color: rgba(255,255,255,0.5); text-decoration: none; }
 
-/* ── MAIN ── */
-.main { padding-top: 52px; max-width: 860px; margin: 0 auto; padding-left: 24px; padding-right: 24px; position: relative; z-index: 2; }
+/* ── MAIN CONTAINER ── */
+.main { padding: 80px 24px 120px; max-width: 1000px; margin: 0 auto; }
 
-/* ── POST ── */
-.post-meta { display: flex; align-items: center; justify-content: space-between; padding: 28px 0 16px; }
-.post-author { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: rgba(255,145,207,0.8); text-transform: uppercase; }
-.post-date { font-size: 9px; color: rgba(255,255,255,0.2); }
-.post-title { font-size: 26px; font-weight: 800; color: white; line-height: 1.25; margin-bottom: 10px; }
-.post-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.6; margin-bottom: 22px; }
-.post-img { width: 100%; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); margin-bottom: 28px; }
-.post-img img { width: 100%; display: block; }
-.post-img-placeholder { height: 200px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.08); }
-.post-text { font-size: 13px; line-height: 1.85; color: rgba(255,255,255,0.7); padding-bottom: 40px; }
-.post-text h1 { font-size: 22px; font-weight: 800; color: white; margin: 28px 0 12px; }
-.post-text h2 { font-size: 17px; font-weight: 700; color: white; margin: 22px 0 10px; }
-.post-text h3 { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.85); margin: 18px 0 8px; }
-.post-text h4 { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 1.5px; text-transform: uppercase; margin: 14px 0 6px; }
-.post-text strong { color: white; font-weight: 700; }
-.post-text em { font-style: italic; color: rgba(255,255,255,0.55); }
-.post-text u { text-decoration: underline; text-decoration-color: rgba(255,0,115,0.5); }
-.post-text a { color: var(--primary); text-decoration: none; }
-.post-text a:hover { text-decoration: underline; }
-.post-text ul { padding-left: 20px; margin: 8px 0; }
-.post-text ul li { margin: 5px 0; }
-.post-text code { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 5px; padding: 2px 7px; font-size: 11px; font-family: 'Courier New',monospace; color: rgba(255,145,207,0.9); }
-.post-text pre { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px 18px; margin: 14px 0; overflow-x: auto; }
-.post-text pre code { background: none; border: none; padding: 0; font-size: 12px; color: rgba(255,255,255,0.75); }
-.post-text blockquote { border-left: 3px solid rgba(255,0,115,0.4); padding: 8px 16px; margin: 14px 0; background: rgba(255,0,115,0.04); border-radius: 0 8px 8px 0; color: rgba(255,255,255,0.5); font-style: italic; }
-.spoiler-wrap { margin: 10px 0; }
-.spoiler-toggle { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 14px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; font-family: 'Poppins',sans-serif; }
-.spoiler-toggle:hover { border-color: rgba(255,0,115,0.3); color: rgba(255,255,255,0.7); }
-.spoiler-icon { font-size: 9px; transition: transform 0.2s; }
-.spoiler-toggle.open .spoiler-icon { transform: rotate(90deg); }
-.spoiler-content { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-top: none; border-radius: 0 0 8px 8px; padding: 12px 14px; font-size: 12px; display: none; }
-.spoiler-content.open { display: block; }
+/* ── POST STYLE (Frame 175) ── */
+.post-card { background: var(--card-bg); border-radius: 16px; padding: 32px; border: 1px solid rgba(255,255,255,0.03); }
+.post-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.post-author { color: var(--primary); letter-spacing: 1px; }
+.post-sep { color: rgba(255,255,255,0.1); }
+.post-date { color: rgba(255,255,255,0.2); }
 
-/* ── DIVIDER ── */
-.section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 0; }
+.post-title { font-size: 28px; font-weight: 800; color: white; margin-bottom: 6px; }
+.post-desc { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 30px; }
+
+/* Двухколоночный контент */
+.post-content-layout { display: flex; gap: 40px; }
+.post-text-side { flex: 1; color: rgba(255,255,255,0.5); line-height: 1.8; font-size: 13px; }
+
+.post-img-side { width: 280px; flex-shrink: 0; }
+.post-preview-box { width: 100%; aspect-ratio: 1/1; background: var(--inner-bg); border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.02); }
+.post-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+.no-preview-text { font-size: 10px; color: rgba(255,255,255,0.1); text-transform: lowercase; font-weight: 600; }
 
 /* ── COMMENTS ── */
-.comments-section { padding: 28px 0 32px; }
-.section-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.2); margin-bottom: 16px; }
-.comment-form { display: flex; gap: 10px; margin-bottom: 20px; }
-.comment-input { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 14px; font-family: 'Poppins',sans-serif; font-size: 12px; color: rgba(255,255,255,0.8); outline: none; transition: border-color 0.2s; resize: none; }
-.comment-input:focus { border-color: rgba(255,0,115,0.3); }
-.comment-input::placeholder { color: rgba(255,255,255,0.15); }
-.comment-send { flex-shrink: 0; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,0,115,0.35); background: rgba(255,0,115,0.08); color: var(--primary); font-family: 'Poppins',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; align-self: flex-end; }
+.comments-section { margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 30px; }
+.section-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+.comment-form { display: flex; gap: 12px; align-items: flex-end; }
+.comment-input { flex: 1; background: var(--inner-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 14px; color: white; font-family: inherit; font-size: 12px; outline: none; resize: none; }
+.comment-send { background: none; border: 1px solid var(--primary); color: var(--primary); padding: 12px 24px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; }
 .comment-send:hover { background: var(--primary); color: white; }
-.comment-msg { font-size: 10px; color: rgba(255,145,207,0.8); font-weight: 600; margin-bottom: 12px; min-height: 14px; }
-.comment-list { display: flex; flex-direction: column; gap: 8px; }
-.comment-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 12px 14px; }
-.comment-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-.comment-author { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,145,207,0.7); }
-.comment-date { font-size: 8px; color: rgba(255,255,255,0.15); }
-.comment-text { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.5; }
-.no-comments { font-size: 10px; color: rgba(255,255,255,0.12); padding: 20px 0; letter-spacing: 1px; }
 
-/* ── OTHER POSTS — горизонтальный скролл снизу ── */
-.other-posts-section { padding: 0 0 120px; }
-.other-posts-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
-.other-posts-scroll::-webkit-scrollbar { height: 3px; }
-.other-posts-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
-.mini-card { flex-shrink: 0; width: 180px; background: rgba(15,10,13,0.5); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; text-decoration: none; color: inherit; transition: border-color 0.2s,transform 0.2s; }
-.mini-card:hover { border-color: rgba(255,0,115,0.25); transform: translateY(-2px); }
-.mini-preview { width: 100%; height: 100px; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
-.mini-preview img { width: 100%; height: 100%; object-fit: cover; }
-.mini-no-prev { font-size: 7px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
-.mini-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
-.mini-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.85); }
-.mini-author { font-size: 8px; font-weight: 700; color: rgba(255,145,207,0.7); text-transform: uppercase; letter-spacing: 1px; }
-.mini-desc { font-size: 10px; color: rgba(255,255,255,0.3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* ── OTHER POSTS ── */
+.other-posts { margin-top: 50px; }
+.other-scroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; align-items: center; }
+.mini-card { width: 200px; flex-shrink: 0; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; text-decoration: none; transition: 0.2s; }
+.mini-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+.mini-prev { height: 100px; background: var(--inner-bg); display: flex; align-items: center; justify-content: center; }
+.mini-body { padding: 12px; background: #181818; }
+.mini-title { font-size: 11px; font-weight: 700; color: #eee; margin-bottom: 2px; }
+.mini-author { font-size: 9px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
 
 /* ── BOTTOM NAV ── */
-.bottom-nav { position: fixed; bottom: 25px; left: 25px; background: rgba(15,10,13,0.434); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center; }
-.nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; text-decoration: none; }
+.bottom-nav { position: fixed; bottom: 25px; left: 25px; background: #161616; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 20px; display: flex; gap: 20px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.4); text-decoration: none; }
 .nav-link:hover { color: white; }
-.nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
-.lang-box { display: flex; gap: 10px; }
-.lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); background: none; border: none; font-family: 'Poppins',sans-serif; }
-.lang-btn.active { color: var(--primary); }
-.bottom-credit { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.15); text-transform: uppercase; z-index: 10; white-space: nowrap; }
-.loading { padding: 60px 0; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
+
+.bottom-credit { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 9px; color: rgba(255,255,255,0.15); text-transform: uppercase; letter-spacing: 1px; }
+
+/* Skeleton placeholder lines */
+.line { height: 8px; background: rgba(255,255,255,0.04); border-radius: 4px; margin-bottom: 12px; width: 100%; }
+.line.short { width: 60%; }
+.line.mid { width: 85%; }
 </style>
 </head>
 <body>
-<div class="bg-base"></div>
-<div class="bg-grid"></div>
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-<div class="bg-glow"></div>
 
 <nav class="topbar">
-  <a href="/" class="topbar-logo">Docs Home</a>
-  <div class="topbar-nav">
-    <button class="topbar-link" id="btn-login" onclick="window.location.href='/auth'">Login</button>
-    <span class="topbar-sep">\</span>
-    <button class="topbar-link" id="btn-register" onclick="window.location.href='/auth'">Register</button>
-    <span class="topbar-amp">&amp;</span>
-    <button class="topbar-link" id="btn-create" style="display:none" onclick="window.location.href='/create'">Create</button>
-    <span class="user-chip" id="user-chip" style="display:none"></span>
-  </div>
-  <div class="topbar-right">
-    <a href="/" class="btn-back">← Back</a>
-  </div>
+    <a href="/" class="topbar-logo">Docs Home</a>
+    <div class="topbar-nav">
+        <button class="topbar-link">Login</button>
+        <span style="color:rgba(255,255,255,0.1)">\</span>
+        <button class="topbar-link">Register & Create</button>
+    </div>
+    <div class="topbar-right">
+        <a href="/" class="btn-back">← Back</a>
+    </div>
 </nav>
 
 <div class="main">
-  <div id="postArea"><div class="loading">Loading post...</div></div>
-  <hr class="section-divider" id="divComments" style="display:none">
-  <div class="comments-section" id="commentsSection" style="display:none">
-    <div class="section-label">Comments</div>
-    <div class="comment-form">
-      <textarea class="comment-input" id="commentText" placeholder="Leave a comment..." rows="2"></textarea>
-      <button class="comment-send" onclick="sendComment()">Send →</button>
+    <div id="postArea">
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="post-author">0XSQUAD</span>
+                <span class="post-sep">|</span>
+                <span class="post-date">21.03.2026</span>
+            </div>
+            <div class="post-title">Post title here</div>
+            <div class="post-desc">Short description of the post goes here.</div>
+            
+            <div class="post-content-layout">
+                <div class="post-text-side">
+                    <div class="line"></div><div class="line"></div><div class="line mid"></div><div class="line"></div>
+                    <div class="line short"></div><div class="line"></div><div class="line mid"></div><div class="line"></div>
+                    <div class="line"></div><div class="line mid"></div><div class="line"></div><div class="line short"></div>
+                </div>
+                <div class="post-img-side">
+                    <div class="post-preview-box">
+                        <span class="no-preview-text">no preview</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="comment-msg" id="commentMsg"></div>
-    <div class="comment-list" id="commentList"><div class="no-comments">No comments yet</div></div>
-  </div>
-  <hr class="section-divider" id="divOther" style="display:none">
-  <div class="other-posts-section" id="otherSection" style="display:none">
-    <div class="section-label" id="otherLabel">Other Posts</div>
-    <div class="other-posts-scroll" id="otherScroll"></div>
-  </div>
+
+    <div class="comments-section">
+        <div class="section-label">Comments</div>
+        <div class="comment-form">
+            <textarea class="comment-input" placeholder="Leave a comment..." rows="1"></textarea>
+            <button class="comment-send">Send →</button>
+        </div>
+    </div>
+
+    <div class="other-posts">
+        <div class="section-label">Other Posts</div>
+        <div class="other-scroll">
+            <a href="#" class="mini-card">
+                <div class="mini-prev"></div>
+                <div class="mini-body">
+                    <div class="mini-title">Post name</div>
+                    <div class="mini-author">Author</div>
+                </div>
+            </a>
+            <a href="#" class="mini-card">
+                <div class="mini-prev"></div>
+                <div class="mini-body">
+                    <div class="mini-title">Post name</div>
+                    <div class="mini-author">Author</div>
+                </div>
+            </a>
+            <div style="color:rgba(255,255,255,0.2); margin-left:10px;">→</div>
+        </div>
+    </div>
 </div>
 
 <nav class="bottom-nav">
-  <a href="/" class="nav-link">Home</a>
-  <a href="/catalog" class="nav-link">Catalog</a>
-  <a href="/obfuscator" class="nav-link">Obfuscator</a>
-  <a href="/getkey" class="nav-link">Authentication</a>
-  <a href="/status" class="nav-link">Status</a>
-  <a href="https://discord.gg/TRPZg4Xfkq" class="nav-link" target="_blank">Discord</a>
-  <div class="nav-divider"></div>
-  <div class="lang-box">
-    <button class="lang-btn active">RU</button>
-    <button class="lang-btn">EN</button>
-  </div>
+    <a href="/" class="nav-link">Home</a>
+    <a href="/catalog" class="nav-link">Catalog</a>
+    <a href="/obfuscator" class="nav-link">Obfuscator</a>
+    <a href="/auth" class="nav-link">Authentication</a>
+    <a href="/status" class="nav-link">Status</a>
+    <a href="/discord" class="nav-link">Discord</a>
 </nav>
+
 <div class="bottom-credit">© 2026 Nekoq. All rights reserved.</div>
 
 <script>
