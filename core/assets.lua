@@ -1,4 +1,4 @@
-local RELOADASS_URL = "https://wexly.vercel.app/assets.lua"
+local RELOADASS_URL = "https://nekoq.vercel.app/assets.lua"
 
 getgenv().assets = {}
 local assets = getgenv().assets
@@ -12,20 +12,20 @@ local function ensurePath(path)
 end
 
 local assetMap = {
-    ["ximeax/swanmo/assets/icon/SWANMO_B.png"] = "swanmo_b",
-	["ximeax/swanmo/assets/bg/bg.png"] = "bgswnmo",
-    ["ximeax/swanmo/assets/icon/swanmo_lb.png"] = "swanmo_lb",
+    ["hux7z/assets/icon/SWANMO_B.png"] = "swanmo_b",
+	["hux7z/assets/bg/bg.png"] = "bgswnmo",
+    ["hux7z/assets/icon/swanmo_lb.png"] = "swanmo_lb",
 }
 
 local assetURL = {
-    ["swanmo_b"] = "https://wexly-cdn.vercel.app/assets/icon/swanmo/SWANMO_B",
-    ["bgswnmo"] = "https://wexly-cdn.vercel.app/assets/icon/swanmo/bg/bg",
-    ["swanmo_lb"] = "https://wexly-cdn.vercel.app/assets/icon/swanmo/swanmo_lb",
+    ["swanmo_b"] = "https://nekoq-cdn.vercel.app/assets/icon/swanmo/SWANMO_B",
+    ["bgswnmo"] = "https://nekoq-cdn.vercel.app/assets/icon/swanmo/bg/bg",
+    ["swanmo_lb"] = "https://nekoq-cdn.vercel.app/assets/icon/swanmo/swanmo_lb",
 }
 local function downloadAsset(path, name)
     local url = assetURL[name]
     if not url then
-        warn("XMS || No URL for asset: " .. name)
+        warn("assets || No URL for asset: " .. name)
         return false
     end
     local ok, data = pcall(game.HttpGet, game, url)
@@ -42,7 +42,7 @@ local function loadAssets(filter)
         if not filter or filter[name] then
             ensurePath(path)
             if not isfile(path) then
-                print("XMS || Downloading asset: " .. name)
+                print("assets || Downloading asset: " .. name)
                 downloadAsset(path, name)
             end
             if isfile(path) then
@@ -50,16 +50,16 @@ local function loadAssets(filter)
                 if ok then
                     assets[name] = id
                 else
-                    warn("XMS || getcustomasset failed: " .. path)
+                    warn("assets || getcustomasset failed: " .. path)
                     assets[name] = ""
                 end
             else
-                warn("XMS || Asset not found: " .. path)
+                warn("assets || Asset not found: " .. path)
                 assets[name] = ""
             end
         end
     end
-    print("XMS || Assets loaded!")
+    print("assets || loaded!")
 end
 
 function assets.restart()
@@ -71,7 +71,7 @@ function assets.unload()
         getgenv().assets[k] = nil
     end
     getgenv().assets = nil
-    print("XMS || Assets unloaded!")
+    print("assets || unloaded!")
 end
 
 loadAssets(nil)
