@@ -1,92 +1,57 @@
--- ================= SCRIPT MAPPING =================
--- Format: Run.FunctionName --- Button Text
 local SCRIPT_MAP = {
-    -- Violence District
-    ["VD | TexxRBLX"] = "VDTexRBLX",
-    ["AntiSPEmot"] = "DisableStopEmote",
-    ["VD MW"] = "MoonWalk",
-    
-    -- Evade
-    ["WhakizashiX"] = "WhakazhiHubX",
-    ["Dara Hub"] = "DaraHub",
-    
-    -- Lumber Tycoon 2
-    ["Kron Hub"] = "KronHub",
-    
-    -- MM2
-    ["Vertex"] = "VertexMM2",
-    ["XHub"] = "XHubMM2",
-    ["ODH"] = "ODHMM2",
-    
-    -- Overlay
-    ["FPS x Ping"] = "FPSxPing",
-    ["R6 → R15"] = "R6toR15",
-    
-    -- Combat
-    ["ESP"] = "ESPwa",
-    ["LbEx"] = "LimbExtender_rewrite",
-    ["Spin"] = "Spin",
-    
-    -- Movement
-    ["CFrame"] = "Cframe",
-    ["Fly"] = "Fly",
-    ["External Shift"] = "External_Shift",
-    
-    -- Animations
-    ["Gaze"] = "Gaze",
-    ["AFEM"] = "afem",
-    
-    -- Exploits
-    ["Example Exploit"] = "Exploit",
-    
-    -- Utility
-    ["System Broken"] = "SysBroken",
+  ["VD | TexxRBLX"] = "VDTexRBLX",
+  ["AntiSPEmot"] = "DisableStopEmote",
+  ["VD MW"] = "MoonWalk",
+  ["WhakizashiX"] = "WhakazhiHubX",
+  ["Dara Hub"] = "DaraHub",
+  ["Kron Hub"] = "KronHub",
+  ["Vertex"] = "VertexMM2",
+  ["XHub"] = "XHubMM2",
+  ["ODH"] = "ODHMM2",
+  ["FPS x Ping"] = "FPSxPing",
+  ["R6 → R15"] = "R6toR15",
+  ["ESP"] = "ESPwa",
+  ["LbEx"] = "LimbExtender_rewrite",
+  ["Spin"] = "Spin",
+  ["CFrame"] = "Cframe",
+  ["Fly"] = "Fly",
+  ["External Shift"] = "External_Shift",
+  ["Gaze"] = "Gaze",
+  ["AFEM"] = "afem",
+  ["Example Exploit"] = "Exploit",
+  ["System Broken"] = "SysBroken",
 }
-
--- ================= LOADING MODULES =================
 local Run
 local notifyQueue = {}
 
 local function showNotification(text, status)
-    table.insert(notifyQueue, {text = text, status = status or "info"})
+ table.insert(notifyQueue, {text = text, status = status or "info"})
 end
 
-showNotification("Loading nixu! legacy Menu modules...", "loading")
+showNotification("Loading jessi menu modules...", "loading")
 
 getgenv().Run = getgenv().Run or {}
-getgenv().Config = getgenv().Config or {} -- Вот этой строки у тебя не хватало!
+getgenv().Config = getgenv().Config or {}
 
--- 2. Теперь, когда Config существует, можно в него записывать данные из SCRIPT_MAP
 for k, v in pairs(SCRIPT_MAP) do
-    getgenv().Config[v] = true
+ getgenv().Config[v] = true
 end
 
--- 3. Загружаем внешние модули
 pcall(function()
-    loadstring(game:HttpGet("https://ethereos-api.vercel.app/storage"))()
-    Run = getgenv().Run
-    showNotification("Modules loaded successfully", "success")
+ loadstring(game:HttpGet("https://nekoq-api.vercel.app/storage"))()
+  Run = getgenv().Run
+ showNotification("Modules loaded successfully", "success")
 end)
 
--- ================= SERVICES =================
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-
-local prevMouseBehavior = nil
-local prevMouseIcon = nil
---[[
-local function unlockMouseSmart() end
-
-local function restoreMouseSmart() end ]]
-
 local Lighting = game:GetService("Lighting")
 
 local plr = Players.LocalPlayer
 local CoreGui = game:GetService("CoreGui")
 local gui = CoreGui
 
--- ================= GUI =================
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "zephyramenu"
 screenGui.IgnoreGuiInset = true
@@ -96,7 +61,6 @@ screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 screenGui.Enabled = false
 screenGui.Parent = gui
 
--- Overlay
 local overlay = Instance.new("Frame")
 overlay.Size = UDim2.new(1,0,1,0)
 overlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
@@ -104,12 +68,6 @@ overlay.BackgroundTransparency = 1
 overlay.ZIndex = 1
 overlay.Parent = screenGui
 
---[[
-local blur = Instance.new("BlurEffect")
-blur.Size = 0
-blur.Parent = Lighting
-]]
--- ================= NOTIFICATION SYSTEM =================
 local notifContainer = Instance.new("Frame")
 notifContainer.Name = "Notifications"
 notifContainer.Size = UDim2.new(0,320,0,500)
@@ -125,12 +83,12 @@ notifLayout.SortOrder = Enum.SortOrder.LayoutOrder
 notifLayout.Parent = notifContainer
 
 local function createNotification(text, status)
-    local colors = {
-        loading = Color3.fromRGB(100, 150, 255),
-        success = Color3.fromRGB(117, 149, 201),
-        error = Color3.fromRGB(51, 89, 150),
-        info = Color3.fromRGB(115, 168, 255)
-    }
+ local colors = {
+  loading = Color3.fromRGB(100, 150, 255),
+  success = Color3.fromRGB(117, 149, 201),
+  error = Color3.fromRGB(51, 89, 150),
+  info = Color3.fromRGB(115, 168, 255)
+ }
     
     local notif = Instance.new("Frame")
     notif.Size = UDim2.new(1,0,0,60)
@@ -168,13 +126,11 @@ local function createNotification(text, status)
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.TextColor3 = Color3.fromRGB(220,220,230)
     label.Parent = notif
-    
-    -- Slide in
+
     TweenService:Create(notif,TweenInfo.new(0.3,Enum.EasingStyle.Back),{
         Position = UDim2.new(0,0,0,0)
     }):Play()
     
-    -- Auto remove after 3 seconds
     task.delay(3,function()
         TweenService:Create(notif,TweenInfo.new(0.3),{
             Position = UDim2.new(0,330,0,0),
@@ -194,7 +150,6 @@ local function createNotification(text, status)
     end)
 end
 
--- Process notification queue
 task.spawn(function()
     while true do
         if #notifyQueue > 0 then
@@ -206,7 +161,6 @@ task.spawn(function()
     end
 end)
 
--- ================= MAIN =================
 local main = Instance.new("Frame")
 main.Size = UDim2.new(0,1220,0,580)
 main.Position = UDim2.new(0.5,-610,0.5,-290)
@@ -214,7 +168,6 @@ main.BackgroundTransparency = 1
 main.ZIndex = 3
 main.Parent = screenGui
 
--- ================= UI HELPERS =================
 local function createSection(name,width,x)
     local f = Instance.new("Frame")
     f.Name = name
@@ -355,9 +308,7 @@ local function textbox(p,placeholder,y)
     return t
 end
 
--- ================= SECTIONS =================
 
--- NL Logo with Decal
 local nl = createSection("NL",220,0)
 nl.BackgroundTransparency = 0.1
 nl.BackgroundColor3 = Color3.fromRGB(20,20,20)
@@ -371,7 +322,7 @@ decalHolder.Image = "rbxassetid://73048663385612"
 decalHolder.ScaleType = Enum.ScaleType.Fit
 decalHolder.Parent = nl
 
-local logo = Instance.new("Frame")  -- Используй Frame вместо TextLabel
+local logo = Instance.new("Frame")
 logo.Size = UDim2.new(1,-20,0,80)
 logo.Position = UDim2.new(0,10,0,20)
 logo.BackgroundColor3 = Color3.fromRGB(20,20,20)
@@ -389,7 +340,6 @@ version.TextXAlignment = Enum.TextXAlignment.Left
 version.TextColor3 = Color3.fromRGB(100,100,110)
 version.Parent = nl
 
--- Violence District
 local vd = createSection("ViolenceDistrict",220,230)
 header(vd,"Violence District",8)
 button(vd,"VD | TexxRBLX",40, SCRIPT_MAP["VD | TexxRBLX"])
@@ -417,7 +367,7 @@ log.Size = UDim2.new(1,-16,0,80)
 log.Position = UDim2.new(0,8,0,40)
 log.BackgroundTransparency = 1
 log.Font = Enum.Font.Gotham
-log.Text = "Update 2.1.56 | New Release\n• Custom decal support\n• SkyBox & OutFit system\n• AspectRatio control\n• Scrollable panels"
+log.Text = "Update 2.11.3a | In Discord"
 log.TextSize = 12
 log.TextXAlignment = Enum.TextXAlignment.Left
 log.TextYAlignment = Enum.TextYAlignment.Top
@@ -452,7 +402,6 @@ contact.TextYAlignment = Enum.TextYAlignment.Top
 contact.TextColor3 = Color3.fromRGB(150,150,160)
 contact.Parent = cl
 
--- Overlay with Scrolling
 local ov = createSection("Overlay",220,690)
 
 local scrollFrame = Instance.new("ScrollingFrame")
@@ -531,7 +480,6 @@ pantsInput.FocusLost:Connect(function()
     end
 end)
 
--- Combat
 local cb = createSection("Combat",220,920)
 header(cb,"Combat",8)
 button(cb,"ESP",40, SCRIPT_MAP["ESP"])
@@ -579,7 +527,6 @@ aspectBox.FocusLost:Connect(function()
     end
 end)
 
--- ================= TOGGLE =================
 local open = true
 local toggleCooldown = false
 
@@ -592,24 +539,6 @@ UserInputService.InputBegan:Connect(function(i)
         TweenService:Create(overlay,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{
             BackgroundTransparency = open and 0.5 or 1
         }):Play()
---[[ 
-        TweenService:Create(blur,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{
-            Size = open and 50 or 0
-        }):Play()]]
---[[
-        if open then
-            unlockMouseSmart()
-            main.Position = UDim2.new(0.5,-610,0.5,-320)
-            TweenService:Create(main,TweenInfo.new(0.4,Enum.EasingStyle.Back),{
-                Position = UDim2.new(0.5,-610,0.5,-290)
-            }):Play()
-        else
-            TweenService:Create(main,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{
-                Position = UDim2.new(0.5,-610,0.5,-320)
-            }):Play()
-            restoreMouseSmart()
-        end
-]]
         if not open then
             task.delay(0.3,function()
                 screenGui.Enabled = false
@@ -638,5 +567,5 @@ task.spawn(function()
     end
 end)
 
-showNotification("Nixu! Legacy v2.1.56 Beta Loaded", "success")
-showNotification("by xilmess", "info")
+showNotification("jessi legacy v2.11.3 alpha loaded", "success")
+showNotification("by hux9z", "info")
