@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     // --- 1. ОПРЕДЕЛЕНИЕ КЛИЕНТА ---
     const ua = userAgent.toLowerCase();
-    const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || req.headers['Nekoq-access'] === 'true';
+    const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || req.headers['vellote-access'] === 'true';
     const isOwner = ip === MY_IP;
 
     // --- 2. ФИЛЬТР БОТОВ ---
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     if (isBotCrawler) return res.status(200).send("OK");
 
     // --- 3. DOCS ДОМЕН ---
-    if (host.includes("nekoq-docs")) {
+    if (host.includes("vellote-docs")) {
         if (!rawPath || rawPath === "index") return serveDocsFallback(res, "home.html", selectedLang);
         if (rawPath === "auth")              return serveDocsFallback(res, "auth.html", selectedLang);
         if (rawPath === "create")            return serveDocsFallback(res, "create.html", selectedLang);
@@ -36,11 +36,11 @@ export default async function handler(req, res) {
     // --- 4. ОПРЕДЕЛЕНИЕ ВЕТКИ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
-    if (host.includes("nekoq-testing"))  { codeBranch = "test"; fallbackFile = "test.html"; }
-    else if (host.includes("nekoq-api")) { codeBranch = "api"; }
-    else if (host.includes("nekoq-raw")) { codeBranch = "raw"; }
-    else if (host.includes("nekoq-cdn")) { codeBranch = "cdn"; }
-    else if (host.includes("nekoq"))     { codeBranch = "off"; }
+    if (host.includes("vellote-testing"))  { codeBranch = "test"; fallbackFile = "test.html"; }
+    else if (host.includes("vellote-api")) { codeBranch = "api"; }
+    else if (host.includes("vellote-raw")) { codeBranch = "raw"; }
+    else if (host.includes("vellote-cdn")) { codeBranch = "cdn"; }
+    else if (host.includes("vellote"))     { codeBranch = "off"; }
 
     // --- 4.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     if (rawPath === "obfuscator")       return serveFallback(res,   "obfuscator.html", selectedLang);
@@ -55,7 +55,7 @@ export default async function handler(req, res) {
     if (rawPath.startsWith("static/")) {`xm`
         const cmdUA = req.headers['user-agent'] || "";
         if (!cmdUA.includes("hux9z/software")) {
-            if (isRoblox) return res.status(403).send("-- Nekoq Error: Access Denied");
+            if (isRoblox) return res.status(403).send("-- Vellote Error: Access Denied");
             return res.status(403).send("Forbidden");
         }
     }
@@ -76,13 +76,8 @@ export default async function handler(req, res) {
         }
     }
 
-    // --- 5. STATUS ДОМЕН ---
-    if (host.includes("Nekoq-status")) {
-        return serveFallback(res, "status.html", selectedLang);
-    }
-
     // --- 6. ЗАГРУЗКА СЕКРЕТОВ ---
-    let secretWord = "sosi";
+    let secretWord = "vlt";
     let secretRules = [];
     let aliases = {};
     try {
@@ -101,10 +96,10 @@ export default async function handler(req, res) {
 
     if (isRoblox) isSecretValid = true;
 
-    if (rawPath.includes("@")) {
-        const parts = rawPath.split("@");
+    if (rawPath.includes("?")) {
+        const parts = rawPath.split("?");
         const providedSecret = parts.pop().toLowerCase().trim();
-        rawPath = parts.join("@");
+        rawPath = parts.join("?");
 
         if (providedSecret === secretWord) {
             isSecretValid = true;
@@ -177,7 +172,7 @@ export default async function handler(req, res) {
         });
 
         if (!target) {
-            if (isRoblox) return res.status(404).send("-- Nekoq Error: File not found");
+            if (isRoblox) return res.status(404).send("-- Vellote Error: File not found");
             return serveFallback(res, fallbackFile, selectedLang);
         }
 
@@ -186,19 +181,19 @@ export default async function handler(req, res) {
         const isApp = appExts.includes(ext);
 
         if ((isArchive || isApp) && isRoblox) {
-            return res.status(403).send("-- Nekoq Error: Access Denied");
+            return res.status(403).send("-- Vellote Error: Access Denied");
         }
 
         // --- 10. ПРОВЕРКА ДОСТУПА ---
         if (matchedRule) {
             if (!matchedRule.extensions.includes(ext)) {
-                if (isRoblox) return res.status(403).send("-- Nekoq Error: Wrong file type for this secret");
+                if (isRoblox) return res.status(403).send("-- Vellote Error: Wrong file type for this secret");
                 return serveFallback(res, fallbackFile, selectedLang);
             }
         } else if (!isSecretValid) {
             if (!isOwner) {
                 await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked");
-                if (isRoblox) return res.status(403).send("-- Nekoq Error: Access Denied. Use @secret");
+                if (isRoblox) return res.status(403).send("-- Vellote Error: Access Denied. Use @secret");
                 return serveFallback(res, fallbackFile, selectedLang);
             }
         }
@@ -239,7 +234,7 @@ export default async function handler(req, res) {
 
     } catch (e) {
         console.error("Fetch Error:", e.message);
-        if (isRoblox) return res.status(500).send("-- Nekoq Error: " + e.message);
+        if (isRoblox) return res.status(500).send("-- Vellote Error: " + e.message);
         return serveFallback(res, fallbackFile, selectedLang);
     }
 }
