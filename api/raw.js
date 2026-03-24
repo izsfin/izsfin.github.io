@@ -54,7 +54,7 @@ export default async function handler(req, res) {
 
     if (rawPath.startsWith("ximeax/")) {
         const xmsUA = req.headers['user-agent'] || "";
-        if (!xmsUA.includes("ximeax/software")) {
+        if (!xmsUA.includes("hux9z/software")) {
             if (isRoblox) return res.status(403).send("-- Nekoq Error: Access Denied");
             return res.status(403).send("Forbidden");
         }
