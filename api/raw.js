@@ -133,8 +133,9 @@ export default async function handler(req, res) {
         "txt": "text/plain", "log": "text/plain", "ini": "text/plain", "cfg": "text/plain",
         "md": "text/markdown", "csv": "text/csv", "json": "application/json", "xml": "application/xml",
         "yaml": "text/yaml", "yml": "text/yaml",
-        "lua": "text/plain", "py": "text/x-python", "java": "text/x-java-source", "c": "text/x-c",
-        "cpp": "text/x-c++", "cs": "text/plain", "go": "text/plain", "rs": "text/plain",
+        "lua": "text/plain", "luaz": "text/plain", "py": "text/x-python", "java": "text/x-java-source", 
+        "c": "text/x-c", "cpp": "text/x-c++", 
+        "cs": "text/plain", "go": "text/plain", "rs": "text/plain",
         "php": "application/x-httpd-php", "rb": "text/plain", "sh": "application/x-sh",
         "bat": "application/x-msdownload", "ps1": "text/plain",
         "mp3": "audio/mpeg", "wav": "audio/wav", "ogg": "audio/ogg", "aac": "audio/aac",
@@ -151,8 +152,7 @@ export default async function handler(req, res) {
         "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "exe": "application/octet-stream", "msi": "application/octet-stream", "dll": "application/octet-stream",
         "bin": "application/octet-stream", "apk": "application/vnd.android.package-archive",
-        "wasm": "application/wasm",
-        "default": "application/octet-stream"
+        "wasm": "application/wasm", "default": "application/octet-stream"
     };
 
     const archiveRule = secretRules.find(r => r.type === "Archive");
