@@ -96,10 +96,10 @@ export default async function handler(req, res) {
 
     if (isRoblox) isSecretValid = true;
 
-    if (rawPath.includes("?")) {
-        const parts = rawPath.split("?");
+    if (rawPath.includes("@")) {
+        const parts = rawPath.split("@");
         const providedSecret = parts.pop().toLowerCase().trim();
-        rawPath = parts.join("?");
+        rawPath = parts.join("@");
 
         if (providedSecret === secretWord) {
             isSecretValid = true;
