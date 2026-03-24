@@ -1,6 +1,3 @@
--- XMS | Meta Info + Config
--- Host: wexly-api.vercel.app/xms/meta
--- UA required: XMS-Loader-v1
 
 local canswer = "please, try later!"
 
@@ -15,10 +12,6 @@ local meta = {
     project_svers   = "³²",
     project_catalog = "https://nekoq.vercel.app/catalog",
     project_discord = ".gg/TRPZg4Xfkq",
-
-    -- ========================================================
-    -- ERROR HANDLERS
-    -- ========================================================
     down = function(self)
         warn(self.project_name .. " | No one of static servers responded, " .. canswer)
     end,
