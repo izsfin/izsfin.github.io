@@ -1,4 +1,4 @@
--- XMS | Logic Module
+-- JSx32 | Logic Module
 -- Returns: Apply, DoClear, BuildCMD
 local HttpService = game:GetService("HttpService")
 local Players     = game:GetService("Players")
@@ -11,7 +11,7 @@ local _ActiveAnims    = {}
 local _ActiveRespawns = {}
 local _CurrentMode    = "once"
 local _LoadedModules  = {}
-local _ConfigPath     = "hux9z/jsx32/xms/xSave/"
+local _ConfigPath     = "hux9z/jsx32/JSx32/xSave/"
 local _RecordApply    = nil
 
 function Logic.Init(ctx)
@@ -186,7 +186,7 @@ function Logic.Apply(data, sandbox)
     
        if not weldTarget then
            weldTarget = char:FindFirstChild("Torso") or char:FindFirstChild("Head")
-           warn("XMS || Target " .. weldName .. " not found, defaulting to " .. (weldTarget and weldTarget.Name or "None"))
+           warn("JSx32 || Target " .. weldName .. " not found, defaulting to " .. (weldTarget and weldTarget.Name or "None"))
        end
        
       if weldTarget then
@@ -207,7 +207,7 @@ function Logic.Apply(data, sandbox)
         end
         
         local w = Instance.new("Weld")
-        w.Name  = "XMS_Weld"
+        w.Name  = "JSx32_Weld"
         w.Part0 = weldTarget
         w.Part1 = part
 
@@ -216,7 +216,7 @@ function Logic.Apply(data, sandbox)
         w.Parent = part
         part.Parent = char
     else
-        warn("XMS || Critical: No weld target found for " .. data.Name)
+        warn("JSx32 || Critical: No weld target found for " .. data.Name)
     end
 
     elseif data.Class == "Face" then
@@ -240,7 +240,7 @@ end
 -- ============================================================
 function Logic.BuildCMD(getVersion, catalog, discord, projectName)
     local version = getVersion and getVersion() or "unknown"
-    local name    = projectName or "XMS"
+    local name    = projectName or "JSx32"
     local lines   = {}
 
     table.insert(lines, "--[[")
@@ -261,7 +261,7 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
         for _, item in pairs(items) do
             table.insert(lines, indent .. item.Name ..
                 string.rep(" ", math.max(1, 22 - #item.Name)) ..
-                '|   xms("' .. item.Name .. '")')
+                '|   jsx("' .. item.Name .. '")')
         end
     end
 
@@ -328,9 +328,9 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
     table.insert(lines, "")
     table.insert(lines, "    " .. name .. " Commands")
     table.insert(lines, "")
-    table.insert(lines, '    xms("name")          - apply item')
-    table.insert(lines, '    xms("name", "clear") - clear item')
-    table.insert(lines, '    xms("all",  "clear") - clear all')
+    table.insert(lines, '    jsx"name")          - apply item')
+    table.insert(lines, '    jsx"name", "clear") - clear item')
+    table.insert(lines, '    jsx"all",  "clear") - clear all')
     table.insert(lines, "")
     if catalog then
         table.insert(lines, "    If you need to see all items with photos check our catalog")
@@ -345,7 +345,7 @@ end
 -- ============================================================
 -- START (called from loader)
 -- ============================================================
-function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
+function Logic.Start(Library, meta, ModuleSystem, UA, BASE)
     local function req(url)
         local ok, r = pcall(function()
             return http.request({ Url=url, Method="GET", Headers={["User-Agent"]=UA} })
@@ -358,7 +358,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         local body = req(url); if not body then return nil end
         local fn, err = loadstring(body)
         if not fn then warn("XMS || "..tostring(err)); return nil end
-        local ok, r = pcall(fn); if not ok then warn("XMS || "..tostring(r)); return nil end
+        local ok, r = pcall(fn); if not ok then warn("JSx32 || "..tostring(r)); return nil end
         return r
     end
 
@@ -386,14 +386,14 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         CurrentMode    = DAMode,
         LoadedModules  = LoadedModules,
         ConfigPath     = "hux9z/jsx32/xSave/",
-        RecordApply    = getgenv().XMS_RecordApply or nil,
+        RecordApply    = getgenv().jsx32_RecordApply or nil,
     })
 
     if ModuleSystem and ModuleSystem.Init then
         ModuleSystem.Init({
             Security=Security, Helpers=Helpers, LoadedModules=LoadedModules,
             DoClear=function(...) Logic.DoClear(...) end,
-            GetVersion=function() return miXconf.project_vers end,
+            GetVersion=function() return meta.project_vers end,
             Apply=function(...) Logic.Apply(...) end,
             MODULES_PATH    ="hux9z/jsx32/modules/", 
             DB_PATH         ="hux9z/jsx32/db/",
@@ -407,14 +407,14 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     -- DAMode
     local function SetDAMode(val)
         local v = val:lower():gsub("%s+","")
-        if v=="1" or v=="once" then DAMode="once"; print("XMS || DAMode = once")
-        elseif v=="2" or v=="true" then DAMode="true"; print("XMS || DAMode = true")
-        elseif v=="reset" or v=="off" then DAMode="once"; print("XMS || DAMode = off")
-        else warn("XMS || Unknown DAMode: "..val) end
+        if v=="1" or v=="once" then DAMode="once"; print("JSx32 || DAMode = once")
+        elseif v=="2" or v=="true" then DAMode="true"; print("JSx32 || DAMode = true")
+        elseif v=="reset" or v=="off" then DAMode="once"; print("JSx32 || DAMode = off")
+        else warn("JSx32 || Unknown DAMode: "..val) end
     end
 
     -- Aliases + Groups
-    local function SetAlias(s,t) Aliases[s:lower()]=t:lower(); print("XMS || Alias: '"..s.."' → '"..t.."'") end
+    local function SetAlias(s,t) Aliases[s:lower()]=t:lower(); print("JSx32 || Alias: '"..s.."' → '"..t.."'") end
     local function ResolveAlias(n) return Aliases[n:lower()] or n end
     local function SetGroup(g,i) Groups[g:lower()]=i end
     local function ResolveGroup(n) return Groups[n:lower()] or nil end
@@ -448,9 +448,9 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
 
         if n == "cmd" then
             local modLines = ModuleSystem and ModuleSystem.BuildCMDLines(Security.IsVerified) or {}
-            local builtIn  = Logic.BuildCMD(function() return miXconf.project_vers end, miXconf.project_catalog, miXconf.project_discord, miXconf.project_name)
+            local builtIn  = Logic.BuildCMD(function() return meta.project_vers end, meta.project_catalog, meta.project_discord, meta.project_name)
             setclipboard(table.concat(modLines,"\n") .. "\n" .. builtIn)
-            print("XMS || CMD copied"); return
+            print("JSx32 || CMD copied"); return
         end
 
         if m == "clear" then Logic.DoClear(n); return end
@@ -458,7 +458,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         for _, d in pairs(Library) do
             if d.Name:lower() == n then
                 if d.ReqPlaceID and d.ReqPlaceID ~= 0 and tonumber(d.ReqPlaceID) ~= game.PlaceId then
-                    warn("XMS || Item '"..d.Name.."' not available"); return
+                    warn("JSx32 || Item '"..d.Name.."' not available"); return
                 end
                 if key and key ~= "" then
                     game:GetService("UserInputService").InputBegan:Connect(function(i,gp)
@@ -480,7 +480,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
             end
         end
 
-        warn("XMS || Item '"..name.."' not found")
+        warn("JSx32 || Item '"..name.."' not found")
     end
 
     -- Respawn
@@ -492,7 +492,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     end)
 
     -- Expose
-    getgenv().xms = function(...) return MainHandler(...) end
+    getgenv().jsx = function(...) return MainHandler(...) end
     setmetatable(_G, { __call = function(_, ...) return MainHandler(...) end })
 end
 
