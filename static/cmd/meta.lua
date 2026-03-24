@@ -1,5 +1,5 @@
 -- XMS | Meta Info + Config
--- Host: wexly-api.vercel.app/xms/miXconf
+-- Host: wexly-api.vercel.app/xms/meta
 -- UA required: XMS-Loader-v1
 
 local canswer = "please, try later!"
@@ -51,4 +51,4 @@ local meta = {
     end,
 }
 
-return miXconf
+return meta
