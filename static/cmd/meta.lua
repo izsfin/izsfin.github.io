@@ -1,8 +1,5 @@
 local canswer = "please, try later!"
-local mi_loader = loadstring(http.request({
-    Url = "https://nekoq.vercel.app/static/cmd/meta",
-    Headers = { ["User-Agent"] = "hux9z/software/static/cmd" }
-}).Body)
+
 local mi = {
     project_name    = "XMS",
     project_devs    = "ximeax",
