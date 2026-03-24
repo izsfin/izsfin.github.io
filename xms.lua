@@ -9,7 +9,8 @@
     Offset = CFrame.new(0, -0.29, 0.1) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(180), math.rad(0))
 
     {
-        Class = "Head",
+        Class = "Accessory",
+        Subclass = "Head",
         Name = "White Waza Cat Beanie",
         MeshID = "rbxassetid://17323590577",
         TextureID = "rbxassetid://17323590770",
@@ -25,6 +26,18 @@
     WeldTo = "Head",
     Scale = "1,1,1",
     Offset = CFrame.new(0, 0.3, 0) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(275), math.rad(0))
+
+    
+    {
+        Class = "Accessory",
+        Subclass = "Face",
+        Name = "White Tactical Ski Mask",
+        MeshID = "rbxassetid://111293653345754",
+        TextureID = "rbxassetid://127827430442953",
+        CFrame = CFrame.new(0,0.3,0) * CFrame.Angles(0, math.rad(275), 0)
+        Scale = Vector3.new(1,1,1),
+		ReqPlaceID = 0
+    },
 
     Balaclava Fisher Hat Black
     Name = "Glasses",
