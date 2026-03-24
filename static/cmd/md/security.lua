@@ -1,4 +1,4 @@
--- [ XMS SECURITY MODULE ]
+-- [ js SECURITY MODULE ]
 -- Загружается с сервера и подключается к основному скрипту
 
 local HttpService = game:GetService("HttpService")
@@ -8,7 +8,7 @@ local Security = {}
 local SECURITY_URL   = "https://ethereos-api.vercel.app/xms/security"
 local VERIFIED_URL   = "https://ethereos-api.vercel.app/xms/verified"
 local DISCORD        = ".gg/TRPZg4Xfkq"
-local ROOT_PATH      = "xilmess/xms/"
+local ROOT_PATH      = "hux9z/JS/x³²/"
 local MODULES_PATH   = ROOT_PATH .. "modules/"
 local PROTECTED_PATHS = {
     ROOT_PATH .. "config",
@@ -16,7 +16,7 @@ local PROTECTED_PATHS = {
     ROOT_PATH .. "security",
 }
 local PROTECTED_GLOBALS = {
-    "xms",
+    "js",
     "MainHandler",
     "DoClear",
     "Apply",
@@ -107,10 +107,10 @@ local function CheckGlobals(moduleName)
             -- Восстанавливаем
             getgenv()[name] = _originalGlobals[name]
 
-            if name == "xms" then
+            if name == "js" then
                 ThrowError(
                     "092 Fatal Error",
-                    "'" .. (moduleName or "Unknown") .. "' attempting to hook getgenv().xms [ Please, change hook function to another in your module ]",
+                    "'" .. (moduleName or "Unknown") .. "' attempting to hook getgenv().js [ Please, change hook function to another in your module ]",
                     true
                 )
             else
@@ -128,16 +128,16 @@ local function CheckGlobals(moduleName)
 end
 
 -- [ ЗАЩИТА CALLSYNTAX ]
-local registeredSyntax = { xms = "built-in" } -- xms всегда занят
+local registeredSyntax = { js = "built-in" } -- js всегда занят
 
 function Security.RegisterCallsyntax(moduleName, syntax)
     if not syntax or syntax == "" then return true end
 
-    -- Попытка занять xms
-    if syntax:lower() == "xms" then
+    -- Попытка занять js
+    if syntax:lower() == "js" then
         ThrowError(
             "091 Fatal Error",
-            "'" .. moduleName .. "' attempts to override built-in callsyntax xms() [ Please, change callsyntax to another if owner of " .. moduleName .. " you ]",
+            "'" .. moduleName .. "' attempts to override built-in callsyntax js() [ Please, change callsyntax to another if owner of " .. moduleName .. " you ]",
             true
         )
         return false
@@ -147,7 +147,7 @@ function Security.RegisterCallsyntax(moduleName, syntax)
     if registeredSyntax[syntax] then
         ThrowError(
             "083 Fatal Error",
-            "Callsyntax from '" .. moduleName .. "' conflicts with '" .. registeredSyntax[syntax] .. "' || Unload first: xms('unload = " .. registeredSyntax[syntax] .. "')",
+            "Callsyntax from '" .. moduleName .. "' conflicts with '" .. registeredSyntax[syntax] .. "' || Unload first: js('unload = " .. registeredSyntax[syntax] .. "')",
             false
         )
         return false
@@ -183,7 +183,7 @@ function Security.CheckVersion(moduleName, sversion, currentVersion)
     if not supported then
         ThrowError(
             "097 Error",
-            "'" .. moduleName .. "' requires xms " .. sversion .. "+ (current: " .. currentVersion .. ")",
+            "'" .. moduleName .. "' requires js " .. sversion .. "+ (current: " .. currentVersion .. ")",
             false
         )
         return false
@@ -265,7 +265,7 @@ function Security.CreateSandbox(moduleName, author, allowedPath)
     end
 
     -- Запрет на getgenv / hookfunction
-    sandbox.getgenv     = function() ThrowError("092 Fatal Error", "'" .. moduleName .. "' attempting to hook getgenv().xms", true) end
+    sandbox.getgenv     = function() ThrowError("092 Fatal Error", "'" .. moduleName .. "' attempting to hook getgenv().js", true) end
     sandbox.hookfunction = function() ThrowError("092 Fatal Error", "'" .. moduleName .. "' attempting to hook built-in function", true) end
 
     sandbox._G = sandbox

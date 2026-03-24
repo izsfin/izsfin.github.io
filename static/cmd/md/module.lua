@@ -1,4 +1,4 @@
--- [ XMS MODULE SYSTEM ]
+-- [ JS³² MODULE SYSTEM ]
 -- Загружается с сервера
 
 local ModuleSystem = {}
@@ -11,8 +11,8 @@ local LoadedModules = nil
 local DoClearFn     = nil
 local GetVersionFn  = nil
 local ApplyFn       = nil
-local MODULES_PATH  = "hux9z/jsx32/modules/"
-local DB_PATH       = "hux9z/jsx32/db/"
+local MODULES_PATH  = "hux9z/JS/x³²/modules/"
+local DB_PATH       = "hux9z/JS/x³²/db/"
 
 -- [ ИНИЦИАЛИЗАЦИЯ — вызвать из основного скрипта ]
 function ModuleSystem.Init(cfg)
@@ -150,7 +150,7 @@ function ModuleSystem.Load(url, isOldVersion)
     })
 
     -- Глобальный callsyntax
-    if callS ~= "" and callS ~= "xms" then
+    if callS ~= "" and callS ~= "js" then
         local sym    = meta.csymbol or "()"
         local openS  = sym:sub(1, 1)
         local closeS = sym:sub(2, 2)
@@ -174,7 +174,7 @@ function ModuleSystem.Load(url, isOldVersion)
         SaveURL(modName, url)
     end
 
-    print("XMS || Module '" .. (meta.NameModule or modName) .. "' by " .. (meta.Author or "Unknown") .. " loaded || " .. (meta.VersionModule or ""))
+    print("JS³² || Module '" .. (meta.NameModule or modName) .. "' by " .. (meta.Author or "Unknown") .. " loaded || " .. (meta.VersionModule or ""))
     return true
 end
 
@@ -183,7 +183,7 @@ function ModuleSystem.Unload(modName)
     local n = tostring(modName):lower()
     local mod = LoadedModules[n]
     if not mod then
-        warn("XMS || Module '" .. modName .. "' not found")
+        warn("JS³² || Module '" .. modName .. "' not found")
         return false
     end
     local callS = mod.meta.callsyntax or ""
@@ -193,7 +193,7 @@ function ModuleSystem.Unload(modName)
     end
     Security.UnregisterModule(n)
     LoadedModules[n] = nil
-    print("XMS || Module '" .. (mod.meta.NameModule or modName) .. "' unloaded")
+    print("JS³² || Module '" .. (mod.meta.NameModule or modName) .. "' unloaded")
     return true
 end
 
@@ -202,7 +202,7 @@ function ModuleSystem.Update(modName)
     local n   = tostring(modName):lower()
     local url = LoadURL(n)
     if not url then
-        warn("XMS || No saved URL for module '" .. modName .. "'")
+        warn("JS³² || No saved URL for module '" .. modName .. "'")
         return false
     end
     ModuleSystem.Unload(n)
@@ -214,13 +214,13 @@ function ModuleSystem.OldLoad(modName)
     local n    = tostring(modName):lower()
     local prev = LoadPrevURL(n)
     if not prev then
-        warn("XMS || No previous version saved for module '" .. modName .. "'")
+        warn("JS³² || No previous version saved for module '" .. modName .. "'")
         return false
     end
     ModuleSystem.Unload(n)
     local ok = ModuleSystem.Load(prev, true)
     if ok then
-        print("XMS || Loaded previous version of '" .. modName .. "'")
+        print("JS³² || Loaded previous version of '" .. modName .. "'")
     end
     return ok
 end
@@ -247,7 +247,7 @@ function ModuleSystem.BuildCMDLines(IsVerifiedFn)
 
         table.insert(lines, " " .. (meta.NameModule or "?") .. " by " .. (meta.Author or "?") .. verMark .. " || " .. (meta.VersionModule or "?") .. social)
 
-        local callS  = meta.callsyntax or "xms"
+        local callS  = meta.callsyntax or "js"
         local sym    = (meta.csymbol and meta.csymbol ~= "") and meta.csymbol or "()"
         local openS  = sym:sub(1, 1)
         local closeS = sym:sub(2, 2)

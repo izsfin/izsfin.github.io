@@ -1,4 +1,4 @@
--- [ XMS HELPERS ]
+-- [ JS³² HELPERS ]
 -- Загружается с сервера, добавляет хелперы в sandbox модулей
 
 local Helpers = {}
