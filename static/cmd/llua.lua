@@ -1,0 +1,1 @@
+return "hux9z/software", "https://nekoq.vercel.app/"
