@@ -385,8 +385,8 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         ActiveRespawns = activeAutoRespawns,
         CurrentMode    = DAMode,
         LoadedModules  = LoadedModules,
-        ConfigPath     = "hux9z/JS/x32/xSave/",
-        RecordApply    = getgenv().JS³²_RecordApply or nil,
+        ConfigPath     = "hux9z/JS/x³²/xSave/",
+        RecordApply    = getgenv().js32_RecordApply or nil,
     })
 
     if ModuleSystem and ModuleSystem.Init then
@@ -491,7 +491,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     end)
 
     -- Expose
-    getgenv().js32 = function(...) return MainHandler(...) end
+    getgenv().js = function(...) return MainHandler(...) end
     setmetatable(_G, { __call = function(_, ...) return MainHandler(...) end })
 end
 
