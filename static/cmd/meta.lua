@@ -12,6 +12,7 @@ local meta = {
     project_name    = "JSx32",
     project_devs    = "hux9z",
     project_vers    = "v2.14.0",
+    project_svers   = "³²"
     project_catalog = "https://nekoq.vercel.app/catalog",
     project_discord = ".gg/TRPZg4Xfkq",
 
