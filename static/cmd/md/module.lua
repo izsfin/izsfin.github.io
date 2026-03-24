@@ -11,8 +11,8 @@ local LoadedModules = nil
 local DoClearFn     = nil
 local GetVersionFn  = nil
 local ApplyFn       = nil
-local MODULES_PATH  = "ximeax/xms/modules/"
-local DB_PATH       = "ximeax/xms/db/"
+local MODULES_PATH  = "hux9z/jsx32/modules/"
+local DB_PATH       = "hux9z/jsx32/db/"
 
 -- [ ИНИЦИАЛИЗАЦИЯ — вызвать из основного скрипта ]
 function ModuleSystem.Init(cfg)
