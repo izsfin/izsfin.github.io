@@ -1,12 +1,23 @@
+-- XMS | Meta Info + Config
+-- Host: wexly-api.vercel.app/xms/miXconf
+-- UA required: XMS-Loader-v1
+
 local canswer = "please, try later!"
 
-local mi = {
-    project_name    = "XMS",
-    project_devs    = "ximeax",
-    project_vers    = "v2.13.2a",
-    project_catalog = "https://wexly.vercel.app/catalog",
+local meta = {
+
+    -- ========================================================
+    -- META INFO
+    -- ========================================================
+    project_name    = "JSx32 System",
+    project_devs    = "hux9z",
+    project_vers    = "v2.14.0",
+    project_catalog = "https://nekoq.vercel.app/catalog",
     project_discord = ".gg/TRPZg4Xfkq",
 
+    -- ========================================================
+    -- ERROR HANDLERS
+    -- ========================================================
     down = function(self)
         warn(self.project_name .. " | No one of static servers responded, " .. canswer)
     end,
