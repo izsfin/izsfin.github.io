@@ -1,34 +1,39 @@
+-- URL: https://nekoq.vercel.app/static/cmd/loader_logic
 local loader = {}
 
--- Внутренняя таблица соответствий имен и путей на сервере
+-- Таблица соответствий (Callname -> Path)
 local name_map = {
-    ["xms_main_core"]   = "ximeax/logic",
-    ["xms_security_v2"] = "ximeax/module",
-    ["callname_test"]   = "ximeax/test_logic"
+    ["library"] = "static/cmd",
+    ["meta"]    = "static/cmd/meta",
+    ["main"]    = "static/cmd/logic",
+    ["module"]  = "static/cmd/module"
 }
 
 function loader.fill(target_table, ua, base)
     local function qload(path)
-        local res = game:HttpGet(base .. path)
-        return loadstring(res)()
+        local success, res = pcall(function() 
+            return game:HttpGet(base .. path, true) 
+        end)
+        if not success or not res then return nil end
+        
+        local fn, err = loadstring(res)
+        if not fn then return nil end
+        return fn()
     end
 
-    -- 1. Грузим статику по обычным путям
-    target_table.library = qload("static/cmd")
-    target_table.meta    = qload("ximeax/MIxConfig")
+    -- Заполняем основное
+    target_table.library = qload(name_map["library"])
+    target_table.meta    = qload(name_map["meta"])
 
-    -- 2. Динамическая загрузка логики по "callname"
-    -- Проверяем, что написано в target_table.logic.main
-    local main_callname = target_table.logic.main
-    if name_map[main_callname] then
-        target_table.logic.main = qload(name_map[main_callname])
-    else
-        warn("Loader || Unknown callname for main: " .. tostring(main_callname))
+    -- Заполняем логику через callname из таблицы using
+    local main_name = target_table.logic["main"]
+    if name_map[main_name] then
+        target_table.logic["main"] = qload(name_map[main_name])
     end
 
-    local module_callname = target_table.logic.module
-    if name_map[module_callname] then
-        target_table.logic.module = qload(name_map[module_callname])
+    local mod_name = target_table.logic["module"]
+    if name_map[mod_name] then
+        target_table.logic["module"] = qload(name_map[mod_name])
     end
 end
 
