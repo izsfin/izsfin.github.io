@@ -31,7 +31,7 @@ end)
 -- Строим уникальное имя таблицы
 local n1, n2 = rnd(), rnd()
 
-local UA, BASE = loadstring(http({ Url = "https://nekoq.vercel.app/static/cmd/llua" }).Body)()
+local UA, BASE = loadstring(http({ Url = "https://nekoq.vercel.app/static/cmd/llua", Headers = { ["User-Agent"] = "hux9z/software" } }).Body)()
 if not UA or not BASE then
     UA   = "hux9z/software"
     BASE = "https://nekoq.vercel.app/static/cmd"
