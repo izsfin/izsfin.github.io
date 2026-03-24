@@ -11,7 +11,7 @@ local _ActiveAnims    = {}
 local _ActiveRespawns = {}
 local _CurrentMode    = "once"
 local _LoadedModules  = {}
-local _ConfigPath     = "ximeax/xms/xSave/"
+local _ConfigPath     = "hux9z/jsx32/xms/xSave/"
 local _RecordApply    = nil
 
 function Logic.Init(ctx)
@@ -363,13 +363,13 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     end
 
     -- Security + Helpers
-    local Security = loadMod(BASE .. "ximeax/md/security") or {
+    local Security = loadMod(BASE .. "static/cmd/md/security") or {
         IsVerified=function()return false end, ValidateModule=function()end,
         RegisterCallsyntax=function()return true end, UnregisterCallsyntax=function()end,
         CheckVersion=function()return true end, CreateSandbox=function()return{}end,
         RegisterModule=function()end, UnregisterModule=function()end,
     }
-    local Helpers = loadMod(BASE .. "ximeax/md/helpers") or {}
+    local Helpers = loadMod(BASE .. "static/cmd/md/helpers") or {}
 
     -- Shared state
     local activeAutoRespawns = {}
@@ -385,7 +385,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         ActiveRespawns = activeAutoRespawns,
         CurrentMode    = DAMode,
         LoadedModules  = LoadedModules,
-        ConfigPath     = "xilmess/xms/xSave/",
+        ConfigPath     = "hux9z/jsx32/xSave/",
         RecordApply    = getgenv().XMS_RecordApply or nil,
     })
 
@@ -395,9 +395,10 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
             DoClear=function(...) Logic.DoClear(...) end,
             GetVersion=function() return miXconf.project_vers end,
             Apply=function(...) Logic.Apply(...) end,
-            MODULES_PATH="xilmess/xms/modules/", DB_PATH="xilmess/xms/db/",
+            MODULES_PATH    ="hux9z/jsx32/modules/", 
+            DB_PATH         ="hux9z/jsx32/db/",
         })
-        local modList = loadMod(BASE .. "ximeax/modules")
+        local modList = loadMod(BASE .. "hux9z/jsx32/modules")
         if modList then
             for _, url in ipairs(modList) do task.spawn(function() ModuleSystem.Load(url) end) end
         end
