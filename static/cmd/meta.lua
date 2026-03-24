@@ -9,7 +9,7 @@ local meta = {
     -- ========================================================
     -- META INFO
     -- ========================================================
-    project_name    = "JSx32",
+    project_name    = "JS",
     project_devs    = "hux9z",
     project_vers    = "v2.14.0",
     project_svers   = "³²",
