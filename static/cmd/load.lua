@@ -1,13 +1,11 @@
-local http = http or syn and syn.request or request
+local http = (syn and syn.request) or (http and http.request) or request
 
--- Генерируем уникальный ID сессии
 local function rnd()
     return math.random(100000, 999999)
 end
 
 local sessionID = rnd() .. "_" .. rnd() .. "_" .. os.time()
 
--- Проверяем был ли уже использован
 local flagFile = "xms_session.lock"
 local alreadyUsed = false
 
@@ -23,22 +21,22 @@ if alreadyUsed then
     return nil
 end
 
--- Записываем флаг
 pcall(function()
     writefile(flagFile, sessionID)
 end)
 
--- Строим уникальное имя таблицы
 local n1, n2 = rnd(), rnd()
 
-local UA, BASE = loadstring(http({ Url = "https://nekoq.vercel.app/static/cmd/llua", Headers = { ["User-Agent"] = "hux9z/software" } }).Body)()
-if not UA or not BASE then
-    UA   = "hux9z/software"
-    BASE = "https://nekoq.vercel.app/static/cmd"
-end
+local UA  = "hux9z/software"
+local BASE = "https://nekoq.vercel.app/static/cmd"
 
 local function fetch(path)
-    return loadstring(http({ Url = BASE .. path, Headers = { ["User-Agent"] = UA } }).Body)()
+    local res = http({ Url = BASE .. path, Headers = { ["User-Agent"] = UA } })
+    if not res or not res.Body or res.Body == "" then
+        warn("XMS || Failed to fetch: " .. path)
+        return nil
+    end
+    return loadstring(res.Body)()
 end
 
 local pkg = {}
