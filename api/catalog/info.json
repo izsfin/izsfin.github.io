@@ -176,52 +176,52 @@
       "name": "Loader",
       "author": "hux9z",
       "preview": "site/catalog/hux9z/assets/Loader.png",
-      "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/loader\"))()",
+      "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/loader\"))()",
       "category": "Scripts",
       "type": "Official Software"
     },
     {
-      "id": "nixu!-mobile",
-      "name": "Nixu! Mobile",
+      "id": "uwp-mobile",
+      "name": "UWP Mobile",
       "author": "hux9z",
       "preview": "site/catalog/hux9z/assets/",
-      "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/mobile\"))()",
+      "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/mobile\"))()",
       "category": "Scripts",
       "type": "Official Software"
     },
     {
-      "id": "swanmo-pc",
-      "name": "Swanmo PC",
+      "id": "uwp-pc",
+      "name": "UWP PC",
       "author": "hux9z",
       "preview": "site/catalog/hux9z/assets/PC.png",
-      "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/pc\"))()",
+      "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/pc\"))()",
       "category": "Scripts",
       "type": "Official Software"
     },
     {
-      "id": "swanmo-legacy",
-      "name": "Swanmo Legacy",
+      "id": "uwp-legacy",
+      "name": "UWP ³² [Legacy]",
       "author": "hux9z",
       "preview": "site/catalog/hux9z/assets/Legacy.png",
-      "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/legacy\"))()",
+      "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/legacy\"))()",
       "category": "Scripts",
       "type": "Official Software"
     },
       {
       "id": "swanmo-premium",
-      "name": "Swanmo Premium",
+      "name": "soon",
       "author": "hux9z",
       "preview": "site/catalog/hux9z/assets/Premium.png",
-      "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/premium\"))()",
+      "command": "soon",
       "category": "Scripts",
       "type": "Official Software"
     },
     {
-      "id": "xms",
-      "name": "XMS [CMD]",
+      "id": "js32",
+      "name": "JS ³²",
       "author": "hux9z",
       "preview": "site/catalog/hux9z/assets/xms.png",
-      "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/xms\"))()",
+      "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/js\"))()",
       "category": "Scripts",
       "type": "Official Software"
     }
