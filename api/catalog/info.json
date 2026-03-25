@@ -3,179 +3,179 @@
     {
       "id": "kawaii-neutral-black-cat-ears",
       "name": "Kawaii Neutral Black Cat Ears",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/kNBCE/preview.png",
-      "command": "_G(\"Black Cat Ears\")",
+      "command": "js(\"Black Cat Ears\")",
       "category": "Accessories",
       "type": "Head"
     },
     {
       "id": "black-beanie",
       "name": "Black Beanie",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/BlackBeanie/preview.png",
-      "command": "_G(\"Black Beanie\")",
+      "command": "js(\"Black Beanie\")",
       "category": "Accessories",
       "type": "Head"
     },
     {
       "id": "black-balaclava-fisher-hat",
       "name": "Black Balaclava Fisher Hat",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/balaclava/fisher-hat/preview.png",
-      "command": "_G(\"Black Balaclava Fisher Hat\")",
+      "command": "js(\"Black Balaclava Fisher Hat\")",
       "category": "Accessories",
       "type": "Head"
     },
     {
       "id": "emo-spiked-shades",
       "name": "Emo Spiked Shades",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/EmoSpikedShades/preview.png",
-      "command": "_G(\"Emo Spiked Shades\")",
+      "command": "js(\"Emo Spiked Shades\")",
       "category": "Accessories",
       "type": "Face"
     },
     {
       "id": "white-polarized-sunglasses",
       "name": "White Polarized Sunglasses",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/polarizedSG/white/preview.png",
-      "command": "_G(\"White Polarized Sunglasses\")",
+      "command": "js(\"White Polarized Sunglasses\")",
       "category": "Accessories",
       "type": "Face"
     },
     {
       "id": "pink-polarized-sunglasses",
       "name": "Pink Polarized Sunglasses",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/polarizedSG/pink/preview.png",
-      "command": "_G(\"Pink Polarized Sunglasses\")",
+      "command": "js(\"Pink Polarized Sunglasses\")",
       "category": "Accessories",
       "type": "Face"
     },
     {
       "id": "black-neck-mask_low",
       "name": "Black Neck Mask (Low)",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/neck-mask/black/preview.png",
-      "command": "_G(\"Black Neck Mask (Low)\")",
+      "command": "js(\"Black Neck Mask (Low)\")",
       "category": "Accessories",
       "type": "Face"
     },
     {
       "id": "white-ski-mask",
       "name": "White Ski Mask",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/neck-mask/white/preview.png",
-      "command": "_G(\"White Ski Mask\")",
+      "command": "js(\"White Ski Mask\")",
       "category": "Accessories",
       "type": "Face"
     },
     {
       "id": "guns-x-alien",
       "name": "Gunslinger & Alien",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/GxA/preview.png",
-      "command": "_G(\"Guns & Alien\")",
+      "command": "js(\"Guns & Alien\")",
       "category": "Characters",
       "type": "body"
     },
     {
       "id": "pal-face-classic",
       "name": "Pal Face",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/PalFace/preview.png",
-      "command": "_G(\"Pal Face Static\")",
+      "command": "js(\"Pal Face Static\")",
       "category": "Characters",
       "type": "face"
     },
     {
       "id": "pal-face",
       "name": "Pal Face",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/PalFace/NSpreview.png",
-      "command": "_G(\"Pal Face\")",
+      "command": "js(\"Pal Face\")",
       "category": "Characters",
       "type": "dhead"
     },
     {
       "id": "purple-bape-v1",
       "name": "Purple Bape #1",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/bape/purple/v.1/preview.png",
-      "command": "_G(\"Purple Bape\")",
+      "command": "js(\"Purple Bape\")",
       "category": "Outfits"
     },
     {
       "id": "purple-bape-v2",
       "name": "Purple Bape #2",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/bape/purple/v.2/preview.png",
-      "command": "_G(\"Purple Bape\")",
+      "command": "js(\"Purple Bape\")",
       "category": "Outfits"
     },
     {
       "id": "black-bape",
       "name": "Black Bape",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/bape/black/preview.png",
-      "command": "_G(\"Black Bape\")",
+      "command": "js(\"Black Bape\")",
       "category": "Outfits"
     },
     {
       "id": "blue-bape-v1",
       "name": "Blue Bape #1",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/bape/blue/v.1/preview.png",
-      "command": "_G(\"Blue Bape #1\")",
+      "command": "js(\"Blue Bape #1\")",
       "category": "Outfits"
     },
     {
       "id": "blue-bape-v2",
       "name": "Blue Bape #2",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/bape/blue/v.2/preview.png",
-      "command": "_G(\"Blue Bape #2\")",
+      "command": "js(\"Blue Bape #2\")",
       "category": "Outfits"
     },
     {
       "id": "black-camo-v1",
       "name": "Black Camo #1",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/Millitary/BlackCamo/v1/preview.png",
-      "command": "_G(\"Black Camo #1\")",
+      "command": "js(\"Black Camo #1\")",
       "category": "Outfits"
     },
     {
       "id": "black-camo-v2",
       "name": "Black Camo #2",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/Millitary/BlackCamo/v2/preview.png",
-      "command": "_G(\"Black Camo #2\")",
+      "command": "js(\"Black Camo #2\")",
       "category": "Outfits"
     },
     {
       "id": "blue-camo",
       "name": "Blue Camo",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/Millitary/BlueCamo/preview.png",
-      "command": "_G(\"Blue Camo\")",
+      "command": "js(\"Blue Camo\")",
       "category": "Outfits"
     },
     {
       "id": "classic-camo",
       "name": "Classic Camo",
-      "author": "0xSquad",
+      "author": "hux9z",
       "preview": "site/catalog/Millitary/ClassicCamo/preview.png",
-      "command": "_G(\"Classic Camo\")",
+      "command": "js(\"Classic Camo\")",
       "category": "Outfits"
     },
     {
       "id": "loader",
       "name": "Loader",
-      "author": "0xSquad",
-      "preview": "site/catalog/0xSquad/assets/Loader.png",
+      "author": "hux9z",
+      "preview": "site/catalog/hux9z/assets/Loader.png",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/loader\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -183,8 +183,8 @@
     {
       "id": "nixu!-mobile",
       "name": "Nixu! Mobile",
-      "author": "0xSquad",
-      "preview": "site/catalog/0xSquad/assets/",
+      "author": "hux9z",
+      "preview": "site/catalog/hux9z/assets/",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/mobile\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -192,8 +192,8 @@
     {
       "id": "swanmo-pc",
       "name": "Swanmo PC",
-      "author": "0xSquad",
-      "preview": "site/catalog/0xSquad/assets/PC.png",
+      "author": "hux9z",
+      "preview": "site/catalog/hux9z/assets/PC.png",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/pc\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -201,8 +201,8 @@
     {
       "id": "swanmo-legacy",
       "name": "Swanmo Legacy",
-      "author": "0xSquad",
-      "preview": "site/catalog/0xSquad/assets/Legacy.png",
+      "author": "hux9z",
+      "preview": "site/catalog/hux9z/assets/Legacy.png",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/legacy\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -210,8 +210,8 @@
       {
       "id": "swanmo-premium",
       "name": "Swanmo Premium",
-      "author": "0xSquad",
-      "preview": "site/catalog/0xSquad/assets/Premium.png",
+      "author": "hux9z",
+      "preview": "site/catalog/hux9z/assets/Premium.png",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/premium\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -219,8 +219,8 @@
     {
       "id": "xms",
       "name": "XMS [CMD]",
-      "author": "0xSquad",
-      "preview": "site/catalog/0xSquad/assets/xms.png",
+      "author": "hux9z",
+      "preview": "site/catalog/hux9z/assets/xms.png",
       "command": "loadstring(game:HttpGet(\"https://wexly.vercel.app/xms\"))()",
       "category": "Scripts",
       "type": "Official Software"
