@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nekoq Docs | Post</title>
+<title>Vellote Docs | Post</title>
 <link rel="icon" type="image/png" href="/site/html/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -258,7 +258,7 @@ async function loadPost() {
     const d = await r.json();
     if (!d.ok||!d.post) { document.getElementById('postArea').innerHTML='<div class="loading">Post not found</div>'; return; }
     const p = d.post;
-    document.title = `${p.PostName} — Nekoq Docs`;
+    document.title = `${p.PostName} — Vellote Docs`;
     document.getElementById('postArea').innerHTML=`
       <div class="post-meta">
         <span class="post-author">${esc(p.Author)}</span>
