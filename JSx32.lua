@@ -361,7 +361,7 @@ local Library = {
 }
 
 
-local UA, Base = loadstring(http.request({ Url = "https://nekoq.vercel.app/static/cmd/llua", Headers = { ["User-Agent"] = "hux9z/software" } }).Body)()
+local UA, Base = loadstring(http.request({ Url = "https://vellote.vercel.app/static/cmd/llua", Headers = { ["User-Agent"] = "hux9z/software" } }).Body)()
 
 local meta = loadstring(http.request({ Url = Base .. "static/cmd/meta", Headers = { ["User-Agent"] = UA } }).Body)(); if not meta then warn("XMS || meta not answer, please try later!"); return end
 
