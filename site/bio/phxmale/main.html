@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>phxmale</title>
+    <link rel="icon" type="image/png" href="/site/html/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #ff0073; }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #050204; color: #d1d1d1;
+            font-family: 'Poppins', sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
+        }
+
+        .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
+        .bg-grid {
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+            z-index: -4;
+        }
+        .blob {
+            position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08;
+            will-change: transform;
+            animation: floatBlob 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); z-index: -3;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--primary), transparent 70%); }
+        .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--primary), transparent 70%); animation-delay: -5s; }
+        @keyframes floatBlob { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(10%,10%) scale(1.1)} }
+        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%), rgba(255,255,255,0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
+
+        /* ── Back ── */
+        .back-btn {
+            position: fixed; top: 22px; left: 22px; z-index: 10;
+            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.3); cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 7px;
+            padding: 8px 14px;
+            background: rgba(15,10,13,0.5); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 10px;
+        }
+        .back-btn:hover { color: white; border-color: rgba(255,255,255,0.1); }
+
+        /* ── Card ── */
+        .card {
+            position: relative; z-index: 2;
+            background: rgba(15,10,13,0.55);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 20px;
+            padding: 40px 36px 32px;
+            width: 340px;
+            display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        /* ── Avatar ── */
+        .avatar-wrap { position: relative; margin-bottom: 16px; }
+        .avatar {
+            width: 78px; height: 78px; border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center; font-size: 30px;
+        }
+        .avatar-ring {
+            position: absolute; inset: -5px; border-radius: 50%;
+            border: 1.5px solid transparent;
+            background:
+                linear-gradient(rgba(5,2,4,0),rgba(5,2,4,0)) padding-box,
+                conic-gradient(from 0deg, var(--primary), transparent 50%, var(--primary)) border-box;
+            animation: spinRing 5s linear infinite;
+        }
+        @keyframes spinRing { to { transform: rotate(360deg); } }
+
+        .name { font-size: 22px; font-weight: 800; color: white; letter-spacing: 1px; margin-bottom: 4px; }
+        .handle { font-size: 11px; color: var(--primary); letter-spacing: 2px; opacity: 0.7; margin-bottom: 22px; }
+        .divider { width: 100%; height: 1px; background: rgba(255,255,255,0.07); margin-bottom: 22px; }
+
+        /* ── RPC block ── */
+        .rpc-box {
+            width: 100%; display: none; align-items: center; gap: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px; padding: 12px 14px;
+            margin-bottom: 16px;
+            animation: fadeUp 0.35s ease forwards;
+        }
+        .rpc-box.visible { display: flex; }
+        .rpc-icon { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .rpc-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .rpc-name { font-size: 12px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .rpc-text { font-size: 10px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* ── Call button ── */
+        .call-btn {
+            width: 100%; padding: 14px 24px; border-radius: 12px;
+            border: 1px solid rgba(74,222,128,0.25);
+            background: rgba(74,222,128,0.07); color: #4ade80;
+            font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .call-btn:hover:not(:disabled) {
+            border-color: rgba(74,222,128,0.5); background: rgba(74,222,128,0.13);
+            transform: translateY(-1px); box-shadow: 0 8px 24px rgba(74,222,128,0.1);
+        }
+        .call-btn:disabled { cursor: default; }
+        .call-btn.waiting { border-color: rgba(255,0,115,0.3); background: rgba(255,0,115,0.07); color: rgba(255,145,207,0.9); }
+
+        .pulse-dot {
+            display: none; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--primary); flex-shrink: 0;
+            animation: pd 1s ease-in-out infinite;
+        }
+        @keyframes pd { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.6)} }
+        .call-btn.waiting .pulse-dot { display: block; }
+        .call-btn.waiting .icon-phone { display: none; }
+
+        .progress-wrap {
+            width: 100%; height: 2px; background: rgba(255,255,255,0.05);
+            border-radius: 2px; margin-top: 12px; overflow: hidden;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .progress-wrap.visible { opacity: 1; }
+        .progress-bar {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--primary), rgba(255,145,207,0.8));
+            border-radius: 2px; transition: width 0.3s linear;
+        }
+        .status-txt {
+            font-size: 10px; color: rgba(255,255,255,0.2);
+            margin-top: 8px; letter-spacing: 0.5px; min-height: 14px; text-align: center;
+        }
+        .status-txt.live { color: rgba(255,145,207,0.8); }
+
+        /* ── Player ── */
+        .player {
+            display: none; width: 100%; flex-direction: column; gap: 10px;
+            animation: fadeUp 0.4s ease forwards;
+        }
+        .player.visible { display: flex; }
+
+        .track-name {
+            font-size: 13px; font-weight: 700; color: white;
+            text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .p-bar {
+            width: 100%; height: 3px;
+            background: rgba(255,255,255,0.08); border-radius: 3px;
+            cursor: pointer; position: relative;
+        }
+        .p-fill {
+            height: 100%; width: 0%; border-radius: 3px;
+            background: linear-gradient(90deg, var(--primary), rgba(255,145,207,0.8));
+            transition: width 0.25s linear; pointer-events: none;
+        }
+
+        .controls {
+            display: flex; align-items: center; justify-content: center; gap: 14px;
+        }
+        .ctrl-btn {
+            background: none; border: none; padding: 0;
+            color: rgba(255,255,255,0.5); cursor: pointer;
+            transition: color 0.2s, transform 0.15s; display: flex; align-items: center;
+        }
+        .ctrl-btn:hover { color: white; transform: scale(1.1); }
+        .ctrl-btn.play-btn {
+            background: white; color: #050204;
+            border-radius: 50%; width: 32px; height: 32px;
+            justify-content: center;
+        }
+        .ctrl-btn.play-btn:hover { transform: scale(1.08); background: rgba(255,255,255,0.9); }
+
+        .vol-row {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .vol-slider {
+            -webkit-appearance: none; appearance: none;
+            width: 90px; height: 3px; border-radius: 3px;
+            background: rgba(255,255,255,0.12); outline: none; cursor: pointer;
+        }
+        .vol-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 12px; height: 12px;
+            border-radius: 50%; background: white; cursor: pointer;
+        }
+
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        body { animation: fadeIn 0.35s ease forwards; }
+    </style>
+</head>
+<body>
+    <div class="bg-base"></div>
+    <div class="bg-grid"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="bg-glow"></div>
+
+    <div class="card">
+        <div class="avatar-wrap">
+            <div class="avatar-ring"></div>
+            <div class="avatar">👤</div>
+        </div>
+        <div class="name">phxmale</div>
+        <div class="handle">@phxmale</div>
+        <div class="divider"></div>
+
+        <!-- RPC (hidden until call ends) -->
+        <div class="rpc-box" id="rpcBox">
+            <img class="rpc-icon" id="rpcIcon" src="" alt="RPC">
+            <div class="rpc-info">
+                <div class="rpc-name" id="rpcName">—</div>
+                <div class="rpc-text" id="rpcDetails"></div>
+                <div class="rpc-text" id="rpcState"></div>
+                <div class="rpc-text" id="rpcTime"></div>
+            </div>
+        </div>
+
+        <!-- Call button (hidden after call ends) -->
+        <div id="callSection" style="width:100%">
+            <button class="call-btn" id="callBtn" onclick="handleCall()">
+                <div class="pulse-dot"></div>
+                <svg class="icon-phone" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.48 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.55a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16z"/>
+                </svg>
+                <span id="btnText">Позвонить</span>
+            </button>
+            <div class="progress-wrap" id="callProgress">
+                <div class="progress-bar" id="callBar"></div>
+            </div>
+            <div class="status-txt" id="statusTxt"></div>
+        </div>
+
+        <!-- Player (hidden until call ends) -->
+        <div class="player" id="player">
+            <span class="track-name" id="trackName">—</span>
+            <div class="p-bar" id="pBar">
+                <div class="p-fill" id="pFill"></div>
+            </div>
+            <div class="controls">
+                <button class="ctrl-btn" id="prevBtn" onclick="prevTrack()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.971 4.285A2 2 0 0 1 21 6v12a2 2 0 0 1-3.029 1.715l-9.997-5.998a2 2 0 0 1-.003-3.432z"/><path d="M3 20V4"/></svg>
+                </button>
+                <button class="ctrl-btn play-btn" id="playBtn" onclick="togglePlay()">
+                    <svg id="playIcon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5L19 12L8 19V5Z"/></svg>
+                </button>
+                <button class="ctrl-btn" id="nextBtn" onclick="nextTrack()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4v16"/><path d="M6.029 4.285A2 2 0 0 0 3 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z"/></svg>
+                </button>
+            </div>
+            <div class="vol-row">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg>
+                <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.01" value="0.7" oninput="setVol(this.value)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="callAudio" preload="auto"></audio>
+    <audio id="musicAudio" preload="auto"></audio>
+
+    <script>
+        // ── Config ──
+        const CALL_URL   = 'https://raw.githubusercontent.com/phxmale/wexly/main/bio/phxmale/call.mp3';
+        const MUSIC_BASE = 'https://raw.githubusercontent.com/phxmale/wexly/main/bio/phxmale/music/';
+        // Список треков — имена файлов без расширения (добавляй сюда)
+        const TRACKS = [
+            'a great hope',
+            'track2',
+            'track3'
+        ];
+
+        // ── State ──
+        let trackIndex = 0;
+        let isPlaying  = false;
+        let progTimer  = null;
+        let rpcTimer   = null;
+        let rpcStart   = null;
+
+        // ── Elements ──
+        const callAudio  = document.getElementById('callAudio');
+        const musicAudio = document.getElementById('musicAudio');
+        const callBtn    = document.getElementById('callBtn');
+        const btnText    = document.getElementById('btnText');
+        const callProg   = document.getElementById('callProgress');
+        const callBar    = document.getElementById('callBar');
+        const statusTxt  = document.getElementById('statusTxt');
+        const callSect   = document.getElementById('callSection');
+        const player     = document.getElementById('player');
+        const rpcBox     = document.getElementById('rpcBox');
+        const trackName  = document.getElementById('trackName');
+        const pFill      = document.getElementById('pFill');
+        const pBar       = document.getElementById('pBar');
+        const playIcon   = document.getElementById('playIcon');
+        const volSlider  = document.getElementById('volSlider');
+
+        // ── Mouse glow ──
+        window.addEventListener('mousemove', e => {
+            document.body.style.setProperty('--x', e.clientX + 'px');
+            document.body.style.setProperty('--y', e.clientY + 'px');
+        });
+
+        // ── Call flow ──
+        function handleCall() {
+            callBtn.classList.add('waiting');
+            callBtn.disabled = true;
+            btnText.textContent = 'Ожидайте...';
+            statusTxt.textContent = 'Соединение...';
+            statusTxt.classList.remove('live');
+
+            callAudio.src = CALL_URL;
+            callAudio.load();
+
+            callAudio.oncanplay = () => {
+                statusTxt.textContent = 'Вызов активен';
+                statusTxt.classList.add('live');
+                callProg.classList.add('visible');
+                callAudio.play().catch(() => {});
+                if (progTimer) clearInterval(progTimer);
+                progTimer = setInterval(() => {
+                    if (!callAudio.duration) return;
+                    callBar.style.width = (callAudio.currentTime / callAudio.duration * 100) + '%';
+                }, 200);
+            };
+
+            callAudio.onerror = () => {
+                resetCall();
+                statusTxt.textContent = 'Ошибка загрузки';
+            };
+
+            callAudio.onended = () => {
+                resetCall();
+                showPostCall();
+            };
+        }
+
+        function resetCall() {
+            if (progTimer) clearInterval(progTimer);
+            callAudio.pause(); callAudio.src = '';
+            callProg.classList.remove('visible');
+            callBar.style.width = '0%';
+            statusTxt.textContent = '';
+            statusTxt.classList.remove('live');
+        }
+
+        // ── After call ends ──
+        function showPostCall() {
+            // Hide call section
+            callSect.style.display = 'none';
+
+            // Show RPC
+            fetchRPC();
+            rpcTimer = setInterval(fetchRPC, 15000);
+
+            // Show player
+            player.classList.add('visible');
+            loadTrack(0);
+            startPlay();
+        }
+
+        // ── RPC ──
+        async function fetchRPC() {
+            try {
+                // Lanyard API (Discord presence)
+                // Замени USER_ID на свой Discord ID
+                const USER_ID = '1048169367935926283';
+                const r = await fetch(`https://api.lanyard.rest/v1/users/${USER_ID}`);
+                const d = await r.json();
+                if (!d.success) { showRPCFallback(); return; }
+
+                const data    = d.data;
+                const activity = (data.activities || []).find(a => a.type === 0);
+
+                if (activity) {
+                    document.getElementById('rpcName').textContent    = activity.name || '—';
+                    document.getElementById('rpcDetails').textContent = activity.details || '';
+                    document.getElementById('rpcState').textContent   = activity.state   || '';
+
+                    // elapsed
+                    if (activity.timestamps?.start) {
+                        rpcStart = activity.timestamps.start;
+                        updateRPCTime();
+                        if (!rpcTimer) rpcTimer = setInterval(updateRPCTime, 1000);
+                    }
+
+                    // icon
+                    const icon = document.getElementById('rpcIcon');
+                    if (activity.assets?.large_image) {
+                        const appId = activity.application_id;
+                        icon.src = `https://cdn.discordapp.com/app-assets/${appId}/${activity.assets.large_image}.png`;
+                        icon.style.display = 'block';
+                    } else {
+                        icon.style.display = 'none';
+                    }
+
+                    rpcBox.classList.add('visible');
+                } else {
+                    showRPCFallback();
+                }
+            } catch(e) {
+                showRPCFallback();
+            }
+        }
+
+        function showRPCFallback() {
+            // Если нет активности или ошибка — не показываем RPC
+            rpcBox.classList.remove('visible');
+        }
+
+        function updateRPCTime() {
+            if (!rpcStart) return;
+            const elapsed = Math.floor((Date.now() - rpcStart) / 1000);
+            const h = Math.floor(elapsed / 3600);
+            const m = Math.floor((elapsed % 3600) / 60);
+            const s = elapsed % 60;
+            const pad = n => String(n).padStart(2,'0');
+            document.getElementById('rpcTime').textContent =
+                (h > 0 ? pad(h) + ':' : '') + pad(m) + ':' + pad(s) + ' elapsed';
+        }
+
+        // ── Player ──
+        function loadTrack(idx) {
+            trackIndex = idx;
+            const name = TRACKS[idx];
+            trackName.textContent = name;
+            musicAudio.src = MUSIC_BASE + encodeURIComponent(name) + '.mp3';
+            musicAudio.volume = parseFloat(volSlider.value);
+            musicAudio.load();
+        }
+
+        function startPlay() {
+            musicAudio.oncanplay = () => {
+                musicAudio.play().catch(() => {});
+                isPlaying = true;
+                updatePlayIcon();
+                startProgressLoop();
+            };
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                musicAudio.pause();
+                isPlaying = false;
+            } else {
+                musicAudio.play().catch(() => {});
+                isPlaying = true;
+            }
+            updatePlayIcon();
+        }
+
+        function updatePlayIcon() {
+            playIcon.innerHTML = isPlaying
+                ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor"/>'
+                : '<path d="M8 5L19 12L8 19V5Z" fill="currentColor"/>';
+        }
+
+        function nextTrack() {
+            const idx = (trackIndex + 1) % TRACKS.length;
+            loadTrack(idx);
+            if (isPlaying) startPlay();
+        }
+
+        function prevTrack() {
+            if (musicAudio.currentTime > 3) {
+                musicAudio.currentTime = 0;
+                return;
+            }
+            const idx = (trackIndex - 1 + TRACKS.length) % TRACKS.length;
+            loadTrack(idx);
+            if (isPlaying) startPlay();
+        }
+
+        function setVol(v) { musicAudio.volume = parseFloat(v); }
+
+        function startProgressLoop() {
+            clearInterval(window._pLoop);
+            window._pLoop = setInterval(() => {
+                if (!musicAudio.duration) return;
+                pFill.style.width = (musicAudio.currentTime / musicAudio.duration * 100) + '%';
+            }, 250);
+        }
+
+        musicAudio.addEventListener('ended', nextTrack);
+
+        // Seek by clicking progress bar
+        pBar.addEventListener('click', e => {
+            if (!musicAudio.duration) return;
+            const rect = pBar.getBoundingClientRect();
+            const pct  = (e.clientX - rect.left) / rect.width;
+            musicAudio.currentTime = pct * musicAudio.duration;
+        });
+    </script>
+</body>
+</html>

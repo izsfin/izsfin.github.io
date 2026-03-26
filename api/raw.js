@@ -43,14 +43,16 @@ export default async function handler(req, res) {
     else if (host.includes("vellote"))     { codeBranch = "off"; }
 
     // --- 4.1. ИСКЛЮЧЕНИЯ ПО ПУТИ ---
+    if (rawPath === 'bio/phxmale')      return serveFallback(res,  'bio/phxmale.html', selectedLang);
     if (rawPath === "obfuscator")       return serveFallback(res,   "obfuscator.html", selectedLang);
     if (rawPath === "getkey")           return serveFallback(res,       "getkey.html", selectedLang);
-    if (rawPath === "api/gen")                    { /* pass through to Vercel function directly */ }
+    if (rawPath === "api/gen")                    { /* pass through to Vercel function directly */ };
     if (rawPath === "status")           return serveFallback(res,       "status.html", selectedLang);
     if (rawPath === "catalog")          return serveFallback(res,      "catalog.html", selectedLang);
     if (rawPath === "auth")             return serveFallback(res,       "authSS.html", selectedLang);
     if (rawPath === "auth/cmd")         return serveFallback(res,       "authCS.html", selectedLang);
     if (rawPath.startsWith("catalog/")) return serveFallback(res, "catalog-item.html", selectedLang);
+    
 
     if (rawPath.startsWith("static/")) {`xm`
         const cmdUA = req.headers['user-agent'] || "";
