@@ -1,3 +1,34 @@
+local Config = {
+    -- Клавиша для открытия/закрытия меню
+    OpenClose = Enum.KeyCode.BackSlash, 
+    
+    -- Цвета в формате RGB строк (для работы Color Highlight в VSCode)
+    Colors = {
+        Main = "143, 255, 248",      -- Основной бирюзовый
+        Secondary = "61, 117, 114",   -- Темный бирюзовый (для градиента)
+        Background = "20, 20, 20",    -- Цвет фона панелей
+        Stroke = "100, 100, 100",     -- Цвет обводок
+	
+        Loading = "87, 247, 237",
+        Success = "117, 149, 201",
+        Error = "32, 107, 102",
+        Info = "31, 204, 193"
+    }
+}
+
+-- Функция-парсер (превращает "0,0,0" в Color3)
+local function parseColor(str)
+    local r, g, b = str:match("(%d+),%s*(%d+),%s*(%d+)")
+    return Color3.fromRGB(tonumber(r), tonumber(g), tonumber(b))
+end
+
+-- Переменные для быстрого доступа к цветам в коде
+local MainColor = parseColor(Config.Colors.Main)
+local SecColor = parseColor(Config.Colors.Secondary)
+local BgColor = parseColor(Config.Colors.Background)
+local StrokeColor = parseColor(Config.Colors.Stroke)
+
+
 local SCRIPT_MAP = {
     ["VD | TexxRBLX"] = "VDTexRBLX",
     ["AntiSPEmot"] = "DisableStopEmote",
@@ -327,7 +358,7 @@ end
 -- NL Logo with Decal
 local nixu = createSection("Nixu",220,0)
 nixu.BackgroundTransparency = 0.1
-nixu.BackgroundColor3 = Color3.fromRGB(20,20,20)
+nixu.BackgroundColor3 = Color3.fromRGB(1,1,1)
 
 
 local version = Instance.new("TextLabel")
@@ -534,7 +565,7 @@ end)
 local open = true
 local toggleCooldown = false
 UserInputService.InputBegan:Connect(function(i)
-    if i.KeyCode == Enum.KeyCode.BackSlash and not toggleCooldown then
+    if i.KeyCode == Config.OpenClose and not toggleCooldown then
         toggleCooldown = true
         open = not open
         screenGui.Enabled = true
@@ -564,7 +595,10 @@ gradient.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0, Color3.fromRGB(143,  255,  248)), --  Pink | 39, 104, 217
     ColorSequenceKeypoint.new(1, Color3.fromRGB(61,   117,  114))  --  Pink | 2, 61, 163 
 }
-task.spawn(function() while true do TweenService:Create(gradient,TweenInfo.new(2,Enum.EasingStyle.Linear,Enum.EasingDirection.InOut,-1,true),{ Rotation = 360 }):Play() task.wait(4) end end)
-
-showNotification("jessi Legacy v2.1.55 beta loaded", "success")
-showNotification("by wehux", "info")
+task.spawn(function()
+    local info = TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1) -- -1 значит бесконечно
+    local tween = TweenService:Create(gradient, info, { Rotation = 360 })
+    tween:Play()
+end)
+showNotification("RL Legacy loaded", "success")
+showNotification("by hux9z", "info")
