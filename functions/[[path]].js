@@ -144,25 +144,33 @@ try {
             owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch
         });
 
-// Ищем файл в списке, игнорируя регистр и пробуя добавить .lua
+// 1. Ищем файл в списке, пробуя разные расширения
         const target = Array.isArray(items) && items.find(i => {
             const name = i.name.toLowerCase();
-            return name === fileName || name === `${fileName}.lua`;
+            const search = fileName.toLowerCase();
+            
+            return name === search || 
+                   name === `${search}.lua` || 
+                   name === `${search}.luaz` ||
+                   name === `${search}.json` || 
+                   name === `${search}.js` ||
+                   name === `${search}.html`;
         });
 
-        if (!target) {
-         return serveFallback(octokit, OWNER, REPO, fallbackFile || "main.html", selectedLang);}
+        if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile || "main.html", selectedLang);
 
-        // Теперь запрашиваем файл по его РЕАЛЬНОМУ пути из GitHub (с правильным регистром)
+        // 2. ОПРЕДЕЛЯЕМ MIME-ТИП ПО РЕАЛЬНОМУ ФАЙЛУ (чтобы не было ошибок 404 в браузере)
+        const realFileName = target.name.toLowerCase();
+        const realExt = realFileName.split('.').pop();
+        const mime = mimeTypes[realExt] || mimeTypes["default"];
+        const isTextual = ["text/", "application/javascript", "application/json"].some(t => mime.startsWith(t));
+
+        // 3. Запрашиваем файл по его РЕАЛЬНОМУ пути (с правильным регистром и расширением)
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
-        // --- КОРРЕКТНОЕ ДЕКОДИРОВАНИЕ UTF-8 (Кириллица) ---
-        let body;
-        const ext = fileName.split('.').pop().toLowerCase();
-        const mime = mimeTypes[ext] || mimeTypes["default"];
-        const isTextual = ["text/", "application/javascript", "application/json"].some(t => mime.startsWith(t));
 
+        let body;
         if (fileData.content) {
             const binaryString = atob(fileData.content);
             const bytes = new Uint8Array(binaryString.length);
