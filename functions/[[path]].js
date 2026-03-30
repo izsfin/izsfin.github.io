@@ -122,45 +122,48 @@ export async function onRequest(context) {
 // --- ПРОДОЛЖЕНИЕ ПОСЛЕ MIME TYPES (V3 SS/FF EDITION) ---
 
 try {
-        const matchedRule = false; // Заглушка, чтобы не было ошибки undefined
+        const matchedRule = false; 
         let gitHubPath = "";
         let fileName = "";
         
         const pathParts = rawPath.split('/').filter(p => p);
         const isV3 = pathParts[0] === "v3";
 
+        // 1. ЛОГИКА РОУТИНГА (ПРЯМАЯ СТАТИКА)
         if (isV3 && pathParts[1] === "ff") {
-            // ЗАПРОС: v3/ff/raw.js -> ПУТЬ: functions/raw.js
+            // Запрос: v3/ff/raw.js -> Ищет в папке: functions/raw.js
             fileName = pathParts[pathParts.length - 1].toLowerCase();
             const subDirs = pathParts.slice(2, -1).join('/');
             gitHubPath = `functions${subDirs ? '/' + subDirs : ''}`;
 
         } else if (isV3 && pathParts[1] === "ss") {
-            // ЗАПРОС: v3/ss/css/tailwind.css -> ПУТЬ: site/html/css/tailwind.css
+            // Запрос: v3/ss/css/tailwind.css -> Ищет в папке: site/html/css/tailwind.css
             const cleanPath = rawPath.replace("v3/ss/", "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
             gitHubPath = "site/html/" + parts.join('/');
 
         } else {
-            // ВСЁ ОСТАЛЬНОЕ (Главная страница)
+            // Обычный вход на сайт (главная)
             fileName = pathParts.length > 0 ? pathParts.pop().toLowerCase() : "index.html";
             gitHubPath = "site/html/" + pathParts.join('/');
         }
 
-        // Чистим путь от слэшей
         gitHubPath = gitHubPath.replace(/\/$/, "");
 
-        // Получаем список файлов из GitHub
+        // 2. ПОЛУЧАЕМ СПИСОК ФАЙЛОВ ИЗ GITHUB
         const { data: items } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch
         });
 
         const target = Array.isArray(items) && items.find(i => i.name.toLowerCase() === fileName);
 
-        if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
+        if (!target) {
+            // Если файла нет, пробуем отдать index.html (fallback)
+            return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
+        }
 
-        // Получаем контент файла
+        // 3. ПОЛУЧАЕМ КОНТЕНТ ФАЙЛА
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
@@ -176,7 +179,8 @@ try {
             body = await res.arrayBuffer();
         }
 
-        const mime = mimeTypes[fileName.split('.').pop().toLowerCase()] || mimeTypes["default"];
+        const ext = fileName.split('.').pop().toLowerCase();
+        const mime = mimeTypes[ext] || mimeTypes["default"];
         
         return new Response(body, {
             status: 200,
@@ -188,7 +192,8 @@ try {
         });
 
     } catch (e) {
-        return new Response(`Vellote Error: ${e.message}`, { status: 500 });
+        // Выводим только реальную ошибку, без всяких "Version system failure"
+        return new Response(`Vellote Debug: ${e.message}`, { status: 500 });
     }
 }
 
