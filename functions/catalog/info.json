@@ -4,7 +4,7 @@
       "id": "kawaii-neutral-black-cat-ears",
       "name": "Kawaii Neutral Black Cat Ears",
       "author": "hux9z",
-      "preview": "site/catalog/kNBCE/preview.png",
+      "preview": "v3/ss/catalog/kNBCE/preview.png",
       "command": "js(\"Black Cat Ears\")",
       "category": "Accessories",
       "type": "Head"
@@ -13,7 +13,7 @@
       "id": "black-beanie",
       "name": "Black Beanie",
       "author": "hux9z",
-      "preview": "site/catalog/BlackBeanie/preview.png",
+      "preview": "v3/ss/catalog/BlackBeanie/preview.png",
       "command": "js(\"Black Beanie\")",
       "category": "Accessories",
       "type": "Head"
@@ -22,7 +22,7 @@
       "id": "black-balaclava-fisher-hat",
       "name": "Black Balaclava Fisher Hat",
       "author": "hux9z",
-      "preview": "site/catalog/balaclava/fisher-hat/preview.png",
+      "preview": "v3/ss/catalog/balaclava/fisher-hat/preview.png",
       "command": "js(\"Black Balaclava Fisher Hat\")",
       "category": "Accessories",
       "type": "Head"
@@ -31,7 +31,7 @@
       "id": "emo-spiked-shades",
       "name": "Emo Spiked Shades",
       "author": "hux9z",
-      "preview": "site/catalog/EmoSpikedShades/preview.png",
+      "preview": "v3/ss/catalog/EmoSpikedShades/preview.png",
       "command": "js(\"Emo Spiked Shades\")",
       "category": "Accessories",
       "type": "Face"
@@ -40,7 +40,7 @@
       "id": "white-polarized-sunglasses",
       "name": "White Polarized Sunglasses",
       "author": "hux9z",
-      "preview": "site/catalog/polarizedSG/white/preview.png",
+      "preview": "v3/ss/catalog/polarizedSG/white/preview.png",
       "command": "js(\"White Polarized Sunglasses\")",
       "category": "Accessories",
       "type": "Face"
@@ -49,7 +49,7 @@
       "id": "pink-polarized-sunglasses",
       "name": "Pink Polarized Sunglasses",
       "author": "hux9z",
-      "preview": "site/catalog/polarizedSG/pink/preview.png",
+      "preview": "v3/ss/catalog/polarizedSG/pink/preview.png",
       "command": "js(\"Pink Polarized Sunglasses\")",
       "category": "Accessories",
       "type": "Face"
@@ -58,7 +58,7 @@
       "id": "black-neck-mask_low",
       "name": "Black Neck Mask (Low)",
       "author": "hux9z",
-      "preview": "site/catalog/neck-mask/black/preview.png",
+      "preview": "v3/ss/catalog/neck-mask/black/preview.png",
       "command": "js(\"Black Neck Mask (Low)\")",
       "category": "Accessories",
       "type": "Face"
@@ -67,7 +67,7 @@
       "id": "white-ski-mask",
       "name": "White Ski Mask",
       "author": "hux9z",
-      "preview": "site/catalog/neck-mask/white/preview.png",
+      "preview": "v3/ss/catalog/neck-mask/white/preview.png",
       "command": "js(\"White Ski Mask\")",
       "category": "Accessories",
       "type": "Face"
@@ -76,7 +76,7 @@
       "id": "guns-x-alien",
       "name": "Gunslinger & Alien",
       "author": "hux9z",
-      "preview": "site/catalog/GxA/preview.png",
+      "preview": "v3/ss/catalog/GxA/preview.png",
       "command": "js(\"Guns & Alien\")",
       "category": "Characters",
       "type": "body"
@@ -85,7 +85,7 @@
       "id": "pal-face-classic",
       "name": "Pal Face",
       "author": "hux9z",
-      "preview": "site/catalog/PalFace/preview.png",
+      "preview": "v3/ss/catalog/PalFace/preview.png",
       "command": "js(\"Pal Face Static\")",
       "category": "Characters",
       "type": "face"
@@ -94,7 +94,7 @@
       "id": "pal-face",
       "name": "Pal Face",
       "author": "hux9z",
-      "preview": "site/catalog/PalFace/NSpreview.png",
+      "preview": "v3/ss/catalog/PalFace/NSpreview.png",
       "command": "js(\"Pal Face\")",
       "category": "Characters",
       "type": "dhead"
@@ -103,7 +103,7 @@
       "id": "purple-bape-v1",
       "name": "Purple Bape #1",
       "author": "hux9z",
-      "preview": "site/catalog/bape/purple/v.1/preview.png",
+      "preview": "v3/ss/catalog/bape/purple/v.1/preview.png",
       "command": "js(\"Purple Bape\")",
       "category": "Outfits"
     },
@@ -111,7 +111,7 @@
       "id": "purple-bape-v2",
       "name": "Purple Bape #2",
       "author": "hux9z",
-      "preview": "site/catalog/bape/purple/v.2/preview.png",
+      "preview": "v3/ss/catalog/bape/purple/v.2/preview.png",
       "command": "js(\"Purple Bape\")",
       "category": "Outfits"
     },
@@ -119,7 +119,7 @@
       "id": "black-bape",
       "name": "Black Bape",
       "author": "hux9z",
-      "preview": "site/catalog/bape/black/preview.png",
+      "preview": "v3/ss/catalog/bape/black/preview.png",
       "command": "js(\"Black Bape\")",
       "category": "Outfits"
     },
@@ -127,7 +127,7 @@
       "id": "blue-bape-v1",
       "name": "Blue Bape #1",
       "author": "hux9z",
-      "preview": "site/catalog/bape/blue/v.1/preview.png",
+      "preview": "v3/ss/catalog/bape/blue/v.1/preview.png",
       "command": "js(\"Blue Bape #1\")",
       "category": "Outfits"
     },
@@ -135,7 +135,7 @@
       "id": "blue-bape-v2",
       "name": "Blue Bape #2",
       "author": "hux9z",
-      "preview": "site/catalog/bape/blue/v.2/preview.png",
+      "preview": "v3/ss/catalog/bape/blue/v.2/preview.png",
       "command": "js(\"Blue Bape #2\")",
       "category": "Outfits"
     },
@@ -143,7 +143,7 @@
       "id": "black-camo-v1",
       "name": "Black Camo #1",
       "author": "hux9z",
-      "preview": "site/catalog/Millitary/BlackCamo/v1/preview.png",
+      "preview": "v3/ss/catalog/Millitary/BlackCamo/v1/preview.png",
       "command": "js(\"Black Camo #1\")",
       "category": "Outfits"
     },
@@ -151,7 +151,7 @@
       "id": "black-camo-v2",
       "name": "Black Camo #2",
       "author": "hux9z",
-      "preview": "site/catalog/Millitary/BlackCamo/v2/preview.png",
+      "preview": "v3/ss/catalog/Millitary/BlackCamo/v2/preview.png",
       "command": "js(\"Black Camo #2\")",
       "category": "Outfits"
     },
@@ -159,7 +159,7 @@
       "id": "blue-camo",
       "name": "Blue Camo",
       "author": "hux9z",
-      "preview": "site/catalog/Millitary/BlueCamo/preview.png",
+      "preview": "v3/ss/catalog/Millitary/BlueCamo/preview.png",
       "command": "js(\"Blue Camo\")",
       "category": "Outfits"
     },
@@ -167,7 +167,7 @@
       "id": "classic-camo",
       "name": "Classic Camo",
       "author": "hux9z",
-      "preview": "site/catalog/Millitary/ClassicCamo/preview.png",
+      "preview": "v3/ss/catalog/Millitary/ClassicCamo/preview.png",
       "command": "js(\"Classic Camo\")",
       "category": "Outfits"
     },
@@ -175,7 +175,7 @@
       "id": "loader",
       "name": "Loader",
       "author": "hux9z",
-      "preview": "site/catalog/hux9z/assets/Loader.png",
+      "preview": "v3/ss/catalog/hux9z/assets/Loader.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/loader\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -184,7 +184,7 @@
       "id": "uwp-mobile",
       "name": "UWP Mobile",
       "author": "hux9z",
-      "preview": "site/catalog/hux9z/assets/",
+      "preview": "v3/ss/catalog/hux9z/assets/",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/mobile\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -193,7 +193,7 @@
       "id": "uwp-pc",
       "name": "UWP PC",
       "author": "hux9z",
-      "preview": "site/catalog/hux9z/assets/PC.png",
+      "preview": "v3/ss/catalog/hux9z/assets/PC.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/pc\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -202,7 +202,7 @@
       "id": "uwp-legacy",
       "name": "UWP ³² [Legacy]",
       "author": "hux9z",
-      "preview": "site/catalog/hux9z/assets/Legacy.png",
+      "preview": "v3/ss/catalog/hux9z/assets/Legacy.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/legacy\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -211,7 +211,7 @@
       "id": "swanmo-premium",
       "name": "soon",
       "author": "hux9z",
-      "preview": "site/catalog/hux9z/assets/Premium.png",
+      "preview": "v3/ss/catalog/hux9z/assets/Premium.png",
       "command": "soon",
       "category": "Scripts",
       "type": "Official Software"
@@ -220,7 +220,7 @@
       "id": "js32",
       "name": "JS ³²",
       "author": "hux9z",
-      "preview": "site/catalog/hux9z/assets/xms.png",
+      "preview": "v3/ss/catalog/hux9z/assets/xms.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/js\"))()",
       "category": "Scripts",
       "type": "Official Software"
