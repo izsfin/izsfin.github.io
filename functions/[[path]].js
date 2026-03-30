@@ -149,13 +149,88 @@ try {
             const name = i.name.toLowerCase();
             const search = fileName.toLowerCase();
             
-            return name === search || 
-                   name === `${search}.lua` || 
-                   name === `${search}.luaz` ||
-                   name === `${search}.json` || 
-                   name === `${search}.js` ||
-                   name === `${search}.html`;
-        });
+     return name === search || 
+       name === `${search}.png`  ||
+       name === `${search}.jpg`  ||
+       name === `${search}.jpeg` ||
+       name === `${search}.jpe`  ||
+       name === `${search}.gif`  ||
+       name === `${search}.bmp`  ||
+       name === `${search}.webp` ||
+       name === `${search}.avif` ||
+       name === `${search}.apng` ||
+       name === `${search}.svg`  ||
+       name === `${search}.svgz` ||
+       name === `${search}.ico`  ||
+       name === `${search}.tif`  ||
+       name === `${search}.tiff` ||
+       name === `${search}.heic` ||
+       name === `${search}.heif` ||
+       name === `${search}.html` ||
+       name === `${search}.htm`  ||
+       name === `${search}.css`  ||
+       name === `${search}.js`   ||
+       name === `${search}.mjs`  ||
+       name === `${search}.ts`   ||
+       name === `${search}.txt`  ||
+       name === `${search}.log`  ||
+       name === `${search}.ini`  ||
+       name === `${search}.cfg`  ||
+       name === `${search}.md`   ||
+       name === `${search}.csv`  ||
+       name === `${search}.json` ||
+       name === `${search}.xml`  ||
+       name === `${search}.yaml` ||
+       name === `${search}.yml`  ||
+       name === `${search}.lua`  ||
+       name === `${search}.luaz` ||
+       name === `${search}.py`   ||
+       name === `${search}.java` ||
+       name === `${search}.c`    ||
+       name === `${search}.cpp`  ||
+       name === `${search}.cs`   ||
+       name === `${search}.go`   ||
+       name === `${search}.rs`   ||
+       name === `${search}.php`  ||
+       name === `${search}.rb`   ||
+       name === `${search}.sh`   ||
+       name === `${search}.bat`  ||
+       name === `${search}.ps1`  ||
+       name === `${search}.mp3`  ||
+       name === `${search}.wav`  ||
+       name === `${search}.ogg`  ||
+       name === `${search}.aac`  ||
+       name === `${search}.m4a`  ||
+       name === `${search}.flac` ||
+       name === `${search}.mp4`  ||
+       name === `${search}.webm` ||
+       name === `${search}.mov`  ||
+       name === `${search}.avi`  ||
+       name === `${search}.mkv`  ||
+       name === `${search}.ttf`  ||
+       name === `${search}.otf`  ||
+       name === `${search}.woff` ||
+       name === `${search}.woff2`||
+       name === `${search}.zip`  ||
+       name === `${search}.rar`  ||
+       name === `${search}.7z`   ||
+       name === `${search}.tar`  ||
+       name === `${search}.gz`   ||
+       name === `${search}.bz2`  ||
+       name === `${search}.xz`   ||
+       name === `${search}.iso`  ||
+       name === `${search}.pdf`  ||
+       name === `${search}.doc`  ||
+       name === `${search}.docx` ||
+       name === `${search}.xls`  ||
+       name === `${search}.xlsx` ||
+       name === `${search}.exe`  ||
+       name === `${search}.msi`  ||
+       name === `${search}.dll`  ||
+       name === `${search}.bin`  ||
+       name === `${search}.apk`  ||
+       name === `${search}.wasm`;
+     });
 
         
 // 1. ЕСЛИ ФАЙЛА НЕТ -> Просто отдаем заглушку
@@ -164,7 +239,7 @@ try {
         // 2. ПРОВЕРКА ДОСТУПА
         if (!isRoblox && ip !== MY_IP && request.headers.get('vellote-access') !== 'true') {
             // Логгер (без await)
-            fetch("https://твой-домен.com/api/logger", {
+            fetch("https://aqusu.pages.dev/v3/ff/logger", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ip, path: url.pathname, domain: host, userAgent })
