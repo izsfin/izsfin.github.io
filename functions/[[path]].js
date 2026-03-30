@@ -126,15 +126,19 @@ try {
             
         } else {
             // Стандартные роуты для MAIN ветки
-            const routes = {
+           const routes = {
                 "bio/phxmale": "bio/main.html", "obfuscator": "obfuscator.html",
-                "getkey": "getkey.html", "status": "status.html", "catalog": "catalog.html",
-                "auth": "authSS.html", "auth/cmd": "authCS.html"
+                "getkey": "getkey.html", "status": "status.html", "catalog": "catalog.html"
             };
-            if (routes[rawPath]) return serveFallback(octokit, OWNER, REPO, routes[rawPath], selectedLang);
-            
+
+            if (routes[rawPath]) {
+                return serveFallback(octokit, OWNER, REPO, routes[rawPath], selectedLang);
+            }
+
+            // ЕСЛИ ЭТО ПРОСТО ПУТЬ (типа /JSx32 или /myscript) -> ИДЕМ В ВЕТКУ OFF
+            codeBranch = "off"; 
             fileName = pathParts.pop()?.toLowerCase() || "index.html";
-            gitHubPath = "site/html" + (pathParts.length > 0 ? "/" + pathParts.join('/') : "");
+            gitHubPath = "."; // Ищем в корне ветки OFF
         }
 
         // Чистим путь и делаем запрос к нужной ветке (codeBranch)
