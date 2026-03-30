@@ -14,6 +14,11 @@ export async function onRequest(context) {
     const OWNER = "phxmale";
     const REPO = "wexly";
     const MY_IP = "77.52.212.190";
+    
+    // Объявляем здесь, чтобы переменная была доступна везде в onRequest
+    let fallbackFile = "main.html"; 
+    let codeBranch = "main";
+    let isBranchOverride = false;
 
     const ua = userAgent.toLowerCase();
     const isRoblox = ua.includes("roblox") || ua === "" || ua === "unknown" || request.headers.get('vellote-access') === 'true';
@@ -23,11 +28,6 @@ export async function onRequest(context) {
     if (ua.includes("discordbot") || ua.includes("telegrambot") || ua.includes("twitterbot")) {
         return new Response("OK", { status: 200 });
     }
-
-    // --- ОПРЕДЕЛЕНИЕ ВЕТКИ И РОУТИНГ ---
-// --- ОПРЕДЕЛЕНИЕ ВЕТКИ И РОУТИНГ ---
-    let codeBranch = "main";
-    let isBranchOverride = false; // Флаг, что мы ищем в спец. ветке от корня
 
     if (rawPath.startsWith(".cdn/")) { 
         codeBranch = "cdn"; 
@@ -103,10 +103,9 @@ try {
         // --- ЖЕЛЕЗНЫЙ РОУТИНГ ПО ВЕТКАМ ---
         
         if (isBranchOverride) {
-            // Если зашли через .api, .cdn и т.д. — ищем в корне соответствующей ветки
+            // Если путь .api/LuaZ.lua -> fileName = "luaz.lua", gitHubPath = ""
             fileName = pathParts.pop().toLowerCase();
-            gitHubPath = pathParts.join('/'); // Ищем в корне или подпапках ветки
-            
+            gitHubPath = pathParts.join('/') || "."; // Используем "." для корня ветки         
         } else if (rawPath.startsWith(`${currentV}/ff/`)) {
             const cleanPath = rawPath.replace(`${currentV}/ff/`, "");
             const parts = cleanPath.split('/').filter(p => p);
@@ -145,13 +144,19 @@ try {
             owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch
         });
 
-        const target = Array.isArray(items) && items.find(i => i.name.toLowerCase() === fileName);
-        if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
+// Ищем файл в списке, игнорируя регистр и пробуя добавить .lua
+        const target = Array.isArray(items) && items.find(i => {
+            const name = i.name.toLowerCase();
+            return name === fileName || name === `${fileName}.lua`;
+        });
 
+        if (!target) {
+         return serveFallback(octokit, OWNER, REPO, fallbackFile || "main.html", selectedLang);}
+
+        // Теперь запрашиваем файл по его РЕАЛЬНОМУ пути из GitHub (с правильным регистром)
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
-
         // --- КОРРЕКТНОЕ ДЕКОДИРОВАНИЕ UTF-8 (Кириллица) ---
         let body;
         const ext = fileName.split('.').pop().toLowerCase();
