@@ -119,78 +119,104 @@ export async function onRequest(context) {
         "wasm": "application/wasm", "default": "application/octet-stream"
     };
 
-    // --- ПРОДОЛЖЕНИЕ ПОСЛЕ MIME TYPES ---
+// --- ПРОДОЛЖЕНИЕ ПОСЛЕ MIME TYPES (V3 SS/FF EDITION) ---
 
     try {
-        const pathParts = rawPath.split('/').filter(p => p);
-        const searchFileName = pathParts.pop().toLowerCase();
-        const searchDir = pathParts.join('/').toLowerCase();
+        let gitHubPath = "";
+        let fileName = "";
+        
+        const isSiteStatic = rawPath.startsWith("v3/ss/");
+        const isFileFetch = rawPath.startsWith("v3/ff/");
 
-        // Запрашиваем список файлов в директории
+        // 1. ОПРЕДЕЛЕНИЕ ПУТИ В REPO
+        if (isSiteStatic) {
+            // Запрос v3/ss/html/css/style.css -> ищет в site/html/css/style.css
+            const cleanPath = rawPath.replace("v3/ss/", "");
+            const parts = cleanPath.split('/').filter(p => p);
+            fileName = parts.pop().toLowerCase();
+            gitHubPath = "site/" + parts.join('/');
+        } else if (isFileFetch) {
+            // Запрос v3/ff/scripts/main.luaz -> ищет в scripts/main.luaz (от корня)
+            const cleanPath = rawPath.replace("v3/ff/", "");
+            const parts = cleanPath.split('/').filter(p => p);
+            fileName = parts.pop().toLowerCase();
+            gitHubPath = parts.join('/');
+        } else {
+            // Обычный запрос (например, /favicon.png) -> ищем в site/html/
+            const parts = rawPath.split('/').filter(p => p);
+            fileName = parts.length > 0 ? parts.pop().toLowerCase() : "index.html";
+            gitHubPath = "site/html/" + parts.join('/');
+        }
+
+        // Чистим путь от лишних слешей
+        gitHubPath = gitHubPath.replace(/\/$/, "");
+
+        // 2. ЗАПРОС СПИСКА ФАЙЛОВ
         const { data: items } = await octokit.repos.getContent({
-            owner: OWNER, repo: REPO, path: searchDir, ref: codeBranch
+            owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch
         });
 
-        // Ищем нужный файл (поддерживаем поиск без расширения)
+        // Ищем нужный файл (поддерживаем поиск без расширения для ff)
         const target = Array.isArray(items) && items.find(i => {
             const n = i.name.toLowerCase();
             const nameWithoutExt = n.includes('.') ? n.split('.').slice(0, -1).join('.') : n;
-            return i.type === 'file' && (n === searchFileName || nameWithoutExt === searchFileName);
+            return i.type === 'file' && (n === fileName || (isFileFetch && nameWithoutExt === fileName));
         });
 
-        if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
+        // Если файл не найден - отдаем главную (если это не прямой запрос к v3)
+        if (!target) {
+            if (isSiteStatic || isFileFetch) return new Response("File Not Found", { status: 404 });
+            return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
+        }
 
         const ext = target.name.split('.').pop().toLowerCase();
         
-        // Блокировка скачивания исполняемых файлов через Roblox
-        if ((["zip", "exe"].includes(ext)) && isRoblox) {
+        // 3. ПРОВЕРКИ БЕЗОПАСНОСТИ
+        if (ext === "exe" && isRoblox) {
             return new Response("-- Vellote Error: Access Denied", { status: 403 });
         }
 
-        // Проверка прав доступа (Секрет, Владелец или Roblox User-Agent)
-        if (!matchedRule && !isSecretValid && !isOwner) {
+        // Правила доступа (Секрет, Владелец или Правило)
+        if (!matchedRule && !isSecretValid && !isOwner && isFileFetch) {
             await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked");
-            return new Response(isRoblox ? "-- Vellote Error: Access Denied. Use @secret" : "Forbidden", { status: 403 });
+            return new Response(isRoblox ? "-- Vellote Error: Forbidden" : "Forbidden", { status: 403 });
         }
 
-        // Логируем успешную загрузку (не логируем для владельца и роботов, чтобы не спамить)
+        // Логируем
         if (!isOwner && !isRoblox) {
-            await sendToLogger(ip, target.name, host, userAgent, "✅ File Loaded");
+            await sendToLogger(ip, target.name, host, userAgent, "✅ Loaded");
         }
 
-        // Получаем сам контент файла
+        // 4. ПОЛУЧЕНИЕ КОНТЕНТА
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
 
-        let content;
+        let body;
         if (fileData.content) {
-            // Декодируем base64 в байты, чтобы не побить кодировку/бинарники
-            const binaryString = atob(fileData.content);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            content = bytes;
+            const binary = atob(fileData.content);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            body = bytes;
         } else {
-            // Если файл слишком большой, GitHub дает download_url
             const res = await fetch(fileData.download_url);
-            content = await res.arrayBuffer();
+            body = await res.arrayBuffer();
         }
 
         const mime = mimeTypes[ext] || mimeTypes["default"];
         
-        return new Response(content, {
+        return new Response(body, {
             status: 200,
             headers: { 
                 "Content-Type": mime + (mime.startsWith("text/") ? "; charset=UTF-8" : ""), 
                 "Access-Control-Allow-Origin": "*",
+                "Cache-Control": isSiteStatic ? "public, max-age=31536000, immutable" : "no-cache",
                 "Content-Disposition": (["zip", "exe"].includes(ext)) ? `attachment; filename="${target.name}"` : 'inline'
             }
         });
 
     } catch (e) {
-        return new Response(isRoblox ? "-- Vellote Error: " + e.message : "Internal Error", { status: 500 });
+        return new Response(isRoblox ? "-- Vellote Error: " + e.message : `Internal Error: ${e.message}`, { status: 500 });
     }
 }
 
@@ -205,26 +231,12 @@ async function serveFallback(octokit, owner, repo, file, lang) {
             headers: { "Content-Type": "text/html; charset=UTF-8" } 
         });
     } catch { 
-        return new Response("Not Found", { status: 404 }); 
-    }
-}
-
-async function serveDocsFallback(octokit, owner, repo, file, lang) {
-    try {
-        const { data: fb } = await octokit.repos.getContent({ owner, repo, path: `site/docs/${file}`, ref: "main" });
-        const html = atob(fb.content).replace(/{{LANG}}/g, lang);
-        return new Response(html, { 
-            status: 200, 
-            headers: { "Content-Type": "text/html; charset=UTF-8" } 
-        });
-    } catch { 
-        return new Response("Not Found", { status: 404 }); 
+        return new Response("Vellote: Root Index Not Found", { status: 404 }); 
     }
 }
 
 async function sendToLogger(ip, path, domain, userAgent, status) {
     try {
-        // Вызываем логгер без префикса /functions/, чтобы Cloudflare Pages его нашел
         await fetch(`https://${domain}/logger`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
