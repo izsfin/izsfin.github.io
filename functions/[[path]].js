@@ -24,32 +24,6 @@ export async function onRequest(context) {
         return new Response("OK", { status: 200 });
     }
 
-    // --- ЛОГИКА ВЕРСИОНИРОВАНИЯ V3 (ff) ---
-    if (rawPath.startsWith("v3/ff/")) {
-        const parts = rawPath.split('/').filter(p => p); // [v3, ff, 2.14.8, static, site]
-        const requestedVer = parts[2];
-        const type = parts[3];
-        const fileName = parts[4];
-
-        try {
-            // Берем версию из functions/ver/site.txt
-            const { data: verData } = await octokit.repos.getContent({
-                owner: OWNER, repo: REPO, path: "functions/ver/site.txt", ref: "main"
-            });
-            const currentVer = atob(verData.content).trim();
-
-            if (requestedVer !== currentVer) {
-                return new Response(`-- Vellote Error: Version Mismatch (Target: ${currentVer})`, { status: 400 });
-            }
-
-            // Если версия ок, отдаем запрашиваемый файл
-            // Например: /v3/ff/2.14.8/static/site -> site/static/site.html
-            return serveFallback(octokit, OWNER, REPO, `${type}/${fileName}.html`, selectedLang);
-        } catch (e) {
-            return new Response("-- Vellote Error: Version system failure", { status: 500 });
-        }
-    }
-
     // --- ОПРЕДЕЛЕНИЕ ВЕТКИ И РОУТИНГ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
@@ -66,27 +40,6 @@ export async function onRequest(context) {
         return serveDocsFallback(octokit, OWNER, REPO, docFile, selectedLang);
     }
 
-    // --- ИСКЛЮЧЕНИЯ И ПРЯМЫЕ ПУТИ ---
-    const routes = {
-        "bio/phxmale": "bio/main.html",
-        "obfuscator": "obfuscator.html",
-        "getkey": "getkey.html",
-        "status": "status.html",
-        "catalog": "catalog.html",
-        "auth": "authSS.html",
-        "auth/cmd": "authCS.html"
-    };
-
-    if (routes[rawPath]) return serveFallback(octokit, OWNER, REPO, routes[rawPath], selectedLang);
-    if (rawPath.startsWith("catalog/")) return serveFallback(octokit, OWNER, REPO, "catalog-item.html", selectedLang);
-
-    if (rawPath.startsWith("static/") && !userAgent.includes("hux9z/software")) {
-        return new Response(isRoblox ? "-- Vellote Error: Access Denied" : "Forbidden", { status: 403 });
-    }
-
-    // --- ОБРАБОТКА ФАЙЛОВ ---
-    if (!rawPath || rawPath === "index") return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
-    
     const mimeTypes = {
         "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "jpe": "image/jpeg",
         "gif": "image/gif", "bmp": "image/bmp", "webp": "image/webp", "avif": "image/avif",
@@ -117,46 +70,55 @@ export async function onRequest(context) {
         "exe": "application/octet-stream", "msi": "application/octet-stream", "dll": "application/octet-stream",
         "bin": "application/octet-stream", "apk": "application/vnd.android.package-archive",
         "wasm": "application/wasm", "default": "application/octet-stream"
-    };
+};
 
-// --- ПРОДОЛЖЕНИЕ ПОСЛЕ MIME TYPES (V3 SS/FF EDITION) ---
-
-try {
-        const matchedRule = false; 
+    // --- ПРОДОЛЖЕНИЕ ПОСЛЕ MIME TYPES (V3 SS/FF EDITION) ---
+    try {
         let gitHubPath = "";
         let fileName = "";
-        
         const pathParts = rawPath.split('/').filter(p => p);
         
-        // 1. ПОЛУЧАЕМ ПРЕФИКС (v3) ИЗ ОДНОГО ФАЙЛА
+        // 1. ПОЛУЧАЕМ ПРЕФИКС (v3) ИЗ ss.txt
         const ssRes = await octokit.repos.getContent({ 
             owner: OWNER, repo: REPO, path: "functions/ver/ss.txt", ref: "main" 
         });
-        const currentV = atob(ssRes.data.content).trim(); // Получит "v3"
+        const currentV = atob(ssRes.data.content).trim(); 
 
-        // 2. РОУТИНГ НА ОСНОВЕ ПРЕФИКСА
+        // 2. РОУТИНГ V3
         if (rawPath.startsWith(`${currentV}/ff/`)) {
-            // Запрос: v3/ff/raw.js -> Путь в GitHub: functions/raw.js
+            // v3/ff/raw.js -> functions/raw.js
             fileName = pathParts[pathParts.length - 1].toLowerCase();
             const subDirs = pathParts.slice(2, -1).join('/');
             gitHubPath = `functions${subDirs ? '/' + subDirs : ''}`;
             
         } else if (rawPath.startsWith(`${currentV}/ss/`)) {
-            // Запрос: v3/ss/css/tailwind.css -> Путь в GitHub: site/html/css/tailwind.css
+            // v3/ss/css/tailwind.css -> site/html/css/tailwind.css
             const cleanPath = rawPath.replace(`${currentV}/ss/`, "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
             gitHubPath = "site/html/" + parts.join('/');
             
         } else {
-            // Главная страница (fallback)
+            // ОБЫЧНЫЕ ПУТИ И ИСКЛЮЧЕНИЯ
+            const routes = {
+                "bio/phxmale": "bio/main.html", "obfuscator": "obfuscator.html",
+                "getkey": "getkey.html", "status": "status.html", "catalog": "catalog.html",
+                "auth": "authSS.html", "auth/cmd": "authCS.html"
+            };
+
+            if (routes[rawPath]) return serveFallback(octokit, OWNER, REPO, routes[rawPath], selectedLang);
+            if (rawPath.startsWith("catalog/")) return serveFallback(octokit, OWNER, REPO, "catalog-item.html", selectedLang);
+            
+            if (!rawPath || rawPath === "index") return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
+
+            // Если не роут, значит ищем файл в site/html/
             fileName = pathParts.length > 0 ? pathParts.pop().toLowerCase() : "index.html";
-            gitHubPath = "site/html/" + pathParts.join('/');
+            gitHubPath = "site/html/" + pathParts.slice(0, -1).join('/');
         }
 
         gitHubPath = gitHubPath.replace(/\/$/, "");
 
-        // 3. ПОИСК И ВЫДАЧА ФАЙЛА
+        // 3. ПОИСК И ВЫДАЧА
         const { data: items } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch
         });
@@ -193,6 +155,28 @@ try {
 
     } catch (e) {
         return new Response(`Vellote Error: ${e.message}`, { status: 500 });
+    }
+}
+
+// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+
+async function serveFallback(octokit, owner, repo, path, lang) {
+    try {
+        const { data: fb } = await octokit.repos.getContent({ owner, repo, path: `site/html/${path}`, ref: "main" });
+        const html = atob(fb.content).replace(/{{LANG}}/g, lang);
+        return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=UTF-8" } });
+    } catch {
+        return new Response("Not Found", { status: 404 });
+    }
+}
+
+async function serveDocsFallback(octokit, owner, repo, path, lang) {
+    try {
+        const { data: fb } = await octokit.repos.getContent({ owner, repo, path: `site/docs/${path}`, ref: "main" });
+        const html = atob(fb.content).replace(/{{LANG}}/g, lang);
+        return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=UTF-8" } });
+    } catch {
+        return new Response("Docs Not Found", { status: 404 });
     }
 }
 
