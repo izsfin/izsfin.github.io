@@ -5,13 +5,13 @@ export async function onRequest(context) {
     const url = new URL(request.url);
     const host = request.headers.get("host") || "";
     
-    // В Cloudflare переменные берутся из env (не забудь добавить GITHUB_TOKEN в Dash)
     const octokit = new Octokit({ auth: env.GITHUB_TOKEN });
     
+    // Чистим путь от начальных слэшей
     let rawPath = url.pathname.replace(/^\/+/, "");
+    
     const selectedLang = url.searchParams.get("lang") || "RU";
     const userAgent = request.headers.get("user-agent") || "";
-    // CF предоставляет IP через специальный заголовок
     const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "0.0.0.0";
 
     const OWNER = "phxmale";
@@ -26,23 +26,42 @@ export async function onRequest(context) {
     const isBotCrawler = ua.includes("discordbot") || ua.includes("telegrambot") || ua.includes("twitterbot") || ua.includes("facebookexternalhit") || ua.includes("linkedinbot");
     if (isBotCrawler) return new Response("OK", { status: 200 });
 
-    // --- DOCS ДОМЕН ---
-    if (host.includes("vellote-docs")) {
-        if (!rawPath || rawPath === "index") return serveDocsFallback(octokit, OWNER, REPO, "home.html", selectedLang);
-        if (rawPath === "auth")               return serveDocsFallback(octokit, OWNER, REPO, "auth.html", selectedLang);
-        if (rawPath === "create")             return serveDocsFallback(octokit, OWNER, REPO, "create.html", selectedLang);
-        if (rawPath.startsWith("post"))       return serveDocsFallback(octokit, OWNER, REPO, "post.html", selectedLang);
-        return serveDocsFallback(octokit, OWNER, REPO, "home.html", selectedLang);
-    }
-
-    // --- ОПРЕДЕЛЕНИЕ ВЕТКИ ---
+    // --- ОПРЕДЕЛЕНИЕ ВЕТКИ И РОУТИНГ ---
     let codeBranch = "main";
     let fallbackFile = "main.html";
-    if (host.includes("vellote-testing"))  { codeBranch = "test"; fallbackFile = "test.html"; }
-    else if (host.includes("vellote-api")) { codeBranch = "api"; }
-    else if (host.includes("vellote-raw")) { codeBranch = "raw"; }
-    else if (host.includes("vellote-cdn")) { codeBranch = "cdn"; }
-    else if (host.includes("aqusu"))     { codeBranch = "off"; }
+
+    // 1. Сначала проверяем папки-префиксы (твоя идея с .cdn, .api)
+    if (rawPath.startsWith(".cdn/")) {
+        codeBranch = "cdn";
+        rawPath = rawPath.replace(".cdn/", "");
+    } else if (rawPath.startsWith(".api/")) {
+        codeBranch = "api";
+        rawPath = rawPath.replace(".api/", "");
+    } else if (rawPath.startsWith(".testing/")) {
+        codeBranch = "test";
+        fallbackFile = "test.html";
+        rawPath = rawPath.replace(".testing/", "");
+    } else if (rawPath.startsWith(".raw/")) {
+        codeBranch = "raw";
+        rawPath = rawPath.replace(".raw/", "");
+    }
+    // 2. Если префиксов нет, проверяем по домену (для совместимости)
+    else if (host.includes("aqusu-testing") || host.includes("vellote-testing")) { 
+        codeBranch = "test"; fallbackFile = "test.html"; 
+    }
+    else if (host.includes("aqusu-api") || host.includes("vellote-api")) { codeBranch = "api"; }
+    else if (host.includes("aqusu-raw") || host.includes("vellote-raw")) { codeBranch = "raw"; }
+    else if (host.includes("aqusu-cdn") || host.includes("vellote-cdn")) { codeBranch = "cdn"; }
+
+    // --- DOCS ЛОГИКА ---
+    if (host.includes("vellote-docs") || rawPath.startsWith(".docs/")) {
+        if (rawPath.startsWith(".docs/")) rawPath = rawPath.replace(".docs/", "");
+        if (!rawPath || rawPath === "index") return serveDocsFallback(octokit, OWNER, REPO, "home.html", selectedLang);
+        if (rawPath === "auth")              return serveDocsFallback(octokit, OWNER, REPO, "auth.html", selectedLang);
+        if (rawPath === "create")            return serveDocsFallback(octokit, OWNER, REPO, "create.html", selectedLang);
+        if (rawPath.startsWith("post"))      return serveDocsFallback(octokit, OWNER, REPO, "post.html", selectedLang);
+        return serveDocsFallback(octokit, OWNER, REPO, "home.html", selectedLang);
+    }
 
     // --- ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     if (rawPath === 'bio/phxmale')      return serveFallback(octokit, OWNER, REPO, 'bio/main.html', selectedLang);
@@ -67,7 +86,7 @@ export async function onRequest(context) {
             const { data } = await octokit.repos.getContent({
                 owner: OWNER, repo: REPO, path: "api/catalog/" + fileName, ref: "main"
             });
-            const content = atob(data.content); // В браузерной среде Cloudflare используем atob вместо Buffer
+            const content = atob(data.content);
             return new Response(content, {
                 status: 200,
                 headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
@@ -141,6 +160,7 @@ export async function onRequest(context) {
         "bin": "application/octet-stream", "apk": "application/vnd.android.package-archive",
         "wasm": "application/wasm", "default": "application/octet-stream"
     };
+
 try {
         const pathParts = rawPath.split('/').filter(p => p);
         const searchFileName = pathParts.pop().toLowerCase();
@@ -159,6 +179,7 @@ try {
         if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
 
         const ext = target.name.split('.').pop().toLowerCase();
+        
         if ((["zip", "exe"].includes(ext)) && isRoblox) return new Response("-- Vellote Error: Access Denied", { status: 403 });
 
         if (!matchedRule && !isSecretValid && !isOwner) {
@@ -174,7 +195,6 @@ try {
 
         let content;
         if (fileData.content) {
-            // Конвертируем base64 в бинарные данные для Response
             const binaryString = atob(fileData.content);
             const bytes = new Uint8Array(binaryString.length);
             for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
@@ -217,7 +237,7 @@ async function serveDocsFallback(octokit, owner, repo, file, lang) {
 
 async function sendToLogger(ip, path, domain, userAgent, status) {
     try {
-        await fetch(`https://${domain}/functions/logger`, { // Обнови путь к логгеру если нужно
+        await fetch(`https://${domain}/functions/logger`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ip, path, domain, userAgent, status })
