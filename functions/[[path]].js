@@ -121,47 +121,57 @@ export async function onRequest(context) {
 
 // --- ПРОДОЛЖЕНИЕ ПОСЛЕ MIME TYPES (V3 SS/FF EDITION) ---
 
-    try {
+try {
+        const matchedRule = false; 
         let gitHubPath = "";
         let fileName = "";
         
-        const isSiteStatic = rawPath.startsWith("v3/ss/");
-        const isFileFetch = rawPath.startsWith("v3/ff/");
+        const pathParts = rawPath.split('/').filter(p => p);
+        
+        // 1. ПОЛУЧАЕМ АКТУАЛЬНУЮ ВЕРСИЮ ИЗ GITHUB (Авто-подстановка)
+        // Читаем конфу из functions/ver/
+        const [ssRes, siteRes] = await Promise.all([
+            octokit.repos.getContent({ owner: OWNER, repo: REPO, path: "functions/ver/ss.txt", ref: "main" }),
+            octokit.repos.getContent({ owner: OWNER, repo: REPO, path: "functions/ver/site.txt", ref: "main" })
+        ]);
 
-        // 1. ОПРЕДЕЛЕНИЕ ПУТИ В REPO
-        if (isSiteStatic) {
-            // Запрос v3/ss/html/css/style.css -> ищет в site/html/css/style.css
-            const cleanPath = rawPath.replace("v3/ss/", "");
+        const currentV = atob(ssRes.data.content).trim();    // Например "v3"
+        const currentVer = atob(siteRes.data.content).trim(); // Например "2.14.8"
+
+        // 2. ОБРАБОТКА ПУТЕЙ (Авто-подстановка v3 и версии)
+        
+        if (rawPath.startsWith("ff/")) {
+            // Запрос: ff/hello.txt -> Итог: functions/2.14.8/hello.txt
+            fileName = pathParts[pathParts.length - 1].toLowerCase();
+            const subDirs = pathParts.slice(1, -1).join('/');
+            gitHubPath = `functions/${currentVer}${subDirs ? '/' + subDirs : ''}`;
+            
+        } else if (rawPath.startsWith("ss/")) {
+            // Запрос: ss/css/tailwind.css -> Итог: site/html/css/tailwind.css
+            const cleanPath = rawPath.replace("ss/", "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
-            gitHubPath = "site/" + parts.join('/');
-        } else if (isFileFetch) {
-            // Запрос v3/ff/scripts/main.luaz -> ищет в scripts/main.luaz (от корня)
-            const cleanPath = rawPath.replace("v3/ff/", "");
-            const parts = cleanPath.split('/').filter(p => p);
-            fileName = parts.pop().toLowerCase();
-            gitHubPath = parts.join('/');
-        } else {
-            // Обычный запрос (например, /favicon.png) -> ищем в site/html/
-            const parts = rawPath.split('/').filter(p => p);
-            fileName = parts.length > 0 ? parts.pop().toLowerCase() : "index.html";
             gitHubPath = "site/html/" + parts.join('/');
+            
+        } else {
+            // Все остальное (корень сайта)
+            fileName = pathParts.length > 0 ? pathParts.pop().toLowerCase() : "index.html";
+            gitHubPath = "site/html/" + pathParts.join('/');
         }
 
-        // Чистим путь от лишних слешей
+        // Чистим путь и идем искать в GitHub
         gitHubPath = gitHubPath.replace(/\/$/, "");
 
-        // 2. ЗАПРОС СПИСКА ФАЙЛОВ
         const { data: items } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch
         });
+        
+        // Ищем файл в полученном списке
+        const target = Array.isArray(items) && items.find(i => i.name.toLowerCase() === fileName);
 
-        // Ищем нужный файл (поддерживаем поиск без расширения для ff)
-        const target = Array.isArray(items) && items.find(i => {
-            const n = i.name.toLowerCase();
-            const nameWithoutExt = n.includes('.') ? n.split('.').slice(0, -1).join('.') : n;
-            return i.type === 'file' && (n === fileName || (isFileFetch && nameWithoutExt === fileName));
-        });
+        if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
+
+        // ... Дальше получение контента (octokit.repos.getContent для target.path)
 
         // Если файл не найден - отдаем главную (если это не прямой запрос к v3)
         if (!target) {
