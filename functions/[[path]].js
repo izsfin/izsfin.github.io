@@ -223,7 +223,7 @@ async function serveFallback(octokit, owner, repo, file, lang) {
     try {
         const { data: fb } = await octokit.repos.getContent({ owner, repo, path: `site/html/${file}`, ref: "main" });
         const html = atob(fb.content).replace(/{{LANG}}/g, lang);
-        return new Response(html, { status: 200, headers: { "Content-Type": "text/html" } });
+        return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=UTF-8" } });
     } catch { return new Response("Not Found", { status: 404 }); }
 }
 
@@ -231,7 +231,7 @@ async function serveDocsFallback(octokit, owner, repo, file, lang) {
     try {
         const { data: fb } = await octokit.repos.getContent({ owner, repo, path: `site/docs/${file}`, ref: "main" });
         const html = atob(fb.content).replace(/{{LANG}}/g, lang);
-        return new Response(html, { status: 200, headers: { "Content-Type": "text/html" } });
+        return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=UTF-8" } });
     } catch { return new Response("Not Found", { status: 404 }); }
 }
 
