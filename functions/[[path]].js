@@ -127,43 +127,43 @@ try {
         let fileName = "";
         
         const pathParts = rawPath.split('/').filter(p => p);
-        const isV3 = pathParts[0] === "v3";
+        
+        // 1. ПОЛУЧАЕМ ПРЕФИКС (v3) ИЗ ОДНОГО ФАЙЛА
+        const ssRes = await octokit.repos.getContent({ 
+            owner: OWNER, repo: REPO, path: "functions/ver/ss.txt", ref: "main" 
+        });
+        const currentV = atob(ssRes.data.content).trim(); // Получит "v3"
 
-        // 1. ЛОГИКА РОУТИНГА (ПРЯМАЯ СТАТИКА)
-        if (isV3 && pathParts[1] === "ff") {
-            // Запрос: v3/ff/raw.js -> Ищет в папке: functions/raw.js
+        // 2. РОУТИНГ НА ОСНОВЕ ПРЕФИКСА
+        if (rawPath.startsWith(`${currentV}/ff/`)) {
+            // Запрос: v3/ff/raw.js -> Путь в GitHub: functions/raw.js
             fileName = pathParts[pathParts.length - 1].toLowerCase();
             const subDirs = pathParts.slice(2, -1).join('/');
             gitHubPath = `functions${subDirs ? '/' + subDirs : ''}`;
-
-        } else if (isV3 && pathParts[1] === "ss") {
-            // Запрос: v3/ss/css/tailwind.css -> Ищет в папке: site/html/css/tailwind.css
-            const cleanPath = rawPath.replace("v3/ss/", "");
+            
+        } else if (rawPath.startsWith(`${currentV}/ss/`)) {
+            // Запрос: v3/ss/css/tailwind.css -> Путь в GitHub: site/html/css/tailwind.css
+            const cleanPath = rawPath.replace(`${currentV}/ss/`, "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
             gitHubPath = "site/html/" + parts.join('/');
-
+            
         } else {
-            // Обычный вход на сайт (главная)
+            // Главная страница (fallback)
             fileName = pathParts.length > 0 ? pathParts.pop().toLowerCase() : "index.html";
             gitHubPath = "site/html/" + pathParts.join('/');
         }
 
         gitHubPath = gitHubPath.replace(/\/$/, "");
 
-        // 2. ПОЛУЧАЕМ СПИСОК ФАЙЛОВ ИЗ GITHUB
+        // 3. ПОИСК И ВЫДАЧА ФАЙЛА
         const { data: items } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch
         });
 
         const target = Array.isArray(items) && items.find(i => i.name.toLowerCase() === fileName);
+        if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
 
-        if (!target) {
-            // Если файла нет, пробуем отдать index.html (fallback)
-            return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
-        }
-
-        // 3. ПОЛУЧАЕМ КОНТЕНТ ФАЙЛА
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
@@ -192,8 +192,7 @@ try {
         });
 
     } catch (e) {
-        // Выводим только реальную ошибку, без всяких "Version system failure"
-        return new Response(`Vellote Debug: ${e.message}`, { status: 500 });
+        return new Response(`Vellote Error: ${e.message}`, { status: 500 });
     }
 }
 
