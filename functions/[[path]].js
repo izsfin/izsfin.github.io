@@ -1,4 +1,4 @@
-import { Octokit } from "https://esm.sh/@octokit/rest";
+import { Octokit } from "@octokit/rest";
 
 export async function onRequest(context) {
     const { request, env } = context;
