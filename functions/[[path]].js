@@ -157,18 +157,34 @@ try {
                    name === `${search}.html`;
         });
 
-        if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile || "main.html", selectedLang);
+        
+// 1. ЕСЛИ ФАЙЛА НЕТ -> Просто отдаем заглушку
+        if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
 
-        // 2. ОПРЕДЕЛЯЕМ MIME-ТИП ПО РЕАЛЬНОМУ ФАЙЛУ (чтобы не было ошибок 404 в браузере)
+        // 2. ПРОВЕРКА ДОСТУПА
+        if (!isRoblox && ip !== MY_IP && request.headers.get('vellote-access') !== 'true') {
+            // Логгер (без await)
+            fetch("https://твой-домен.com/api/logger", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip, path: url.pathname, domain: host, userAgent })
+            }).catch(() => {});
+
+            return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
+        }
+
+        // 3. ОПРЕДЕЛЯЕМ MIME-ТИП (берём из target, который мы нашли выше)
         const realFileName = target.name.toLowerCase();
         const realExt = realFileName.split('.').pop();
         const mime = mimeTypes[realExt] || mimeTypes["default"];
         const isTextual = ["text/", "application/javascript", "application/json"].some(t => mime.startsWith(t));
 
-        // 3. Запрашиваем файл по его РЕАЛЬНОМУ пути (с правильным регистром и расширением)
+        // 4. ЕДИНСТВЕННЫЙ ЗАПРОС КОДА (только если прошли проверку доступа)
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
+
+        // ... дальше твой блок с let body и return Response
 
         let body;
         if (fileData.content) {
