@@ -6,10 +6,12 @@
     <title> Vellote | Main </title>
     <link rel="icon" type="image/png" href="/favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="/css/tailwind.css" rel="stylesheet">
+
     <style>
         :root {
-            --primary: #ff0073; /* Твой новый розовый акцент */
+            --primary: #ff0073;
         }
 
         body {
@@ -20,11 +22,10 @@
         }
 
         /* Фоновые слои */
-        .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
+        .bg-base { position: fixed; inset: 0; background-image: url("/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
 
         .bg-grid {
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background-image:
                 linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
@@ -35,23 +36,12 @@
         }
 
         .blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.08;
-            will-change: transform;
-            animation: floatBlob 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08;
+            will-change: transform; animation: floatBlob 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
             z-index: -3;
         }
-        .blob-1 {
-            top: -10%; left: -10%; width: 50vw; height: 50vw;
-            background: radial-gradient(circle, var(--primary), transparent 70%);
-        }
-        .blob-2 {
-            bottom: -10%; right: -10%; width: 60vw; height: 60vw;
-            background: radial-gradient(circle, var(--primary), transparent 70%);
-            animation-delay: -5s;
-        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--primary), transparent 70%); }
+        .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--primary), transparent 70%); animation-delay: -5s; }
 
         @keyframes floatBlob {
             0% { transform: translate(0, 0) scale(1); }
@@ -60,18 +50,12 @@
 
         .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
         
-        /* Контент */
         .content { max-width: 650px; margin-left: 10%; z-index: 2; }
-        h1 { color: white; font-size: 52px; font-weight: 800; letter-spacing: 2px; margin-bottom: 25px; }
-        .text-container { line-height: 1.7; font-size: 15px; margin-bottom: 20px; color: rgba(255,255,255,0.7); }
-        .signature { margin-top: 40px; font-size: 15px; color: white; }
-        .footer-copy { margin-top: 10px; font-size: 11px; opacity: 0.3; text-transform: uppercase; letter-spacing: 1px; }
-
+        
         /* Навигация */
         .bottom-nav {
             position: fixed; bottom: 25px; left: 25px;
-            background: rgba(15, 10, 13, 0.434);
-            backdrop-filter: blur(20px);
+            background: rgba(15, 10, 13, 0.4); backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px; padding: 10px 20px;
             display: flex; gap: 25px; z-index: 10; align-items: center;
@@ -81,10 +65,8 @@
         .nav-link.active-page { color: rgba(255, 145, 207, 0.8); }
         .nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
 
-        /* Lang */
-        .lang-box { display: flex; gap: 10px; }
         .lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); }
-        .lang-btn.active { color: var(--primary); } /* Исправлено с синего на розовый */
+        .lang-btn.active { color: var(--primary); }
 
         .bottom-credit {
             position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
@@ -105,10 +87,10 @@
     <div id="glow" class="bg-glow"></div>
 
     <div class="content">
-        <h1>Vellote</h1>
-        <div id="text-container" class="text-container"></div>
-        <div id="signature-container" class="signature"></div>
-        <div class="footer-copy">0xSquad © 2026</div>
+        <h1 class="text-white text-5xl font-extrabold tracking-wider mb-6">Vellote</h1>
+        <div id="text-container" class="leading-relaxed text-sm mb-5 text-white/70"></div>
+        <div id="signature-container" class="mt-10 text-sm text-white"></div>
+        <div class="mt-2 text-[11px] opacity-30 uppercase tracking-widest">OverㄨSoft © 2026</div>
     </div>
 
     <div class="bottom-nav">
@@ -119,7 +101,7 @@
         <span onclick="window.location.href='/status'" class="nav-link">Status</span>
         <span onclick="window.open('https://discord.gg/TRPZg4Xfkq','_blank')" class="nav-link">Discord</span>
         <div class="nav-divider"></div>
-        <div class="lang-box">
+        <div class="flex gap-2.5">
             <span onclick="setLang('RU')" id="lang-RU" class="lang-btn">RU</span>
             <span onclick="setLang('EN')" id="lang-EN" class="lang-btn">EN</span>
         </div>
@@ -128,6 +110,7 @@
     <div class="bottom-credit" id="bottomCredit"></div>
 
     <script>
+        // Движение свечения за мышью
         window.addEventListener('mousemove', (e) => {
             document.body.style.setProperty('--x', e.clientX + 'px');
             document.body.style.setProperty('--y', e.clientY + 'px');
@@ -139,16 +122,16 @@
             window.location.href = url.href;
         }
 
-        const currentLang = "{{LANG}}".trim();
+        const currentLang = "{{LANG}}".trim() || "RU";
         const translations = {
             RU: {
-                text: `<p><strong>Привет пользователь!</strong> Это файловый хостинг для проектов от 0xSquad. Мы поддерживаем и патчим скрипты каждый день нашей командой ! </p><p>Vellote настроен очень удобно настроен + понятен для поиска и использования наших проектов !</p>`,
-                sign: `Искренне,<br><strong>Команда 0xSquad.</strong>`,
+                text: `<p><strong>Привет пользователь!</strong> Это файловый хостинг для проектов от <strong>OverㄨSoft</strong>. Мы поддерживаем и патчим скрипты каждый день нашей командой!</p><p>Vellote настроен максимально удобно для поиска и использования наших проектов.</p>`,
+                sign: `Искренне,<br><strong>Команда OverㄨSoft.</strong>`,
                 credit: `Написано ellyMS`
             },
             EN: {
-                text: `<p><strong>Hii user !</strong> This is file hosting for 0xSquad projects. Our team maintains and patches scripts daily ! </p><p>Vellote is very user-friendly and easy to use, making it easy to find and use our projects ! </p>`,
-                sign: `Sincerely,<br><strong>0xSquad.</strong>`,
+                text: `<p><strong>Hii user!</strong> This is file hosting for <strong>OverㄨSoft</strong> projects. Our team maintains and patches scripts daily!</p><p>Vellote is designed to be user-friendly, making it easy to find and use our projects.</p>`,
+                sign: `Sincerely,<br><strong>OverㄨSoft.</strong>`,
                 credit: `Written by ellyMS`
             }
         };
@@ -158,7 +141,7 @@
         document.getElementById('signature-container').innerHTML = data.sign;
         document.getElementById('bottomCredit').textContent = data.credit;
 
-        const btn = document.getElementById('lang-' + (currentLang || 'RU'));
+        const btn = document.getElementById('lang-' + currentLang);
         if (btn) btn.classList.add('active');
     </script>
 </body>
