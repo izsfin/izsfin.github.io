@@ -83,19 +83,30 @@ try {
         const currentV = atob(ssRes.data.content).trim(); 
 
         // --- УЛУЧШЕННЫЙ РОУТИНГ ---
+// 2. РОУТИНГ V3 (SS, SC, FF)
         if (rawPath.startsWith(`${currentV}/ff/`)) {
+            // v3/ff/script.lua -> functions/script.lua
             const cleanPath = rawPath.replace(`${currentV}/ff/`, "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
             gitHubPath = "functions" + (parts.length > 0 ? "/" + parts.join('/') : "");
             
         } else if (rawPath.startsWith(`${currentV}/ss/`)) {
+            // v3/ss/css/style.css -> site/html/css/style.css
             const cleanPath = rawPath.replace(`${currentV}/ss/`, "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
             gitHubPath = "site/html" + (parts.length > 0 ? "/" + parts.join('/') : "");
             
+        } else if (rawPath.startsWith(`${currentV}/sc/`)) {
+            // v3/sc/Millitary/ClassicCamo/preview.png -> site/catalog/Millitary/ClassicCamo/preview.png
+            const cleanPath = rawPath.replace(`${currentV}/sc/`, "");
+            const parts = cleanPath.split('/').filter(p => p);
+            fileName = parts.pop().toLowerCase();
+            gitHubPath = "site/catalog" + (parts.length > 0 ? "/" + parts.join('/') : "");
+            
         } else {
+            // ... остальной код для обычных роутов (bio, obfuscator и т.д.)
             const routes = {
                 "bio/phxmale": "bio/main.html", "obfuscator": "obfuscator.html",
                 "getkey": "getkey.html", "status": "status.html", "catalog": "catalog.html",
