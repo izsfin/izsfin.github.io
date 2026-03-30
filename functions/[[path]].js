@@ -72,34 +72,30 @@ export async function onRequest(context) {
         "wasm": "application/wasm", "default": "application/octet-stream"
 };
 
-    // --- ПРОДОЛЖЕНИЕ ПОСЛЕ MIME TYPES (V3 SS/FF EDITION) ---
-    try {
+try {
         let gitHubPath = "";
         let fileName = "";
         const pathParts = rawPath.split('/').filter(p => p);
         
-        // 1. ПОЛУЧАЕМ ПРЕФИКС (v3) ИЗ ss.txt
         const ssRes = await octokit.repos.getContent({ 
             owner: OWNER, repo: REPO, path: "functions/ver/ss.txt", ref: "main" 
         });
         const currentV = atob(ssRes.data.content).trim(); 
 
-        // 2. РОУТИНГ V3
+        // --- УЛУЧШЕННЫЙ РОУТИНГ ---
         if (rawPath.startsWith(`${currentV}/ff/`)) {
-            // v3/ff/raw.js -> functions/raw.js
-            fileName = pathParts[pathParts.length - 1].toLowerCase();
-            const subDirs = pathParts.slice(2, -1).join('/');
-            gitHubPath = `functions${subDirs ? '/' + subDirs : ''}`;
+            const cleanPath = rawPath.replace(`${currentV}/ff/`, "");
+            const parts = cleanPath.split('/').filter(p => p);
+            fileName = parts.pop().toLowerCase();
+            gitHubPath = "functions" + (parts.length > 0 ? "/" + parts.join('/') : "");
             
         } else if (rawPath.startsWith(`${currentV}/ss/`)) {
-            // v3/ss/css/tailwind.css -> site/html/css/tailwind.css
             const cleanPath = rawPath.replace(`${currentV}/ss/`, "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
-            gitHubPath = "site/html/" + parts.join('/');
+            gitHubPath = "site/html" + (parts.length > 0 ? "/" + parts.join('/') : "");
             
         } else {
-            // ОБЫЧНЫЕ ПУТИ И ИСКЛЮЧЕНИЯ
             const routes = {
                 "bio/phxmale": "bio/main.html", "obfuscator": "obfuscator.html",
                 "getkey": "getkey.html", "status": "status.html", "catalog": "catalog.html",
@@ -108,17 +104,14 @@ export async function onRequest(context) {
 
             if (routes[rawPath]) return serveFallback(octokit, OWNER, REPO, routes[rawPath], selectedLang);
             if (rawPath.startsWith("catalog/")) return serveFallback(octokit, OWNER, REPO, "catalog-item.html", selectedLang);
-            
             if (!rawPath || rawPath === "index") return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
 
-            // Если не роут, значит ищем файл в site/html/
-            fileName = pathParts.length > 0 ? pathParts.pop().toLowerCase() : "index.html";
-            gitHubPath = "site/html/" + pathParts.slice(0, -1).join('/');
+            fileName = pathParts.pop().toLowerCase();
+            gitHubPath = "site/html" + (pathParts.length > 0 ? "/" + pathParts.join('/') : "");
         }
 
         gitHubPath = gitHubPath.replace(/\/$/, "");
 
-        // 3. ПОИСК И ВЫДАЧА
         const { data: items } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch
         });
@@ -130,26 +123,34 @@ export async function onRequest(context) {
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
 
+        // --- КОРРЕКТНОЕ ДЕКОДИРОВАНИЕ UTF-8 (Кириллица) ---
         let body;
+        const ext = fileName.split('.').pop().toLowerCase();
+        const mime = mimeTypes[ext] || mimeTypes["default"];
+        const isTextual = ["text/", "application/javascript", "application/json"].some(t => mime.startsWith(t));
+
         if (fileData.content) {
-            const binary = atob(fileData.content);
-            const bytes = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-            body = bytes;
+            const binaryString = atob(fileData.content);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+            
+            if (isTextual) {
+                body = new TextDecoder("utf-8").decode(bytes);
+            } else {
+                body = bytes;
+            }
         } else {
             const res = await fetch(fileData.download_url);
             body = await res.arrayBuffer();
         }
 
-        const ext = fileName.split('.').pop().toLowerCase();
-        const mime = mimeTypes[ext] || mimeTypes["default"];
-        
         return new Response(body, {
             status: 200,
             headers: {
-                "Content-Type": mime + (mime.startsWith("text/") ? "; charset=UTF-8" : ""),
+                "Content-Type": mime + (isTextual ? "; charset=UTF-8" : ""),
                 "Access-Control-Allow-Origin": "*",
-                "Cache-Control": "public, max-age=3600"
+                "Cache-Control": "public, max-age=3600",
+                "X-Content-Type-Options": "nosniff"
             }
         });
 
@@ -158,12 +159,10 @@ export async function onRequest(context) {
     }
 }
 
-// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
-
 async function serveFallback(octokit, owner, repo, path, lang) {
     try {
         const { data: fb } = await octokit.repos.getContent({ owner, repo, path: `site/html/${path}`, ref: "main" });
-        const html = atob(fb.content).replace(/{{LANG}}/g, lang);
+        const html = new TextDecoder("utf-8").decode(Uint8Array.from(atob(fb.content), c => c.charCodeAt(0))).replace(/{{LANG}}/g, lang);
         return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=UTF-8" } });
     } catch {
         return new Response("Not Found", { status: 404 });
@@ -173,19 +172,9 @@ async function serveFallback(octokit, owner, repo, path, lang) {
 async function serveDocsFallback(octokit, owner, repo, path, lang) {
     try {
         const { data: fb } = await octokit.repos.getContent({ owner, repo, path: `site/docs/${path}`, ref: "main" });
-        const html = atob(fb.content).replace(/{{LANG}}/g, lang);
+        const html = new TextDecoder("utf-8").decode(Uint8Array.from(atob(fb.content), c => c.charCodeAt(0))).replace(/{{LANG}}/g, lang);
         return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=UTF-8" } });
     } catch {
         return new Response("Docs Not Found", { status: 404 });
     }
-}
-
-async function sendToLogger(ip, path, domain, userAgent, status) {
-    try {
-        await fetch(`https://${domain}/logger`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ip, path, domain, userAgent, status })
-        });
-    } catch (e) {}
 }
