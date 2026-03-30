@@ -122,82 +122,45 @@ export async function onRequest(context) {
 // --- ПРОДОЛЖЕНИЕ ПОСЛЕ MIME TYPES (V3 SS/FF EDITION) ---
 
 try {
-        const matchedRule = false; 
+        const matchedRule = false; // Заглушка, чтобы не было ошибки undefined
         let gitHubPath = "";
         let fileName = "";
         
         const pathParts = rawPath.split('/').filter(p => p);
-        
-        // 1. ПОЛУЧАЕМ АКТУАЛЬНУЮ ВЕРСИЮ ИЗ GITHUB (Авто-подстановка)
-        // Читаем конфу из functions/ver/
-        const [ssRes, siteRes] = await Promise.all([
-            octokit.repos.getContent({ owner: OWNER, repo: REPO, path: "functions/ver/ss.txt", ref: "main" }),
-            octokit.repos.getContent({ owner: OWNER, repo: REPO, path: "functions/ver/site.txt", ref: "main" })
-        ]);
+        const isV3 = pathParts[0] === "v3";
 
-        const currentV = atob(ssRes.data.content).trim();    // Например "v3"
-        const currentVer = atob(siteRes.data.content).trim(); // Например "2.14.8"
-
-        // 2. ОБРАБОТКА ПУТЕЙ (Авто-подстановка v3 и версии)
-        
-        if (rawPath.startsWith("ff/")) {
-            // Запрос: ff/hello.txt -> Итог: functions/2.14.8/hello.txt
+        if (isV3 && pathParts[1] === "ff") {
+            // ЗАПРОС: v3/ff/raw.js -> ПУТЬ: functions/raw.js
             fileName = pathParts[pathParts.length - 1].toLowerCase();
-            const subDirs = pathParts.slice(1, -1).join('/');
-            gitHubPath = `functions/${currentVer}${subDirs ? '/' + subDirs : ''}`;
-            
-        } else if (rawPath.startsWith("ss/")) {
-            // Запрос: ss/css/tailwind.css -> Итог: site/html/css/tailwind.css
-            const cleanPath = rawPath.replace("ss/", "");
+            const subDirs = pathParts.slice(2, -1).join('/');
+            gitHubPath = `functions${subDirs ? '/' + subDirs : ''}`;
+
+        } else if (isV3 && pathParts[1] === "ss") {
+            // ЗАПРОС: v3/ss/css/tailwind.css -> ПУТЬ: site/html/css/tailwind.css
+            const cleanPath = rawPath.replace("v3/ss/", "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
             gitHubPath = "site/html/" + parts.join('/');
-            
+
         } else {
-            // Все остальное (корень сайта)
+            // ВСЁ ОСТАЛЬНОЕ (Главная страница)
             fileName = pathParts.length > 0 ? pathParts.pop().toLowerCase() : "index.html";
             gitHubPath = "site/html/" + pathParts.join('/');
         }
 
-        // Чистим путь и идем искать в GitHub
+        // Чистим путь от слэшей
         gitHubPath = gitHubPath.replace(/\/$/, "");
 
+        // Получаем список файлов из GitHub
         const { data: items } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch
         });
-        
-        // Ищем файл в полученном списке
+
         const target = Array.isArray(items) && items.find(i => i.name.toLowerCase() === fileName);
 
         if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
 
-        // ... Дальше получение контента (octokit.repos.getContent для target.path)
-
-        // Если файл не найден - отдаем главную (если это не прямой запрос к v3)
-        if (!target) {
-            if (isSiteStatic || isFileFetch) return new Response("File Not Found", { status: 404 });
-            return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
-        }
-
-        const ext = target.name.split('.').pop().toLowerCase();
-        
-        // 3. ПРОВЕРКИ БЕЗОПАСНОСТИ
-        if (ext === "exe" && isRoblox) {
-            return new Response("-- Vellote Error: Access Denied", { status: 403 });
-        }
-
-        // Правила доступа (Секрет, Владелец или Правило)
-        if (!matchedRule && !isSecretValid && !isOwner && isFileFetch) {
-            await sendToLogger(ip, rawPath, host, userAgent, "🛡️ Access Blocked");
-            return new Response(isRoblox ? "-- Vellote Error: Forbidden" : "Forbidden", { status: 403 });
-        }
-
-        // Логируем
-        if (!isOwner && !isRoblox) {
-            await sendToLogger(ip, target.name, host, userAgent, "✅ Loaded");
-        }
-
-        // 4. ПОЛУЧЕНИЕ КОНТЕНТА
+        // Получаем контент файла
         const { data: fileData } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: target.path, ref: codeBranch
         });
@@ -213,35 +176,19 @@ try {
             body = await res.arrayBuffer();
         }
 
-        const mime = mimeTypes[ext] || mimeTypes["default"];
+        const mime = mimeTypes[fileName.split('.').pop().toLowerCase()] || mimeTypes["default"];
         
         return new Response(body, {
             status: 200,
-            headers: { 
-                "Content-Type": mime + (mime.startsWith("text/") ? "; charset=UTF-8" : ""), 
+            headers: {
+                "Content-Type": mime + (mime.startsWith("text/") ? "; charset=UTF-8" : ""),
                 "Access-Control-Allow-Origin": "*",
-                "Cache-Control": isSiteStatic ? "public, max-age=31536000, immutable" : "no-cache",
-                "Content-Disposition": (["zip", "exe"].includes(ext)) ? `attachment; filename="${target.name}"` : 'inline'
+                "Cache-Control": "public, max-age=3600"
             }
         });
 
     } catch (e) {
-        return new Response(isRoblox ? "-- Vellote Error: " + e.message : `Internal Error: ${e.message}`, { status: 500 });
-    }
-}
-
-// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
-
-async function serveFallback(octokit, owner, repo, file, lang) {
-    try {
-        const { data: fb } = await octokit.repos.getContent({ owner, repo, path: `site/html/${file}`, ref: "main" });
-        const html = atob(fb.content).replace(/{{LANG}}/g, lang);
-        return new Response(html, { 
-            status: 200, 
-            headers: { "Content-Type": "text/html; charset=UTF-8" } 
-        });
-    } catch { 
-        return new Response("Vellote: Root Index Not Found", { status: 404 }); 
+        return new Response(`Vellote Error: ${e.message}`, { status: 500 });
     }
 }
 
