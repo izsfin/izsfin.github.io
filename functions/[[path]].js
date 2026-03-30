@@ -1,4 +1,4 @@
-import { Octokit } from "@octokit/rest";
+import { Octokit } from "https://esm.sh/@octokit/rest";
 
 export async function onRequest(context) {
     const { request, env } = context;
@@ -241,6 +241,6 @@ async function sendToLogger(ip, path, domain, userAgent, status) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ip, path, domain, userAgent, status })
-        }); 
+        });
     } catch (e) {}
 }
