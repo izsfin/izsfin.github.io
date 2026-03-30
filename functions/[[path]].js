@@ -42,7 +42,7 @@ export async function onRequest(context) {
     else if (host.includes("vellote-api")) { codeBranch = "api"; }
     else if (host.includes("vellote-raw")) { codeBranch = "raw"; }
     else if (host.includes("vellote-cdn")) { codeBranch = "cdn"; }
-    else if (host.includes("vellote"))     { codeBranch = "off"; }
+    else if (host.includes("aqusu"))     { codeBranch = "off"; }
 
     // --- ИСКЛЮЧЕНИЯ ПО ПУТИ ---
     if (rawPath === 'bio/phxmale')      return serveFallback(octokit, OWNER, REPO, 'bio/main.html', selectedLang);
