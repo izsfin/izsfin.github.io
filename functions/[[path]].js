@@ -241,6 +241,6 @@ async function sendToLogger(ip, path, domain, userAgent, status) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ip, path, domain, userAgent, status })
-        });
+        }); 
     } catch (e) {}
 }
