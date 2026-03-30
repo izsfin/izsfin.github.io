@@ -25,14 +25,31 @@ export async function onRequest(context) {
     }
 
     // --- ОПРЕДЕЛЕНИЕ ВЕТКИ И РОУТИНГ ---
+// --- ОПРЕДЕЛЕНИЕ ВЕТКИ И РОУТИНГ ---
     let codeBranch = "main";
-    let fallbackFile = "main.html";
+    let isBranchOverride = false; // Флаг, что мы ищем в спец. ветке от корня
 
-    if (rawPath.startsWith(".cdn/")) { codeBranch = "cdn"; rawPath = rawPath.replace(".cdn/", ""); }
-    else if (rawPath.startsWith(".api/")) { codeBranch = "api"; rawPath = rawPath.replace(".api/", ""); }
-    else if (rawPath.startsWith(".testing/")) { codeBranch = "test"; fallbackFile = "test.html"; rawPath = rawPath.replace(".testing/", ""); }
-    else if (rawPath.startsWith(".raw/")) { codeBranch = "raw"; rawPath = rawPath.replace(".raw/", ""); }
-
+    if (rawPath.startsWith(".cdn/")) { 
+        codeBranch = "cdn"; 
+        rawPath = rawPath.replace(".cdn/", ""); 
+        isBranchOverride = true; 
+    }
+    else if (rawPath.startsWith(".api/")) { 
+        codeBranch = "api"; 
+        rawPath = rawPath.replace(".api/", ""); 
+        isBranchOverride = true; 
+    }
+    else if (rawPath.startsWith(".testing/")) { 
+        codeBranch = "test"; 
+        rawPath = rawPath.replace(".testing/", ""); 
+        isBranchOverride = true; 
+    }
+    else if (rawPath.startsWith(".raw/")) { 
+        codeBranch = "raw"; 
+        rawPath = rawPath.replace(".raw/", ""); 
+        isBranchOverride = true; 
+    }
+    
     // --- DOCS ЛОГИКА ---
     if (host.includes("vellote-docs") || rawPath.startsWith(".docs/")) {
         if (rawPath.startsWith(".docs/")) rawPath = rawPath.replace(".docs/", "");
@@ -77,52 +94,53 @@ try {
         let fileName = "";
         const pathParts = rawPath.split('/').filter(p => p);
         
+        // Получаем версию для V3 (ss/sc/ff)
         const ssRes = await octokit.repos.getContent({ 
             owner: OWNER, repo: REPO, path: "functions/ver/ss.txt", ref: "main" 
         });
         const currentV = atob(ssRes.data.content).trim(); 
 
-        // --- УЛУЧШЕННЫЙ РОУТИНГ ---
-// 2. РОУТИНГ V3 (SS, SC, FF)
-        if (rawPath.startsWith(`${currentV}/ff/`)) {
-            // v3/ff/script.lua -> functions/script.lua
+        // --- ЖЕЛЕЗНЫЙ РОУТИНГ ПО ВЕТКАМ ---
+        
+        if (isBranchOverride) {
+            // Если зашли через .api, .cdn и т.д. — ищем в корне соответствующей ветки
+            fileName = pathParts.pop().toLowerCase();
+            gitHubPath = pathParts.join('/'); // Ищем в корне или подпапках ветки
+            
+        } else if (rawPath.startsWith(`${currentV}/ff/`)) {
             const cleanPath = rawPath.replace(`${currentV}/ff/`, "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
             gitHubPath = "functions" + (parts.length > 0 ? "/" + parts.join('/') : "");
             
         } else if (rawPath.startsWith(`${currentV}/ss/`)) {
-            // v3/ss/css/style.css -> site/html/css/style.css
             const cleanPath = rawPath.replace(`${currentV}/ss/`, "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
             gitHubPath = "site/html" + (parts.length > 0 ? "/" + parts.join('/') : "");
             
         } else if (rawPath.startsWith(`${currentV}/sc/`)) {
-            // v3/sc/Millitary/ClassicCamo/preview.png -> site/catalog/Millitary/ClassicCamo/preview.png
             const cleanPath = rawPath.replace(`${currentV}/sc/`, "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
             gitHubPath = "site/catalog" + (parts.length > 0 ? "/" + parts.join('/') : "");
             
         } else {
-            // ... остальной код для обычных роутов (bio, obfuscator и т.д.)
+            // Стандартные роуты для MAIN ветки
             const routes = {
                 "bio/phxmale": "bio/main.html", "obfuscator": "obfuscator.html",
                 "getkey": "getkey.html", "status": "status.html", "catalog": "catalog.html",
                 "auth": "authSS.html", "auth/cmd": "authCS.html"
             };
-
             if (routes[rawPath]) return serveFallback(octokit, OWNER, REPO, routes[rawPath], selectedLang);
-            if (rawPath.startsWith("catalog/")) return serveFallback(octokit, OWNER, REPO, "catalog-item.html", selectedLang);
-            if (!rawPath || rawPath === "index") return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
-
-            fileName = pathParts.pop().toLowerCase();
+            
+            fileName = pathParts.pop()?.toLowerCase() || "index.html";
             gitHubPath = "site/html" + (pathParts.length > 0 ? "/" + pathParts.join('/') : "");
         }
 
+        // Чистим путь и делаем запрос к нужной ветке (codeBranch)
         gitHubPath = gitHubPath.replace(/\/$/, "");
-
+        
         const { data: items } = await octokit.repos.getContent({
             owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch
         });
