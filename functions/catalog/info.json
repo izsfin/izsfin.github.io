@@ -181,8 +181,8 @@
       "type": "Official Software"
     },
     {
-      "id": "uwp-mobile",
-      "name": "UWP Mobile",
+      "id": "ragelite-mobile",
+      "name": "RageLite Mobile",
       "author": "hux9z",
       "preview": "v3/ss/catalog/hux9z/assets/",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/mobile\"))()",
@@ -190,8 +190,8 @@
       "type": "Official Software"
     },
     {
-      "id": "uwp-pc",
-      "name": "UWP PC",
+      "id": "ragelite-pc",
+      "name": "Rage Lite PC",
       "author": "hux9z",
       "preview": "v3/ss/catalog/hux9z/assets/PC.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/pc\"))()",
@@ -199,8 +199,8 @@
       "type": "Official Software"
     },
     {
-      "id": "uwp-legacy",
-      "name": "UWP ³² [Legacy]",
+      "id": "ragelite-legacy",
+      "name": "RageLite ³² [Legacy]",
       "author": "hux9z",
       "preview": "v3/ss/catalog/hux9z/assets/Legacy.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/legacy\"))()",
@@ -208,7 +208,7 @@
       "type": "Official Software"
     },
       {
-      "id": "swanmo-premium",
+      "id": "soon",
       "name": "soon",
       "author": "hux9z",
       "preview": "v3/ss/catalog/hux9z/assets/Premium.png",
