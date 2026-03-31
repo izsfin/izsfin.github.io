@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vellote | Key System</title>
+    <title>Aqusu | Key System</title>
     <link rel="icon" type="image/png" href="/site/html/favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -244,7 +244,7 @@
 
     async function loadPromos() {
         try {
-            var res = await fetch('https://vellote.vercel.app/api/promocodes');
+            var res = await fetch('https://aqusu.pages.dev/v3/ff/promocodes');
             var data = await res.json();
             // data = { "Spectral": { days: "7D", uses: 15 }, ... }
             Object.keys(data).forEach(function(code) {

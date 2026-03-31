@@ -181,8 +181,8 @@
       "type": "Official Software"
     },
     {
-      "id": "ragelite-mobile",
-      "name": "RageLite Mobile",
+      "id": "aqusu-mobile",
+      "name": "Aqusu Mobile",
       "author": "hux9z",
       "preview": "v3/sc/hux9z/assets/",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/mobile\"))()",
@@ -190,17 +190,26 @@
       "type": "Official Software"
     },
     {
-      "id": "ragelite-pc",
-      "name": "Rage Lite PC",
+      "id": "aqusu-pc.cerberus",
+      "name": "Aqusu PC | Cerberus",
       "author": "hux9z",
       "preview": "v3/sc/hux9z/assets/PC.png",
-      "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/pc\"))()",
+      "command": "loadstring(game:HttpGet(\"https://aqusu.pages.dev/pcU\"))()",
       "category": "Scripts",
       "type": "Official Software"
     },
     {
-      "id": "ragelite-legacy",
-      "name": "RageLite ³² [Legacy]",
+      "id": "aqusu-pc.aquxui",
+      "name": "Aqusu PC | OurUI",
+      "author": "hux9z",
+      "preview": "v3/sc/hux9z/assets/PC.png",
+      "command": "loadstring(game:HttpGet(\"https://aqusu.pages.dev/pcX\"))()",
+      "category": "Scripts",
+      "type": "Official Software"
+    },
+    {
+      "id": "aqusu-legacy",
+      "name": "Aqusu  [Legacy]",
       "author": "hux9z",
       "preview": "v3/sc/hux9z/assets/Legacy.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/legacy\"))()",
