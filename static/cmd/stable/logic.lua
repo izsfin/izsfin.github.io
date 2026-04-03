@@ -240,7 +240,7 @@ end
 -- ============================================================
 function Logic.BuildCMD(getVersion, catalog, discord, projectName)
     local version = getVersion and getVersion() or "unknown"
-    local name    = projectName or "js"
+    local name    = projectName 
     local lines   = {}
 
     table.insert(lines, "--[[")
