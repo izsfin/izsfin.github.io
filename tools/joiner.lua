@@ -1,35 +1,11 @@
---[[ JID x PID Joiner || v1.1.0 || by electrox0 ]]
---[[ Сервисы для скрипта ]] 
-local TeleportService = game:GetService("TeleportService"); local LogService = game:GetService("LogService"); local setclipboard = setclipboard or print
+--[[ JID x PID Joiner || v1.2.0 || by electrox0 ]]
 
-local function process(mode, PID, JID)
- local p = PID or game.PlaceId
-  local j = JID or game.JobId
-  local result = ""
-  if PID and JID then result = p .. " | " .. j
-  elseif PID then result = tostring(p)
-  elseif JID then result = tostring(j); end
-  if mode == "P" then print("Value : " .. result)
-  elseif mode == "G" then setclipboard(result) print("Value copied to clipboard"); end end
-
+local TeleportService = game:GetService("TeleportService"); local Players = game:GetService("Players"); local setclipboard = setclipboard or print
+local function process(mode, result); if mode == "P" then  print("Value : " .. result); elseif mode == "G" then  setclipboard(result)  print("Value copied to clipboard: " .. result); end  end
 local args = {...}
-
-for _, input in pairs(args) do
-  local str = tostring(input)
-  local mode = str:sub(1, 2):upper()
-  local cleanStr = str:sub(3)
-
-  if mode == "P=" or mode == "G=" then
-   local m = mode:sub(1, 1) -- 'P' или 'G'
-   local PID = cleanStr:match("(%d+)")
-   local JID = cleanStr:match("([%w%-]{20,})")    
-   process(m, PID, JID)
-
---[[ Одиночные команды ]]
-  elseif str == "JID" then process("P", nil, game.JobId) setclipboard(game.JobId)
-  elseif str == "PID" then process("P", game.PlaceId, nil) setclipboard(tostring(game.PlaceId))
- else print("Value : " .. str) end
-end
+for _, input in pairs(args) do; local str = tostring(input); local upperStr = str:upper(); if upperStr:sub(1, 2) == "P=" or upperStr:sub(1, 2) == "G=" then;  local mode = upperStr:sub(1, 1);  local content = str:sub(3);  local result = content:gsub("JID", game.JobId):gsub("PID", tostring(game.PlaceId));  process(mode, result) elseif upperStr == "JID" then  process("P", game.JobId) setclipboard(game.JobId) elseif upperStr == "PID" then  process("P", tostring(game.PlaceId)) setclipboard(tostring(game.PlaceId))
+ else local pId = str:match("placeId=(%d+)") or str:match("^%d+$") local jId = str:match("gameInstanceId=([%w%-]+)") or str:match("[%w%-]{20,}") if pId or jId then;  local targetP = tonumber(pId) or game.PlaceId;  print("Value : Attempting teleport to " .. targetP);  if jId then;  TeleportService:TeleportToPlaceInstance(targetP, jId, Players.LocalPlayer);  else;  TeleportService:Teleport(targetP, Players.LocalPlayer);  end
+ else print("Value : " .. str) end end end
 
 --[[ Old Joiner || v1.0.1 || by electrox0 ]]
 --[[
