@@ -225,10 +225,6 @@ end
 function SSl:Init()
     self:GetOrCreateSelf()
     self:FlushQueue() -- отправить неотправленное с прошлой сессии
-
-    game:BindToClose(function()
-        self:FlushQueue()
-    end)
 end
 
 return SSl
