@@ -97,9 +97,11 @@ end
 local function buildChat(container, contact)
     local frame = Instance.new("Frame")
     frame.Name              = "Chat"
-    frame.Size              = UDim2.new(1, 0, 1, 0)
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.Position = UDim2.new(0, 0, 0, 0)
     frame.BackgroundColor3  = SP.Colors.Background
     frame.BorderSizePixel   = 0
+    frame.BackgroundTransparency = 0.8
     frame.Parent            = container
 
     local BackgroundCorner = Instance.new("UICorner")
