@@ -72,7 +72,12 @@ local UI          = load("UI",          PP_BASE_URL .. "UI")
 getgenv().PP.UI   = UI
 
 -- Инициализация
-if SSl  then SSl:Init()  end
-if UI   then UI:Init()   end
+-- Запуск
+if SSl then SSl:Init() end
 
+if UI then
+    UI:Init()
+    -- Сразу показать телефон при первом запуске
+    UI:Toggle()
+end
 print("[PP] Loaded successfully | v" .. PP_VERSION)
