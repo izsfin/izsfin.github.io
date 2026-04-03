@@ -1,1 +1,1 @@
-return "hux9z/software", "https://aqusu.vercel.app/~/static/cmd/stable/"
+return "hux9z/software", "https://aqusu.pages.dev/~/static/cmd/stable/"
