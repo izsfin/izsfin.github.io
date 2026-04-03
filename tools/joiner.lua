@@ -1,23 +1,21 @@
-local TeleportService = game:GetService("TeleportService")
-local Players = game:GetService("Players")
-local input = ... -- Получаем наше "value"
+--[[ Arg Joiner || by electrox0]]
+--[[ Services ]]    local TeleportService = game:GetService("TeleportService") local Players = game:GetService("Players")
+--[[ In () in end]] local args = {...}
+local targetPlaceId = nil
+local targetJobId = nil
 
-if not input then return end
+--[[ Logic]]
+for _, val in pairs(args) do
+ local s = tostring(val)
+ local pIdUrl = s:match("placeId=(%d+)")
+ local jIdUrl = s:match("gameInstanceId=([%w%-]+)")
+    
+ if pIdUrl then targetPlaceId = tonumber(pIdUrl) end
+ if jIdUrl then targetJobId = jIdUrl end
+ 
+ if tonumber(s) and not targetPlaceId then targetPlaceId = tonumber(s)
+ elseif s:find("-") and #s > 20 then targetJobId = s; end end
 
--- 1. Если передали полную ссылку roblox://...
-local pIdFromUrl = input:match("placeId=(%d+)")
-local jIdFromUrl = input:match("gameInstanceId=([%w%-]+)")
-
-if pIdFromUrl and jIdFromUrl then
-    TeleportService:TeleportToPlaceInstance(tonumber(pIdFromUrl), jIdFromUrl, Players.LocalPlayer)
-
--- 2. Если передали JobID (выглядит как 4a68fd58...)
-elseif #input > 20 and input:find("-") then
-    -- ВАЖНО: Чтобы зайти по JobID, нужно знать PlaceID. 
-    -- Если ты передал ТОЛЬКО JobID, скрипт попробует текущий PlaceId
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, input, Players.LocalPlayer)
-
--- 3. Если передали только PlaceID (число)
-elseif tonumber(input) then
-    TeleportService:Teleport(tonumber(input), Players.LocalPlayer)
-end
+--[[ Logic | Place + Job ID Join ]]   if targetPlaceId and targetJobId then TeleportService:TeleportToPlaceInstance(targetPlaceId, targetJobId, Players.LocalPlayer)
+--[[ Logic | PlaceID join        ]]   elseif targetPlaceId then TeleportService:Teleport(targetPlaceId, Players.LocalPlayer)
+--[[ Logic | JobId Join          ]]   elseif targetJobId then TeleportService:TeleportToPlaceInstance(game.PlaceId, targetJobId, Players.LocalPlayer) end
