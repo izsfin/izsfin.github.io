@@ -1,0 +1,1 @@
+return "hux9z/software", "https://aqusu.vercel.app/~/static/cmd/"

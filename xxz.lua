@@ -361,13 +361,13 @@ local Library = {
 }
 
 
-local UA, Base = loadstring(http.request({ Url = "https://vellote.vercel.app/static/cmd/llua", Headers = { ["User-Agent"] = "hux9z/software" } }).Body)()
+local UA, Base = loadstring(http.request({ Url = "https://aqusu.vercel.app/~/static/cmd/llua", Headers = { ["User-Agent"] = "hux9z/software" } }).Body)()
 
-local meta = loadstring(http.request({ Url = Base .. "static/cmd/meta", Headers = { ["User-Agent"] = UA } }).Body)(); if not meta then warn("XMS || meta not answer, please try later!"); return end
+local meta = loadstring(http.request({ Url = Base .. "meta", Headers = { ["User-Agent"] = UA } }).Body)(); if not meta then warn("xCMD || Metanot answer, please try later!"); return end
 
 print(meta.project_name .. " | Loading | " .. meta.project_vers  .. "  " .. meta.project_svers)
 
-local Logic = loadstring(http.request({ Url = Base .. "static/cmd/logic", Headers = { ["User-Agent"] = UA } }).Body)();  if not Logic then  if meta.logic_down then meta:logic_down() end; return  end
+local Logic = loadstring(http.request({ Url = Base .. "logic", Headers = { ["User-Agent"] = UA } }).Body)();  if not Logic then  if meta.logic_down then meta:logic_down() end; return  end
 
 Logic.Start(Library, meta, ModuleSystem, UA, Base)
 print(meta.project_name .. " | Loaded | " .. meta.project_vers .. "  " .. meta.project_svers)

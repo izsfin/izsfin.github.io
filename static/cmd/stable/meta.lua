@@ -6,11 +6,11 @@ local meta = {
     -- ========================================================
     -- META INFO
     -- ========================================================
-    project_name    = "JS",
-    project_devs    = "hux9z",
-    project_vers    = "v2.14.0",
-    project_svers   = "³²",
-    project_catalog = "https://nekoq.vercel.app/catalog",
+    project_name    = "xCMD",
+    project_devs    = "xELLO LLC",
+    project_vers    = "v2.14.2",
+    project_svers   = "Stable",
+    project_catalog = "https://aqusu.pages.dev/catalog",
     project_discord = ".gg/TRPZg4Xfkq",
     down = function(self)
         warn(self.project_name .. " | No one of static servers responded, " .. canswer)

@@ -1,1 +1,0 @@
-return "hux9z/software", "https://vellote.vercel.app/"
