@@ -102,6 +102,9 @@ local function buildChat(container, contact)
     frame.BorderSizePixel   = 0
     frame.Parent            = container
 
+    local BackgroundCorner = Instance.new("UICorner")
+    BackgroundCorner.CornerRadius = Udim2.new(0, 40)
+    BackgroundCorner.Parent       = frame
     -- Шапка
     local header = Instance.new("Frame")
     header.Size             = UDim2.new(1, 0, 0, 44)
