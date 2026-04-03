@@ -164,6 +164,11 @@ AppContainer.BorderSizePixel = 0
 AppContainer.ZIndex         = 15
 AppContainer.Visible        = false
 AppContainer.Parent         = Phone
+AppContainer.ClipsDescendants = true
+
+local AppCorner = Instance.new("UICorner")
+AppCorner.CornerRadius = UDim.new(0, 12)
+AppCorner.Parent = AppContainer
 
 -- Home bar
 local HomeBar = Instance.new("TextButton")

@@ -82,8 +82,8 @@ StaticPhone.Icons = {
 
 -- Приложения (порядок на рабочем столе)
 StaticPhone.Apps = {
-    { id = "Call",     icon = "Call",     label = "Phone"    },
     { id = "Messages", icon = "Messages", label = "Messages" },
+    { id = "Contacts", icon = "Contacts", label = "Contacts" },
     { id = "Store",    icon = "Store",    label = "Store"    },
     { id = "Settings", icon = "Settings", label = "Settings" },
 }
