@@ -52,6 +52,10 @@ Background.ScaleType        = Enum.ScaleType.Crop
 Background.ZIndex           = 1
 Background.Parent           = Phone
 
+local BackgroundCorner = Instance.new("UICorner")
+BackgroundCorner.CornerRadius = SP.Layout.CornerRadius
+BackgroundCorner.Parent       = Background
+
 -- Статус бар
 local StatusBar = Instance.new("Frame")
 StatusBar.Name              = "StatusBar"
