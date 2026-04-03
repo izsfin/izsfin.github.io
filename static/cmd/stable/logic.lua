@@ -11,7 +11,7 @@ local _ActiveAnims    = {}
 local _ActiveRespawns = {}
 local _CurrentMode    = "once"
 local _LoadedModules  = {}
-local _ConfigPath     = "hux9z/JS/x32/xSave/"
+local _ConfigPath     = "xELO LLC/xCMD/Configs"
 local _RecordApply    = nil
 
 function Logic.Init(ctx)
@@ -386,7 +386,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         CurrentMode    = DAMode,
         LoadedModules  = LoadedModules,
         ConfigPath     = "hux9z/JS/x³²/xSave/",
-        RecordApply    = getgenv().js32_RecordApply or nil,
+        RecordApply    = getgenv().xCMD_RecordApply or nil,
     })
 
     if ModuleSystem and ModuleSystem.Init then
@@ -491,7 +491,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     end)
 
     -- Expose
-    getgenv().js = function(...) return MainHandler(...) end
+    getgenv().xC = function(...) return MainHandler(...) end
     setmetatable(_G, { __call = function(_, ...) return MainHandler(...) end })
 end
 
