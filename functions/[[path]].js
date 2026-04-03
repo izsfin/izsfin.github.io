@@ -12,7 +12,7 @@ export async function onRequest(context) {
     const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "0.0.0.0";
 
     const OWNER = "phxmale";
-    const REPO = "wexly";
+    const REPO = "aqusu.x";
     const MY_IP = "77.52.212.190";
     
     // Объявляем здесь, чтобы переменная была доступна везде в onRequest
@@ -124,22 +124,27 @@ try {
             fileName = parts.pop().toLowerCase();
             gitHubPath = "site/catalog" + (parts.length > 0 ? "/" + parts.join('/') : "");
             
-        } else {
-            // Стандартные роуты для MAIN ветки
-           const routes = {
-                "bio/phxmale": "bio/main.html", "obfuscator": "obfuscator.html",
-                "getkey": "getkey.html", "status": "status.html", "catalog": "catalog.html"
-            };
+} else {
+    // Стандартные роуты для MAIN ветки
+    const routes = {
+        "bio/phxmale": "bio/main.html", "obfuscator": "obfuscator.html",
+        "getkey": "getkey.html", "status": "status.html", "catalog": "catalog.html"
+    };
 
-            if (routes[rawPath]) {
-                return serveFallback(octokit, OWNER, REPO, routes[rawPath], selectedLang);
-            }
-
-            // ЕСЛИ ЭТО ПРОСТО ПУТЬ (типа /JSx32 или /myscript) -> ИДЕМ В ВЕТКУ OFF
-            codeBranch = "off"; 
-            fileName = pathParts.pop()?.toLowerCase() || "index.html";
-            gitHubPath = "."; // Ищем в корне ветки OFF
-        }
+    if (routes[rawPath]) {
+        return serveFallback(octokit, OWNER, REPO, routes[rawPath], selectedLang);
+    } else if (rawPath.startsWith("~/")) {
+        codeBranch = "off";
+        const cleanPath = rawPath.replace("~/", "");
+        const parts = cleanPath.split('/').filter(p => p);
+        fileName = parts.pop()?.toLowerCase() || "index.html";
+        gitHubPath = parts.length > 0 ? parts.join("/") : ".";
+    } else {
+        codeBranch = "off";
+        fileName = pathParts.pop()?.toLowerCase() || "index.html";
+        gitHubPath = ".";
+    }
+}
 
         // Чистим путь и делаем запрос к нужной ветке (codeBranch)
         gitHubPath = gitHubPath.replace(/\/$/, "");
@@ -241,7 +246,7 @@ try {
         if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
 
         // 2. ПРОВЕРКА ДОСТУПА
-        if (!isRoblox && ip !== MY_IP && request.headers.get('vellote-access') !== 'true') {
+        if (!rawPath.startsWith("~/") && !isRoblox && ip !== MY_IP && request.headers.get('vellote-access') !== 'true') {
             // Логгер (без await)
             fetch("https://aqusu.pages.dev/v3/ff/logger", {
                 method: 'POST',
