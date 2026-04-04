@@ -17,8 +17,8 @@ ScreenGui.Parent = game:GetService("CoreGui")
 
 -- // Маленькое окно 300x150 по центру
 local Window = Instance.new("Frame")
-Window.Size = UDim2.new(0, 300, 0, 150)
-Window.Position = UDim2.new(0.5, -150, 0.5, -75)
+Window.Size = UDim2.new(0, 600, 0, 300)
+Window.Position = UDim2.new(0.5, -300, 0.5, -150)
 Window.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 Window.BorderSizePixel = 0
 Window.Parent = ScreenGui
@@ -42,7 +42,7 @@ AuthorLabel.Position = UDim2.new(0, 0, 0, 54)
 AuthorLabel.BackgroundTransparency = 1
 AuthorLabel.Text = "by abuse.electro"
 AuthorLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-AuthorLabel.TextSize = 11
+AuthorLabel.TextSize = 22
 AuthorLabel.Font = Enum.Font.Gotham
 AuthorLabel.TextXAlignment = Enum.TextXAlignment.Center
 AuthorLabel.Parent = Window
@@ -92,7 +92,7 @@ for i, stepName in ipairs(Steps) do
     name.BackgroundTransparency = 1
     name.Text = stepName
     name.TextColor3 = Color3.fromRGB(30, 30, 30)
-    name.TextSize = 8
+    name.TextSize = 16
     name.Font = Enum.Font.Gotham
     name.TextXAlignment = Enum.TextXAlignment.Left
     name.Parent = row
@@ -103,7 +103,7 @@ for i, stepName in ipairs(Steps) do
     check.BackgroundTransparency = 1
     check.Text = "○"
     check.TextColor3 = Color3.fromRGB(80, 80, 80)
-    check.TextSize = 8
+    check.16
     check.Font = Enum.Font.GothamBold
     check.Parent = row
 
@@ -117,7 +117,7 @@ StatusLabel.Position = UDim2.new(0, 4, 1, -16)
 StatusLabel.BackgroundTransparency = 1
 StatusLabel.Text = "Starting script..."
 StatusLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
-StatusLabel.TextSize = 10
+StatusLabel.TextSize = 20
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
 StatusLabel.Parent = Window
