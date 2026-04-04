@@ -796,4 +796,8 @@ return function()
         end
     end)
 
-    -- // Ст
+    -- // Старт
+    createTab()
+
+    return { createTab = createTab, addLog = addLog }
+end
