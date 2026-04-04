@@ -28,7 +28,7 @@ local Loader = loadstring(game:HttpGet("https://aqusu.pages.dev/~/tools/DebugCon
 Loader.setStatus("Loading Executor...")
 Loader.setStep(1, "loading")
 local ok, Table = pcall(function()
-    return loadstring(game:HttpGet("https://aqusu.pages.dev/~/tools/DebugConsole/table"))(UID, sUID, nil, BUID)
+    return loadstring(game:HttpGet("https://aqusu.pages.dev/~/tools/DebugConsole/Table"))(UID, sUID, nil, BUID)
 end)
 
 if not ok or not Table then

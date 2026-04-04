@@ -22,6 +22,6 @@ return function(UID, sUID, URL, BUID)
             Yomka  = "Failed to Debug. YOMKA in BlackURL and cannot be debugged.",
         },
     }
-    print(type(Table))
+    print("returning table", type(Table))
     return Table
 end
