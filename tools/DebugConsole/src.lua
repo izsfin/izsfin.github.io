@@ -1,67 +1,48 @@
--- // DebugConsole.lua
 return function()
-
     local Players      = game:GetService("Players")
     local LocalPlayer  = Players.LocalPlayer
     local CoreGui      = game:GetService("CoreGui")
-
     local AccessType   = getgenv().DC_AccessType or "Default"
     local CheckURL     = getgenv().DC_CheckURL
     local AntiDC       = getgenv()["antiDC" .. "v1" .. "FS"]
     local Colors       = getgenv().DC_Colors
     local Icons        = getgenv().DC_Icons
-
-    -- // Скрываем стандартную консоль
     local DevConsole = CoreGui:FindFirstChild("DevConsoleMaster")
     if DevConsole then
         DevConsole.Enabled = false
     end
-
-    -- // Состояние
     local Tabs = {}
     local ActiveTab = nil
-
-    -- // Создаём ScreenGui
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "DebugConsole_DC"
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.Parent = CoreGui
-
-    -- // Главное окно
     local Window = Instance.new("Frame")
     Window.Name = "Window"
-    Window.Size = UDim2.new(0, 710, 0, 430)
-    Window.Position = UDim2.new(0.5, -355, 0.5, -215)
+    Window.Size = UDim2.new(0, 702, 0, 500)
+    Window.Position = UDim2.new(0.5, -351, 0.5, -250)
     Window.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     Window.BorderSizePixel = 0
     Window.Parent = ScreenGui
-
     local WindowCorner = Instance.new("UICorner")
     WindowCorner.CornerRadius = UDim.new(0, 6)
     WindowCorner.Parent = Window
-
-    -- // Топбар
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Size = UDim2.new(1, 0, 0, 32)
     TopBar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
     TopBar.BorderSizePixel = 0
     TopBar.Parent = Window
-
     local TopCorner = Instance.new("UICorner")
     TopCorner.CornerRadius = UDim.new(0, 6)
     TopCorner.Parent = TopBar
-
-    -- Фикс нижних углов топбара
     local TopFix = Instance.new("Frame")
     TopFix.Size = UDim2.new(1, 0, 0, 6)
     TopFix.Position = UDim2.new(0, 0, 1, -6)
     TopFix.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
     TopFix.BorderSizePixel = 0
     TopFix.Parent = TopBar
-
-    -- // Кнопка добавить таб
     local AddTabBtn = Instance.new("TextButton")
     AddTabBtn.Name = "AddTab"
     AddTabBtn.Size = UDim2.new(0, 24, 0, 24)
@@ -73,40 +54,32 @@ return function()
     AddTabBtn.BorderSizePixel = 0
     AddTabBtn.Font = Enum.Font.GothamBold
     AddTabBtn.Parent = TopBar
-
     local AddCorner = Instance.new("UICorner")
     AddCorner.CornerRadius = UDim.new(0, 4)
     AddCorner.Parent = AddTabBtn
-
-    -- // Контейнер табов
     local TabContainer = Instance.new("Frame")
     TabContainer.Name = "TabContainer"
     TabContainer.Size = UDim2.new(1, -200, 1, 0)
     TabContainer.Position = UDim2.new(0, 32, 0, 0)
     TabContainer.BackgroundTransparency = 1
     TabContainer.Parent = TopBar
-
     local TabLayout = Instance.new("UIListLayout")
     TabLayout.FillDirection = Enum.FillDirection.Horizontal
     TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
     TabLayout.Padding = UDim.new(0, 4)
     TabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
     TabLayout.Parent = TabContainer
-
-    -- // Кнопки справа (Console / Minimize / Close)
     local RightButtons = Instance.new("Frame")
     RightButtons.Size = UDim2.new(0, 190, 1, 0)
     RightButtons.Position = UDim2.new(1, -194, 0, 0)
     RightButtons.BackgroundTransparency = 1
     RightButtons.Parent = TopBar
-
     local RightLayout = Instance.new("UIListLayout")
     RightLayout.FillDirection = Enum.FillDirection.Horizontal
     RightLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
     RightLayout.VerticalAlignment = Enum.VerticalAlignment.Center
     RightLayout.Padding = UDim.new(0, 4)
     RightLayout.Parent = RightButtons
-
     local function makeTopBtn(text, bgColor)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(0, text == "Console" and 70 or 28, 0, 24)
@@ -523,6 +496,14 @@ return function()
 
     -- // Стартуем с одним табом
     createTab()
+
+    local UIS = game:GetService("UserInputService")
+    UIS.InputBegan:Connect(function(input, gameProcessed)
+        if input.KeyCode == Enum.KeyCode.F9 then
+            ScreenGui.Enabled = not ScreenGui.Enabled
+        end
+    end)
+
 
     return {
         createTab = createTab,
