@@ -575,7 +575,6 @@ return function()
     end
 
     -- // ПКМ по пустому месту TabFrame
-    TabFrame.MouseButton2Click = nil
     TabFrame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton2 then
             local mouse = LocalPlayer:GetMouse()
