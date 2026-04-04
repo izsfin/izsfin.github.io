@@ -1,27 +1,22 @@
--- // Table.lua (на сервере, возвращается через loadstring)
-return function(UID, sUID, URL, BUID)
+-- // Table.lua
+local Table = {
+    Meta = {
+        version   = "1.0.0",
+        verAUID   = "URL_DC_BETA",
+        verStable = "URL_DC_STABLE",
+    },
 
-    local Table = {
-        Meta = {
-            version   = "1.0.0",
-            verAUID   = "URL_DC_BETA",   -- URL бета версии для Allowed/Special
-            verStable = "URL_DC_STABLE", -- URL стабильной версии
-        },
+    AllowedUID = {},
+    SpecialUID = {},
+    BannedUID  = {},
 
-        AllowedUID = {},
+    DisallowedURL = {
+        Yomka = "https://yomka.example.com",
+    },
 
-        SpecialUID = {},
+    DisallowedURL_ST = {
+        Yomka = "Failed to Debug. YOMKA in BlackURL and cannot be debugged.",
+    },
+}
 
-        BannedUID = {},
-
-        DisallowedURL = {
-            Yomka  = "https://yomka.example.com",
-        },
-
-        DisallowedURL_ST = {
-            Yomka  = "Failed to Debug. YOMKA in BlackURL and cannot be debugged.",
-        },
-    }
-    print("returning table", type(Table))
-    return Table
-end
+return Table
