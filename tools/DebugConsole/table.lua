@@ -8,26 +8,18 @@ return function(UID, sUID, URL, BUID)
             verStable = "URL_DC_STABLE", -- URL стабильной версии
         },
 
-        AllowedUID = {
-            -- "12345678",
-        },
+        AllowedUID = {},
 
-        SpecialUID = {
-            -- "12345678",
-        },
+        SpecialUID = {},
 
-        BannedUID = {
-            -- "12345678",
-        },
+        BannedUID = {},
 
         DisallowedURL = {
             Yomka  = "https://yomka.example.com",
-            -- Alias = "https://example.com/file",
         },
 
         DisallowedURL_ST = {
             Yomka  = "Failed to Debug. YOMKA in BlackURL and cannot be debugged.",
-            -- Alias = "Custom message here",
         },
     }
     return Table
