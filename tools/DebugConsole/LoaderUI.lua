@@ -103,7 +103,7 @@ for i, stepName in ipairs(Steps) do
     check.BackgroundTransparency = 1
     check.Text = "○"
     check.TextColor3 = Color3.fromRGB(80, 80, 80)
-    check.16
+    check.TextSize = 16
     check.Font = Enum.Font.GothamBold
     check.Parent = row
 
