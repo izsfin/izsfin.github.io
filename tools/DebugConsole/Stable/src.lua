@@ -210,6 +210,7 @@ return function()
     TabFrame.BorderSizePixel = 0
     TabFrame.ClipsDescendants = true
     TabFrame.Parent = Window
+    TabFrame.AutomaticSize = Enum.AutomaticSize.None
 
     local TFCorner = Instance.new("UICorner")
     TFCorner.Parent = TabFrame
@@ -617,18 +618,17 @@ return function()
     end)
 
     CM_Clear.MouseButton1Click:Connect(function()
-        if cmTarget == "console" then
-            for _, c in ipairs(ConsoleLogFrame:GetChildren()) do
-                if not c:IsA("UIListLayout") then c:Destroy() end
-            end
-        elseif type(cmTarget) == "table" then
-            local tab = cmTarget
-            for _, c in ipairs(tab.logFrame:GetChildren()) do
-                if not c:IsA("UIListLayout") then c:Destroy() end
-            end
-            tab.logs = {}
+    if cmTarget == "console" then
+        for _, c in ipairs(ConsoleLogFrame:GetChildren()) do
+            if c:IsA("Frame") then c:Destroy() end
         end
-        hideContextMenu()
+    elseif type(cmTarget) == "table" then
+        for _, c in ipairs(cmTarget.logFrame:GetChildren()) do
+            if c:IsA("Frame") then c:Destroy() end
+        end
+        cmTarget.logs = {}
+    end
+    hideContextMenu()
     end)
 
     CM_Create.MouseButton1Click:Connect(function()
