@@ -113,9 +113,8 @@ try {
         // --- ЖЕЛЕЗНЫЙ РОУТИНГ ПО ВЕТКАМ ---
         
         if (isBranchOverride) {
-            // Если путь .api/LuaZ.lua -> fileName = "luaz.lua", gitHubPath = ""
-            fileName = pathParts.pop().toLowerCase();
-            gitHubPath = pathParts.join('/') || "."; // Используем "." для корня ветки         
+            fileName = pathParts.pop()?.toLowerCase() || "index.html"; // добавь ?. и фолбек
+            gitHubPath = pathParts.join('/') || ".";
         } else if (rawPath.startsWith(`${currentV}/ff/`)) {
             const cleanPath = rawPath.replace(`${currentV}/ff/`, "");
             const parts = cleanPath.split('/').filter(p => p);
