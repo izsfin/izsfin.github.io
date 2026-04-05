@@ -28,7 +28,17 @@ export async function onRequest(context) {
     if (ua.includes("discordbot") || ua.includes("telegrambot") || ua.includes("twitterbot")) {
         return new Response("OK", { status: 200 });
     }
-
+    // Вставить после объявления переменных, перед блоком if (rawPath.startsWith(".cdn/"))
+    if (host.includes("cdn-misslua")) {
+        codeBranch = "cdn";
+        isBranchOverride = true;
+    } else if (host.includes("api-misslua")) {
+        codeBranch = "api";
+        isBranchOverride = true;
+    } else if (host.includes("raw-misslua")) {
+        codeBranch = "raw";
+        isBranchOverride = true;
+    }
     if (rawPath.startsWith(".cdn/")) { 
         codeBranch = "cdn"; 
         rawPath = rawPath.replace(".cdn/", ""); 
