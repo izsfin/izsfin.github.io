@@ -1,14 +1,14 @@
-import crypto from 'crypto';
-// Nekoq Obfuscator v5 — Lua 5.1 compatible
+const SYM_SEED = 'misslua-2025-H1';
 
-// Symbol table — та же логика что в sym.js
-const SYM_SEED = process.env.SYM_SEED || 'nekoq-2025-H1';
-function numToSym(n) {
-    const hash = crypto.createHash('sha256')
-        .update(SYM_SEED + ':' + n.toString())
-        .digest('hex');
-    return 'x' + hash.slice(0, 5).toUpperCase();
+async function numToSym(n) {
+    const enc = new TextEncoder();
+    const data = enc.encode(SYM_SEED + ':' + n.toString());
+    const hashBuf = await crypto.subtle.digest('SHA-256', data);
+    const hex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return 'x' + hex.slice(0, 5).toUpperCase();
 }
+
+
 
 function rStr(l) {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -45,16 +45,6 @@ function strToBytes(s) {
 function mNum(n) {
     const r = ri(1000, 9000);
     return `(${r + n}-${r})`;
-}
-
-// Symbol table: число → символ через API
-const SYM_CACHE = new Map();
-function fetchSym(n) {
-    if (SYM_CACHE.has(n)) return SYM_CACHE.get(n);
-    // Вычисляем напрямую через numToSym — без HTTP запроса
-    const sym = numToSym(n);
-    SYM_CACHE.set(n, sym);
-    return sym;
 }
 
 function condFalse() {
@@ -160,7 +150,7 @@ function minifyLua(code) {
         if (!trimmed) continue; // пустые строки пропускаем
 
         // Payload строки и заголовок — без изменений
-        if (/^"\\[0-9]{3}/.test(trimmed) || (trimmed.startsWith('--[[') && trimmed.includes('Nekoq'))) {
+        if (/^"\\[0-9]{3}/.test(trimmed) || (trimmed.startsWith('--[[') && trimmed.includes('misslua'))) {
             out.push(trimmed);
             continue;
         }
@@ -210,23 +200,17 @@ async function obfuscate(source) {
     const vSalt2 = rStr();
 
     // Предзагружаем символы для key, salt, 1, 256, 0
-    const symKey   = fetchSym(key)  || null;
-    const symSalt  = fetchSym(salt) || null;
-    const symKey2  = fetchSym(key2)  || null;
-    const symSalt2 = fetchSym(salt2) || null;
-
-    // Вспомогательная функция: число → sym выражение или fallback
-    const S = (n) => {
-        const cached = SYM_CACHE.get(n);
-        return cached ? `${vSym}["${cached}"]` : mNum(n);
-    };
+    const symKey   = await numToSym(key);
+    const symSalt  = await numToSym(salt);
+    const symKey2  = await numToSym(key2);
+    const symSalt2 = await numToSym(salt2);
 
     const lines = [];
 
     const vOrigLoad = rStr(); // сохраняем оригинальный load ДО любых хуков
     const vHttpGet  = rStr();
 
-    lines.push(`--[[ Nekoq v1.1.2 || https://nekoq.vercel.app ]]`);
+    lines.push(`--[[ MissLua v1.2.0 || https://misslua.pages.dev ]]`);
     lines.push(`return (function(...)`);
     // Первое что делаем — захватываем оригинальный load через debug.getinfo
     // чтобы обойти любой hook установленный ДО нашего скрипта
@@ -245,8 +229,8 @@ async function obfuscate(source) {
     lines.push(`    ${vOrigLoad} = load or loadstring`);
     lines.push(`end`);
     const vSyntax = rStr(); // препроцессор luan
-    lines.push(`local ${vSyntax} = ${vOrigLoad}(game:HttpGet("https://nekoq.vercel.app/api/syntax"))()`);
-    lines.push(`local ${vSym} = ${vOrigLoad}(game:HttpGet("https://nekoq.vercel.app/api/sym?loader=1"))()`);
+    lines.push(`local ${vSyntax} = ${vOrigLoad}(game:HttpGet("https://misslua.pages.dev/v3/ff/syntax"))()`);
+    lines.push(`local ${vSym} = ${vOrigLoad}(game:HttpGet("https://misslua.pages.dev/v3/ff/sym?loader=1"))()`);
     lines.push(``);
 
     // bxor функция
@@ -343,40 +327,43 @@ async function obfuscate(source) {
     // Применяем минификатор к финальному выводу (кроме первой строки-заголовка)
     const raw = lines.join('\n');
     const rawLines = raw.split('\n');
-    const header = rawLines[0]; // --[[ Nekoq ... ]]
+    const header = rawLines[0]; // --[[ misslua ... ]]
     const body = rawLines.slice(1).join('\n');
     return header + ' ' + minifyLua(body);
 }
 
-export const config = { api: { bodyParser: { sizeLimit: '200kb' } } };
-
-export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    if (req.method === 'OPTIONS') return res.status(200).end();
-
-    let code = '';
-    if (req.method === 'POST') {
-        // Vercel иногда не парсит — читаем вручную если нужно
-        let body = req.body;
-        if (typeof body === 'string') {
-            try { body = JSON.parse(body); } catch {}
-        }
-        code = body?.code || '';
-    } else if (req.method === 'GET') {
-        code = req.query?.code || '';
-    } else {
-        return res.status(405).json({ error: 'Method not allowed' });
+export async function onRequest(context) {
+    const { request } = context;
+    
+    // CORS
+    const corsHeaders = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+    };
+    
+    if (request.method === "OPTIONS") {
+        return new Response(null, { status: 200, headers: corsHeaders });
     }
 
-    if (!code || !code.trim()) return res.status(400).json({ error: 'No code provided' });
-    if (code.length > 100000) return res.status(400).json({ error: 'Code too large (max 100KB)' });
+    let code = '';
+    if (request.method === "POST") {
+        const body = await request.json().catch(() => ({}));
+        code = body?.code || '';
+    } else {
+        const url = new URL(request.url);
+        code = url.searchParams.get("code") || '';
+    }
+
+    if (!code.trim()) return new Response(JSON.stringify({ error: 'No code provided' }), { status: 400, headers: corsHeaders });
 
     try {
         const result = await obfuscate(code.trim());
-        return res.status(200).json({ success: true, result, size: result.length });
+        return new Response(JSON.stringify({ success: true, result, size: result.length }), {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
     } catch (e) {
-        return res.status(500).json({ error: 'Obfuscation failed: ' + e.message });
+        return new Response(JSON.stringify({ error: 'Obfuscation failed: ' + e.message }), { status: 500, headers: corsHeaders });
     }
 }
