@@ -113,9 +113,9 @@ try {
         // --- ЖЕЛЕЗНЫЙ РОУТИНГ ПО ВЕТКАМ ---
         
         if (isBranchOverride) {
-            fileName = pathParts.pop()?.toLowerCase() || "index.html"; // добавь ?. и фолбек
-            gitHubPath = pathParts.join('/') || ".";
-        } else if (rawPath.startsWith(`${currentV}/ff/`)) {
+          fileName = pathParts.pop()?.toLowerCase() || "index.html";
+          gitHubPath = pathParts.join('/') || ""; // "." -> ""
+        }else if (rawPath.startsWith(`${currentV}/ff/`)) {
             const cleanPath = rawPath.replace(`${currentV}/ff/`, "");
             const parts = cleanPath.split('/').filter(p => p);
             fileName = parts.pop().toLowerCase();
