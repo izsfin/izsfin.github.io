@@ -113,8 +113,11 @@ try {
         // --- ЖЕЛЕЗНЫЙ РОУТИНГ ПО ВЕТКАМ ---
         
         if (isBranchOverride) {
+          if (pathParts.length === 0) {
+            return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang);
+        }
           fileName = pathParts.pop()?.toLowerCase() || "index.html";
-          gitHubPath = pathParts.join('/') || ""; // "." -> ""
+          gitHubPath = pathParts.join('/') || "";
         }else if (rawPath.startsWith(`${currentV}/ff/`)) {
             const cleanPath = rawPath.replace(`${currentV}/ff/`, "");
             const parts = cleanPath.split('/').filter(p => p);
@@ -134,14 +137,33 @@ try {
             gitHubPath = "site/catalog" + (parts.length > 0 ? "/" + parts.join('/') : "");
             
 } else {
-    // Стандартные роуты для MAIN ветки
-    const routes = {
-        "bio/phxmale": "bio/main.html", "obfuscator": "obfuscator.html",
-        "getkey": "getkey.html", "status": "status.html", "catalog": "catalog.html"
+    // --- RAW PATH РОУТИНГ ---
+    const rawRoutes = {
+        "forum":               "forum/home.html",
+        "forum/auth":          "forum/auth.html",
+        "forum/create":        "forum/create.html",
+        "catalog":             "catalog.html",
+        "tools":               "tools/home.html",
+        "tools/luau/obfuscator":          "tools/luau/obfuscator.html",
+        "tools/luau/minifycator":         "tools/luau/minifycator.html",
+        "tools/custom.syntax/luaz":       "tools/cs/LuaZ_obfuscator.html",
+        "tools/custom.syntax/luam":       "tools/cs/LuaM_obfuscator.html",
+        "tools/custom.syntax/nuqau":      "tools/cs/Nuqau_obfuscator.html",
+        // legacy
+        "bio/phxmale": "bio/main.html",
+        "obfuscator":  "obfuscator.html",
+        "getkey":      "getkey.html",
+        "status":      "status.html",
     };
 
-    if (routes[rawPath]) {
-        return serveFallback(octokit, OWNER, REPO, routes[rawPath], selectedLang);
+    const normalizedPath = rawPath.toLowerCase();
+
+    if (rawRoutes[normalizedPath]) {
+        return serveFallback(octokit, OWNER, REPO, rawRoutes[normalizedPath], selectedLang);
+    } else if (normalizedPath.startsWith("forum/")) {
+        return serveFallback(octokit, OWNER, REPO, "forum/post.html", selectedLang);
+    } else if (normalizedPath.startsWith("catalog/")) {
+        return serveFallback(octokit, OWNER, REPO, "catalog-item.html", selectedLang);
     } else if (rawPath.startsWith("~/")) {
         codeBranch = "off";
         const cleanPath = rawPath.replace("~/", "");
