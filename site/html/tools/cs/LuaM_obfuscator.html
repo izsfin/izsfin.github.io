@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MissLua | LuaM Obfuscator</title>
+    <link rel="icon" type="image/png" href="/v3/ss/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #ff0073; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #141414; color: #d1d1d1; font-family: 'Poppins', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; animation: fadeIn 0.35s ease forwards; }
+
+        .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px); background-size: 50px 50px; mask-image: radial-gradient(circle at center,black 30%,transparent 80%); -webkit-mask-image: radial-gradient(circle at center,black 30%,transparent 80%); z-index: -1; }
+        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%),rgba(255,255,255,0.03) 0%,transparent 100%); z-index: -1; pointer-events: none; }
+
+        .main { flex: 1; display: flex; flex-direction: column; padding: 28px 28px 0; gap: 14px; min-height: 0; position: relative; z-index: 2; }
+        .editors-row { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; min-height: 0; }
+
+        .panel { background: rgba(20,20,20,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; transition: border-color 0.3s; }
+        .panel:focus-within { border-color: rgba(255,0,115,0.3); }
+        .panel-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.8); padding: 13px 16px 11px; border-bottom: 1px solid rgba(255,255,255,0.04); flex-shrink: 0; letter-spacing: 0.2px; display: flex; align-items: center; justify-content: space-between; }
+        .panel-badge { font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(255,0,115,0.12); border: 1px solid rgba(255,0,115,0.25); color: var(--primary); letter-spacing: 1px; text-transform: uppercase; }
+
+        textarea { flex: 1; background: transparent; border: none; outline: none; resize: none; padding: 14px 16px !important; font-family: 'Poppins', monospace; font-size: 12px; line-height: 1.75; color: rgba(255,255,255,0.7); width: 100%; }
+        textarea::placeholder { color: rgba(255,255,255,0.15); }
+        textarea::-webkit-scrollbar { width: 3px; }
+        textarea::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 2px; }
+        #outputCode { color: rgba(255,145,207,0.8); font-size: 11px; white-space: pre-wrap; word-break: break-all; }
+
+        .buttons-row { display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .btn-group { display: flex; gap: 10px; }
+
+        .btn { font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700; padding: 11px 30px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(20,20,20,0.8); backdrop-filter: blur(20px); color: white; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden; }
+        .btn::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at var(--bx,50%) var(--by,50%),rgba(255,255,255,0.07) 0%,transparent 55%); opacity: 0; transition: opacity 0.3s; }
+        .btn:hover::after { opacity: 1; }
+        .btn:hover { border-color: rgba(255,255,255,0.15); background: rgba(30,30,30,0.9); transform: translateY(-1px); }
+        .btn-obfuscate { border-color: rgba(255,0,115,0.35); }
+        .btn-obfuscate:hover { border-color: var(--primary); box-shadow: 0 0 18px rgba(255,0,115,0.12); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .toggle-group { display: flex; align-items: center; background: rgba(20,20,20,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; height: 42px; }
+        .toggle-opt { font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700; padding: 0 16px; height: 100%; display: flex; align-items: center; cursor: pointer; transition: all 0.2s; color: rgba(255,255,255,0.3); letter-spacing: 0.3px; border: none; background: transparent; }
+        .toggle-opt.active { background: rgba(255,255,255,0.06); color: var(--primary); }
+        .toggle-sep { width: 1px; height: 60%; background: rgba(255,255,255,0.07); flex-shrink: 0; }
+
+        .status-row { display: flex; align-items: center; gap: 8px; height: 24px; flex-shrink: 0; padding: 0 2px; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.15); transition: all 0.3s; }
+        .status-dot.busy { background: var(--primary); box-shadow: 0 0 7px var(--primary); animation: sdpulse 0.9s ease-in-out infinite; }
+        .status-dot.ok { background: #4ade80; box-shadow: 0 0 7px #4ade80; }
+        .status-dot.err { background: #f87171; box-shadow: 0 0 7px #f87171; }
+        @keyframes sdpulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+        .status-text { font-size: 11px; color: rgba(255,255,255,0.25); }
+        .status-text.ok { color: rgba(74,222,128,0.65); }
+        .status-text.err { color: rgba(248,113,113,0.65); }
+        .status-text.busy { color: var(--primary); }
+
+        .char-counter { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.18); letter-spacing: 0.5px; }
+
+        .bottom-nav { position: fixed; bottom: 25px; left: 25px; background: rgba(20,20,20,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center; }
+        .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
+        .nav-link:hover { color: white; }
+        .nav-link.active-page { color: rgba(255,145,207,0.8); }
+
+        .toast { position: fixed; bottom: 24px; right: 24px; background: rgba(20,20,20,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,0,115,0.35); color: rgba(255,145,207,0.9); font-size: 12px; font-weight: 600; padding: 10px 20px; border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: translateY(14px); opacity: 0; transition: all 0.22s ease; z-index: 100; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    </style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<div class="main">
+    <div class="editors-row">
+        <div class="panel">
+            <div class="panel-title">
+                Lua Source Code
+                <span class="panel-badge">Input</span>
+            </div>
+            <textarea id="inputCode" placeholder="-- paste your Lua code here..."></textarea>
+        </div>
+        <div class="panel">
+            <div class="panel-title">
+                LuaM Obfuscated
+                <span class="panel-badge">Output</span>
+            </div>
+            <textarea id="outputCode" readonly placeholder="-- obfuscated output will appear here..."></textarea>
+        </div>
+    </div>
+
+    <div class="buttons-row">
+        <div class="btn-group">
+            <button class="btn btn-obfuscate" id="runBtn" onclick="runObfuscate()">Obfuscate</button>
+
+            <!-- Limit -->
+            <div class="toggle-group">
+                <button class="toggle-opt" id="limit16k" onclick="setLimit('16k')">16k</button>
+                <div class="toggle-sep"></div>
+                <button class="toggle-opt active" id="limitInf" onclick="setLimit('inf')">∞</button>
+            </div>
+
+            <!-- Minify -->
+            <div class="toggle-group">
+                <button class="toggle-opt active" id="modeMinify" onclick="setMode('minify')">Minify</button>
+                <div class="toggle-sep"></div>
+                <button class="toggle-opt" id="modeNo" onclick="setMode('no')">No Minify</button>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="copyOutput()">Copy</button>
+            <button class="btn" onclick="downloadOutput()">Download</button>
+        </div>
+    </div>
+
+    <div class="status-row">
+        <div class="status-dot" id="sDot"></div>
+        <span class="status-text" id="sTxt">Ready</span>
+        <span style="flex:1"></span>
+        <span class="char-counter" id="inCounter">Input: 0 chars</span>
+        <span style="width:18px"></span>
+        <span class="char-counter" id="outCounter">Output: 0 chars</span>
+    </div>
+
+    <div style="height:68px;flex-shrink:0;"></div>
+</div>
+
+<div class="bottom-nav">
+    <span onclick="window.location.href='/'" class="nav-link">Home</span>
+    <span onclick="window.location.href='/tools'" class="nav-link">Tools</span>
+    <span onclick="window.location.href='/tools/custom.syntax/luam'" class="nav-link active-page">LuaM</span>
+    <span onclick="window.location.href='/status'" class="nav-link">Status</span>
+    <span onclick="window.open('https://discord.gg/TRPZg4Xfkq','_blank')" class="nav-link">Discord</span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    window.addEventListener('mousemove', e => {
+        document.body.style.setProperty('--x', e.clientX + 'px');
+        document.body.style.setProperty('--y', e.clientY + 'px');
+    });
+
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('mousemove', e => {
+            const r = btn.getBoundingClientRect();
+            btn.style.setProperty('--bx', ((e.clientX - r.left) / r.width * 100) + '%');
+            btn.style.setProperty('--by', ((e.clientY - r.top) / r.height * 100) + '%');
+        });
+    });
+
+    function setStatus(msg, type) {
+        const dot = document.getElementById('sDot');
+        const txt = document.getElementById('sTxt');
+        dot.className = 'status-dot' + (type ? ' ' + type : '');
+        txt.className = 'status-text' + (type ? ' ' + type : '');
+        txt.textContent = msg;
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    let currentLimit = 'inf';
+    let currentMode = 'minify';
+
+    function setLimit(val) {
+        currentLimit = val;
+        document.getElementById('limit16k').classList.toggle('active', val === '16k');
+        document.getElementById('limitInf').classList.toggle('active', val === 'inf');
+    }
+
+    function setMode(val) {
+        currentMode = val;
+        document.getElementById('modeMinify').classList.toggle('active', val === 'minify');
+        document.getElementById('modeNo').classList.toggle('active', val === 'no');
+    }
+
+    async function runObfuscate() {
+        const code = document.getElementById('inputCode').value.trim();
+        if (!code) { setStatus('No input code', 'err'); return; }
+
+        const btn = document.getElementById('runBtn');
+        btn.disabled = true;
+        document.getElementById('outputCode').value = '';
+        setStatus('Obfuscating...', 'busy');
+
+        try {
+            const res = await fetch('https://misslua.pages.dev/v3/ff/luam/obfuscator', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code,
+                    minify: currentMode === 'minify' ? 'yes' : 'no',
+                    infinity: currentLimit === 'inf' ? 'yes' : 'no'
+                })
+            });
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                setStatus(data.error || 'Obfuscation failed', 'err');
+                return;
+            }
+
+            let result = data.result;
+
+            if (currentLimit === '16k' && result.length > 16000) {
+                let cutAt = result.lastIndexOf('\n', 15999);
+                if (cutAt < 0) cutAt = 15999;
+                result = result.substring(0, cutAt);
+                setStatus(`Done — trimmed to 16k · ${result.length} chars`, 'ok');
+            } else {
+                const kb = (result.length / 1024).toFixed(1);
+                setStatus(`Done — ${kb} KB`, 'ok');
+            }
+
+            document.getElementById('outputCode').value = result;
+            document.getElementById('outCounter').textContent = 'Output: ' + result.length.toLocaleString() + ' chars';
+        } catch (e) {
+            setStatus('Request failed: ' + e.message, 'err');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    function copyOutput() {
+        const out = document.getElementById('outputCode').value;
+        if (!out) return;
+        navigator.clipboard.writeText(out).then(() => showToast('Copied ✓'));
+    }
+
+    function downloadOutput() {
+        const out = document.getElementById('outputCode').value;
+        if (!out) return;
+        const blob = new Blob([out], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `luam-obfuscated-${Date.now()}.lua`;
+        a.click();
+        showToast('Downloaded ✓');
+    }
+
+    document.getElementById('inputCode').addEventListener('input', function() {
+        document.getElementById('inCounter').textContent = 'Input: ' + this.value.length.toLocaleString() + ' chars';
+    });
+</script>
+</body>
+</html>
