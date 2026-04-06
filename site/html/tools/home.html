@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MissLua | Tools</title>
+    <link rel="icon" type="image/png" href="/v3/ss/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #ff0073; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #050204; color: #d1d1d1; font-family: 'Poppins', sans-serif; height: 100vh; overflow: hidden; animation: fadeIn 0.35s ease forwards; }
+
+        .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
+        .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px); background-size: 50px 50px; mask-image: radial-gradient(circle at center,black 30%,transparent 80%); -webkit-mask-image: radial-gradient(circle at center,black 30%,transparent 80%); z-index: -4; }
+        .blob { position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08; animation: floatBlob 20s infinite alternate cubic-bezier(0.4,0,0.2,1); z-index: -3; }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle,var(--primary),transparent 70%); }
+        .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle,var(--primary),transparent 70%); animation-delay: -5s; }
+        @keyframes floatBlob { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(10%,10%) scale(1.1)} }
+        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%),rgba(255,255,255,0.05) 0%,transparent 100%); z-index: -2; pointer-events: none; }
+
+        .main { position: relative; z-index: 2; padding: 36px 36px 120px; height: 100vh; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .main::-webkit-scrollbar { display: none; }
+
+        .page-header { margin-bottom: 32px; }
+        .page-title { font-size: 32px; font-weight: 800; color: white; letter-spacing: -0.5px; background: linear-gradient(to bottom, #fff, #999); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .section-block { margin-bottom: 36px; }
+        .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+        .section-title { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.25); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+        .section-line { flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
+
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+
+        .tool-card {
+            background: rgba(15,10,13,0.55);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            flex-direction: column;
+        }
+        .tool-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px -10px rgba(255,0,115,0.2);
+        }
+
+        /* 16:9 превью */
+        .tool-preview {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: rgba(255,255,255,0.02);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .tool-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .tool-card:hover .tool-preview img { transform: scale(1.05); }
+        .tool-preview-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(255,0,115,0.06), rgba(255,0,115,0.02));
+        }
+        .tool-preview-icon {
+            font-size: 28px;
+            opacity: 0.25;
+        }
+
+        .tool-info { padding: 12px 14px 14px; }
+        .tool-name { font-size: 12px; font-weight: 700; color: white; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tool-desc { font-size: 10px; color: rgba(255,255,255,0.3); margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tool-btn {
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tool-btn:hover { background: rgba(255,0,115,0.15); border-color: var(--primary); color: white; }
+
+        .state-msg { text-align: center; padding: 80px 0; font-size: 13px; color: rgba(255,255,255,0.2); font-weight: 600; }
+
+        .bottom-nav { position: fixed; bottom: 25px; left: 25px; background: rgba(15,10,13,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center; }
+        .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
+        .nav-link:hover { color: white; }
+        .nav-link.active-page { color: rgba(255,145,207,0.8); }
+
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    </style>
+</head>
+<body>
+<div class="bg-base"></div>
+<div class="bg-grid"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="bg-glow"></div>
+
+<div class="main">
+    <div class="page-header">
+        <div class="page-title">Tools</div>
+    </div>
+    <div id="toolsContent"><div class="state-msg">Loading...</div></div>
+</div>
+
+<div class="bottom-nav">
+    <span onclick="window.location.href='/'" class="nav-link">Home</span>
+    <span onclick="window.location.href='/catalog'" class="nav-link">Catalog</span>
+    <span onclick="window.location.href='/tools'" class="nav-link active-page">Tools</span>
+    <span onclick="window.location.href='/status'" class="nav-link">Status</span>
+    <span onclick="window.open('https://discord.gg/TRPZg4Xfkq','_blank')" class="nav-link">Discord</span>
+</div>
+
+<script>
+    const DB_URL = 'https://misslua.pages.dev/v3/ff/db/tools/u';
+
+    window.addEventListener('mousemove', e => {
+        document.body.style.setProperty('--x', e.clientX + 'px');
+        document.body.style.setProperty('--y', e.clientY + 'px');
+    });
+
+    async function loadTools() {
+        try {
+            const res = await fetch(DB_URL);
+            const db = await res.json();
+            render(db);
+        } catch(e) {
+            document.getElementById('toolsContent').innerHTML = '<div class="state-msg">Error: ' + e.message + '</div>';
+        }
+    }
+
+    function render(db) {
+        const sections = db.sections || [];
+        const tools = db.tools || {};
+        const content = document.getElementById('toolsContent');
+
+        if (!sections.length) { content.innerHTML = '<div class="state-msg">No tools found</div>'; return; }
+
+        let html = '';
+        sections.forEach(section => {
+            const sectionTools = (section.tools || []).map(name => tools[name]).filter(Boolean);
+            if (!sectionTools.length) return;
+
+            html += `<div class="section-block">
+                <div class="section-header">
+                    <div class="section-title">${section.name}</div>
+                    <div class="section-line"></div>
+                </div>
+                <div class="tools-grid">`;
+
+            sectionTools.forEach(tool => {
+                const preview = tool.preview
+                    ? `<img src="${tool.preview}" alt="" onerror="this.parentElement.innerHTML='<div class=tool-preview-placeholder><span class=tool-preview-icon>⚙</span></div>'">`
+                    : `<div class="tool-preview-placeholder"><span class="tool-preview-icon">⚙</span></div>`;
+
+                html += `<div class="tool-card" onclick="window.location.href='${tool.path}'">
+                    <div class="tool-preview">${preview}</div>
+                    <div class="tool-info">
+                        <div class="tool-name">${tool.name}</div>
+                        ${tool.desc ? `<div class="tool-desc">${tool.desc}</div>` : ''}
+                        <button class="tool-btn" onclick="event.stopPropagation();window.location.href='${tool.path}'">Open</button>
+                    </div>
+                </div>`;
+            });
+
+            html += `</div></div>`;
+        });
+
+        content.innerHTML = html || '<div class="state-msg">No tools found</div>';
+    }
+
+    loadTools();
+</script>
+</body>
+</html>
