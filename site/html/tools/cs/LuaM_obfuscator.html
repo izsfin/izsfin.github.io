@@ -191,7 +191,7 @@
         setStatus('Obfuscating...', 'busy');
 
         try {
-            const res = await fetch('https://misslua.pages.dev/v3/ff/luam/obfuscator', {
+            const res = await fetch('https://misslua.pages.dev/luam/obfuscator', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
