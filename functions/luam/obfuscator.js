@@ -1,101 +1,97 @@
-// MissLua | LuaM Obfuscator v1.0.0
-// MEX = MissEX — custom 3-char encoding per character, random table per script
+// MissLua | LuaM Obfuscator v2.0.0
+// Блоки: /../ = мусор, \\..\\ = код (с индексом)
+// MEX: только A-Z a-z 0-9 (безопасно для Lua [[]])
 
-const MEX_POOL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()_+{}[]|;:\'".,<>?\\';
+const MEX_POOL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-// Генерация рандомного MEX символа (3 char)
-function randMex(pool) {
-    let s = '';
-    for (let i = 0; i < 3; i++) s += pool[Math.floor(Math.random() * pool.length)];
-    return s;
-}
+function ri(min, max) { return min + Math.floor(Math.random() * (max - min + 1)); }
 
-// Генерация таблицы: каждый char (0-255) → несколько вариантов MEX (от 3 до 6)
-function genMexTable(pool) {
-    const table = {};
-    for (let i = 0; i < 256; i++) {
-        const variants = [];
-        const count = 3 + Math.floor(Math.random() * 4); // 3-6 вариантов
-        const used = new Set();
-        while (variants.length < count) {
-            const m = randMex(pool);
-            if (!used.has(m)) { used.add(m); variants.push(m); }
-        }
-        table[i] = variants;
-    }
-    return table;
-}
-
-// Кодируем строку через MEX таблицу
-function mexEncode(str, table) {
-    const parts = [];
-    for (let i = 0; i < str.length; i++) {
-        const code = str.charCodeAt(i);
-        const variants = table[code] || table[63]; // fallback '?'
-        const picked = variants[Math.floor(Math.random() * variants.length)];
-        parts.push('/' + picked + '/');
-    }
-    return parts.join('');
-}
-
-// Строим компактную таблицу для встраивания в Lua (только нужные chars)
-function buildLuaTable(str, table) {
-    const needed = new Set();
-    for (let i = 0; i < str.length; i++) needed.add(str.charCodeAt(i));
-    
-    // Обратная таблица: mex → charcode
-    const reverse = {};
-    needed.forEach(code => {
-        table[code].forEach(mex => { reverse[mex] = code; });
-    });
-    return reverse;
-}
-
-// Рандомное имя переменной
 function rVar() {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const len = 6 + Math.floor(Math.random() * 8);
     return Array.from({length: len}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
-function ri(min, max) { return min + Math.floor(Math.random() * (max - min + 1)); }
+function rName16() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let s = chars[Math.floor(Math.random() * 52)];
+    for (let i = 1; i < 16; i++) s += chars[Math.floor(Math.random() * chars.length)];
+    return s;
+}
 
-// Мусорные строки на разных языках (чтоб байтить)
-const BAIT_LANGS = [
+// Генерация MEX таблицы (char → 3 варианта из пула)
+function genMexTable() {
+    const table = {};
+    for (let i = 0; i < 256; i++) {
+        const variants = new Set();
+        while (variants.size < 3) {
+            let s = '';
+            for (let j = 0; j < 3; j++) s += MEX_POOL[Math.floor(Math.random() * MEX_POOL.length)];
+            variants.add(s);
+        }
+        table[i] = [...variants];
+    }
+    return table;
+}
+
+// Кодируем строку в MEX
+function mexEncode(str, table) {
+    const parts = [];
+    for (let i = 0; i < str.length; i++) {
+        const code = str.charCodeAt(i);
+        const variants = table[code] || table[63];
+        parts.push(variants[Math.floor(Math.random() * variants.length)]);
+    }
+    return parts.join(' ');
+}
+
+// Обратная таблица только для нужных символов
+function buildReverseTable(str, table) {
+    const needed = new Set();
+    for (let i = 0; i < str.length; i++) needed.add(str.charCodeAt(i));
+    const rev = {};
+    needed.forEach(code => {
+        table[code].forEach(mex => { rev[mex] = code; });
+    });
+    return rev;
+}
+
+// Мусорные строки на разных языках
+const BAIT = [
     'This is not the main code lol',
     'Это не основной код lol',
     'Це не основний код lol',
-    'Este no es el código principal lol',
-    'Ce n\'est pas le code principal lol',
-    'Das ist nicht der Hauptcode lol',
-    'これはメインコードではありません lol',
-    'Ini bukan kode utama lol',
-    'Bu ana kod değil lol',
-    'Це не той код що ти шукаєш',
+    'Este no es el código principal',
+    'Ce n est pas le code principal',
+    'Das ist nicht der Hauptcode',
+    'これはメインコードではありません',
+    'Bu ana kod degil lol',
     'Ты думал тут что-то важное?',
     'Nice try. Nothing here.',
-    'كود وهمي، لا شيء هنا',
-    'Faux code, rien ici',
+    'كود وهمي لا شيء هنا',
+    'Faux code rien ici',
     'Falso código aqui',
+    '이것은 메인 코드가 아닙니다',
+    'นี่ไม่ใช่รหัสหลัก',
 ];
 
-function baitText() {
-    const count = ri(1, 255);
+function baitBlock() {
+    const count = ri(1, 50);
     const parts = [];
-    for (let i = 0; i < count; i++) {
-        parts.push(BAIT_LANGS[Math.floor(Math.random() * BAIT_LANGS.length)]);
-    }
+    for (let i = 0; i < count; i++) parts.push(BAIT[Math.floor(Math.random() * BAIT.length)]);
     return parts.join(' | ');
 }
 
-// HEX в обратную сторону с / разделителем
-function reverseHex(str) {
-    const bytes = [];
-    for (let i = 0; i < str.length; i++) {
-        bytes.push(str.charCodeAt(i).toString(16).padStart(2, '0').toUpperCase());
-    }
-    bytes.reverse();
-    return bytes.map(b => '/' + b + '/').join('');
+function junkCode() {
+    const a = ri(100, 9999), b = ri(1, 99);
+    const stmts = [
+        `local _ = ${a} * ${b} - ${a}`,
+        `local _ = type(${a}) == "number" and ${b} or ${a}`,
+        `local _ = math.floor(${a} / ${b})`,
+        `local _ = math.max(${a}, ${b})`,
+        `local _ = (function() return ${a + b} end)()`,
+    ];
+    return stmts[Math.floor(Math.random() * stmts.length)];
 }
 
 // Минификатор Lua
@@ -111,124 +107,147 @@ function minifyLua(code) {
         const trimmed = line.trim();
         if (!trimmed) continue;
         if (trimmed.startsWith('--') && !trimmed.startsWith('--[[')) continue;
-        let processed = line.replace(/--\[\[.*?\]\]/g, '');
-        const mlStart = processed.indexOf('--[[');
-        if (mlStart !== -1) {
-            const mlEnd = processed.indexOf(']]', mlStart + 4);
-            if (mlEnd !== -1) { processed = processed.slice(0, mlStart) + processed.slice(mlEnd + 2); }
-            else { inML = true; processed = processed.slice(0, mlStart); }
+        let p = line.replace(/--\[\[.*?\]\]/g, '');
+        const ms = p.indexOf('--[[');
+        if (ms !== -1) {
+            const me = p.indexOf(']]', ms + 4);
+            if (me !== -1) p = p.slice(0, ms) + p.slice(me + 2);
+            else { inML = true; p = p.slice(0, ms); }
         }
-        // Убираем однострочные комментарии
-        processed = processed.replace(/--[^\[\n][^\n]*/g, '').trim();
-        if (processed) out.push(processed);
+        p = p.replace(/--[^\[\n][^\n]*/g, '').trim();
+        if (p) out.push(p);
     }
     return out.join(' ');
 }
 
 async function obfuscateLuaM(source, doMinify) {
-    const pool = MEX_POOL;
-    const mexTable = genMexTable(pool);
-
-    // Имена переменных загрузчиков (рандомные)
-    const vLoad  = rVar(); // основной обработчик
-    const vDump  = rVar(); // защита от дампа  
-    const vJunk1 = rVar(); // мусор 1
-    const vJunk2 = rVar(); // мусор 2
-    const vBait  = rVar(); // байт HEX
-
-    // Имена декодера
-    const vTbl   = rVar(); // MEX таблица
-    const vDec   = rVar(); // decode функция
-    const vS     = rVar(); // строка
-    const vR     = rVar(); // результат
-    const vI     = rVar(); // итератор
-    const vK     = rVar(); // ключ
-    const vMatch = rVar(); // match result
-    const vSub   = rVar(); // string.sub
-    const vChar  = rVar(); // string.char
+    const mexTable = genMexTable();
 
     // Кодируем основной код
     const encoded = mexEncode(source, mexTable);
+    const revTable = buildReverseTable(source, mexTable);
 
-    // Строим обратную таблицу только для нужных символов
-    const reverseTable = buildLuaTable(source, mexTable);
-
-    // Сериализуем таблицу в Lua
-    const tblEntries = Object.entries(reverseTable)
+    // Сериализуем обратную таблицу в Lua
+    const tblStr = Object.entries(revTable)
         .map(([mex, code]) => `["${mex}"]=${code}`)
         .join(',');
 
-    // Мусорный байт (bait)
-    const bait = baitText();
-    const baitHex = reverseHex(bait);
+    // Имена переменных
+    const vName    = rVar();  // _name
+    const vMex     = rVar();  // MEX таблица
+    const vDec     = rVar();  // декодер
+    const vArr     = rVar();  // массив (имя придёт с сервера через _name.u)
+    const vRun     = rVar();  // runner
+    const vOut     = rVar();  // результат
+    const vErr     = rVar();  // ошибка
+    const vLoad    = rVar();  // loadstring
+    const vS       = rVar();
+    const vR       = rVar();
+    const vI       = rVar();
+    const vK       = rVar();
+    const vM       = rVar();
+    const vParts   = rVar();  // собранные куски кода
+    const vIdx     = rVar();
 
-    // Мусорный код (junk) — тоже в MEX
-    const junkSrc = `local _ = ${ri(1000,9999)} local __ = _ * ${ri(2,99)} - ${ri(1,500)}`;
-    const junkEncoded = mexEncode(junkSrc, mexTable);
+    // Разбиваем закодированный код на 3 куска
+    const third = Math.floor(encoded.length / 3);
+    const chunk1 = encoded.slice(0, third);
+    const chunk2 = encoded.slice(third, third * 2);
+    const chunk3 = encoded.slice(third * 2);
+
+    // Рандомный порядок блоков
+    const blocks = [
+        { idx: 1, code: chunk1 },
+        { idx: 2, code: chunk2 },
+        { idx: 3, code: chunk3 },
+    ].sort(() => Math.random() - 0.5);
+
+    // Фейковые Run() — ничего не делают
+    const fakeRunNames = Array.from({length: ri(2,4)}, () => rName16());
+    const fakeRuns = fakeRunNames.map(n => `local ${n} = function() end ${n}()`).join('\n');
+
+    // Строим массив с блоками
+    let arrayContent = '\n';
+
+    // Перемешиваем блоки с мусором
+    for (const block of blocks) {
+        // Мусор до
+        for (let j = 0; j < ri(1, 3); j++) {
+            arrayContent += `/../${baitBlock()}/../\n`;
+        }
+        // Код блок с индексом
+        arrayContent += `\\\\[${block.idx}]${block.code}\\\\\n`;
+        // Мусор после
+        for (let j = 0; j < ri(1, 2); j++) {
+            arrayContent += `/../${junkCode()}/../\n`;
+        }
+    }
+    // Финальный мусор
+    for (let j = 0; j < ri(2, 4); j++) {
+        arrayContent += `/../${baitBlock()}/../\n`;
+    }
 
     const lines = [];
     lines.push(`--[[ MissLua | LuaM v1.0.1 | https://misslua.pages.dev ]]`);
     lines.push(`return (function(...)`);
     lines.push(`local _A = {...}`);
+    lines.push(`local ${vLoad} = load or loadstring`);
     lines.push(``);
 
-    // MEX таблица (встроена прямо в скрипт)
-    lines.push(`local ${vTbl}={${tblEntries}}`);
+    // Грузим key с сервера
+    lines.push(`local ${vName} = ${vLoad}(game:HttpGet("https://misslua.pages.dev/lms/key"))()`);
+    lines.push(`assert(${vName} and ${vName}.u and ${vName}.s, "Syntax Error")`);
     lines.push(``);
 
-    // Декодер (спрятан через замыкание)
-    lines.push(`local ${vSub}=string.sub`);
-    lines.push(`local ${vChar}=string.char`);
-    lines.push(`local ${vDec}=(function()`);
-    lines.push(`    return function(${vS})`);
-    lines.push(`        local ${vR}=""`);
-    lines.push(`        local ${vI}=1`);
-    lines.push(`        while ${vI}<=#${vS} do`);
-    lines.push(`            if ${vSub}(${vS},${vI},${vI})=="/" then`);
-    lines.push(`                local ${vK}=${vSub}(${vS},${vI}+1,${vI}+3)`);
-    lines.push(`                local ${vMatch}=${vTbl}[${vK}]`);
-    lines.push(`                if ${vMatch} then ${vR}=${vR}..${vChar}(${vMatch}) end`);
-    lines.push(`                ${vI}=${vI}+5`);
-    lines.push(`            else`);
-    lines.push(`                ${vI}=${vI}+1`);
-    lines.push(`            end`);
-    lines.push(`        end`);
-    lines.push(`        return ${vR}`);
+    // Запускаем защиту
+    lines.push(`${vName}.s()`);
+    lines.push(``);
+
+    // MEX таблица
+    lines.push(`local ${vMex} = {${tblStr}}`);
+    lines.push(``);
+
+    // Декодер
+    lines.push(`local ${vDec} = function(${vS})`);
+    lines.push(`    local ${vR} = ""`);
+    lines.push(`    local ${vI} = 1`);
+    lines.push(`    local _t = {}`);
+    lines.push(`    for w in (${vS} .. " "):gmatch("(%S+)%s") do _t[#_t+1] = w end`);
+    lines.push(`    for _,${vK} in ipairs(_t) do`);
+    lines.push(`        local ${vM} = ${vMex}[${vK}]`);
+    lines.push(`        if ${vM} then ${vR} = ${vR} .. string.char(${vM}) end`);
     lines.push(`    end`);
-    lines.push(`end)()`);
+    lines.push(`    return ${vR}`);
+    lines.push(`end`);
     lines.push(``);
 
-    // Загрузчики
-    lines.push(`local ${vLoad}=load or loadstring`);
-    lines.push(`local ${vDump}=load or loadstring`);
-    lines.push(`local ${vJunk1}=load or loadstring`);
-    lines.push(`local ${vJunk2}=load or loadstring`);
-    lines.push(`local ${vBait}=load or loadstring`);
+    // Фейковые Run()
+    lines.push(fakeRuns);
     lines.push(``);
 
-    // Мусор 1 — junk код в MEX
-    lines.push(`${vJunk1}(${vDec}("${junkEncoded}"))()`);
+    // Массив — имя берём из _name.u
+    lines.push(`local ${vArr}`);
+    lines.push(`do`);
+    lines.push(`    local _n = ${vName}.u`);
+    lines.push(`    ${vArr} = [[${arrayContent}]]`);
+    lines.push(`end`);
     lines.push(``);
 
-    // Байт блок — HEX в обратную сторону (люди будут пытаться расшифровать)
-    lines.push(`${vBait}(${vDec}("${mexEncode('--[[ ' + baitHex + ' ]]', mexTable)}"))`);
+    // Runner — парсит блоки \\ [idx] code \\, сортирует, декодирует, запускает
+    lines.push(`local ${vParts} = {}`);
+    lines.push(`for ${vIdx}, chunk in (${vArr}):gmatch("\\\\\\\\%[(%d+)%]([^\\\\]-)\\\\\\\\") do`);
+    lines.push(`    ${vParts}[tonumber(${vIdx})] = chunk`);
+    lines.push(`end`);
     lines.push(``);
 
-    // Мусор 2
-    const junk2Src = `local _ = type(${ri(1,999)}) == "number" and ${ri(100,9999)} or ${ri(1,99)}`;
-    lines.push(`${vJunk2}(${vDec}("${mexEncode(junk2Src, mexTable)}"))()`);
+    // Собираем куски в правильном порядке
+    lines.push(`local _full = ""`);
+    lines.push(`for _i = 1, #${vParts} do _full = _full .. (${vParts}[_i] or "") end`);
     lines.push(``);
 
-    // Основной код
-    lines.push(`local ${rVar()},${rVar()}=${vLoad}(${vDec}("${encoded}"))`);
-    lines.push(`assert(${rVar()},${rVar()})`); // намеренно другие имена чтоб путало
-    
-    // Финальный запуск — переписываем правильно
-    const vOut = rVar();
-    const vErr = rVar();
-    lines.pop(); lines.pop();
-    lines.push(`local ${vOut},${vErr}=${vLoad}(${vDec}("${encoded}"))`);
-    lines.push(`assert(${vOut},${vErr})`);
+    // Декодируем и запускаем
+    lines.push(`local ${vOut}, ${vErr} = ${vLoad}(${vDec}(_full))`);
+    lines.push(`assert(${vOut}, ${vErr} or "Syntax Error")`);
     lines.push(`return ${vOut}(table.unpack(_A))`);
     lines.push(`end)(...)`);
 
@@ -273,18 +292,18 @@ export async function onRequest(context) {
     try {
         const result = await obfuscateLuaM(code.trim(), minify !== 'no');
 
-        let finalResult = result;
+        let final = result;
         if (infinity !== 'yes' && result.length > 16000) {
-            let cutAt = result.lastIndexOf('\n', 15999);
-            if (cutAt < 0) cutAt = 15999;
-            finalResult = result.substring(0, cutAt);
+            let cut = result.lastIndexOf('\n', 15999);
+            if (cut < 0) cut = 15999;
+            final = result.substring(0, cut);
         }
 
-        return new Response(JSON.stringify({ success: true, result: finalResult, size: finalResult.length }), {
+        return new Response(JSON.stringify({ success: true, result: final, size: final.length }), {
             status: 200,
             headers: { ...corsHeaders, "Content-Type": "application/json" }
         });
-    } catch (e) {
+    } catch(e) {
         return new Response(JSON.stringify({ error: 'Obfuscation failed: ' + e.message }), { status: 500, headers: corsHeaders });
     }
 }
