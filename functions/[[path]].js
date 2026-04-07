@@ -154,7 +154,7 @@ try {
         "obfuscator":  "obfuscator.html",
         "getkey":      "getkey.html",
         "status":      "status.html",
-    };
+    }; 
 
     const normalizedPath = rawPath.toLowerCase();
 
