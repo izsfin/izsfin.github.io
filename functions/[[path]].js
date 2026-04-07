@@ -74,8 +74,7 @@ try { let gitHubPath = ""; let fileName = ""; const pathParts = rawPath.split('/
     }; 
 
     const normalizedPath = rawPath.toLowerCase(); if (rawRoutes[normalizedPath]) { return serveFallback(octokit, OWNER, REPO, rawRoutes[normalizedPath], selectedLang); } else if (normalizedPath.startsWith("forum/")) { return serveFallback(octokit, OWNER, REPO, "forum/post.html", selectedLang); } else if (normalizedPath.startsWith("catalog/")) { return serveFallback(octokit, OWNER, REPO, "catalog-item.html", selectedLang); } else if (rawPath.startsWith("~/")) {  codeBranch = "off";  const cleanPath = rawPath.replace("~/", "");  const parts = cleanPath.split('/').filter(p => p);  fileName = parts.pop()?.toLowerCase() || "index.html";  gitHubPath = parts.length > 0 ? parts.join("/") : "."; } else { codeBranch = "off";  fileName = pathParts.pop()?.toLowerCase() || "index.html"; gitHubPath = "."; } } gitHubPath = gitHubPath.replace(/\/$/, ""); const { data: items } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: gitHubPath, ref: codeBranch  }); 
-    const target = Array.isArray(items) && items.find(i => { const name = i.name.toLowerCase(); const search = fileName.toLowerCase();
-            
+    const target = Array.isArray(items) && items.find(i => { const name = i.name.toLowerCase(); const search = fileName.toLowerCase();         
      return name === search || 
        name === `${search}.png`  ||
        name === `${search}.jpg`  ||
@@ -156,18 +155,14 @@ try { let gitHubPath = ""; let fileName = ""; const pathParts = rawPath.split('/
        name === `${search}.dll`  ||
        name === `${search}.bin`  ||
        name === `${search}.apk`  ||
-       name === `${search}.wasm`;
-     });
-
-        
-   if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang); if (!rawPath.startsWith("~/") && !isRoblox && ip !== MY_IP && request.headers.get('vellote-access') !== 'true') { fetch("https://misslua.pages.dev/functions/logger.js", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip, path: url.pathname, domain: host, userAgent }) }).catch(() => {}); return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang); }
-
-        const realFileName = target.name.toLowerCase();
-        const realExt = realFileName.split('.').pop();
-        const mime = mimeTypes[realExt] || mimeTypes["default"];
-        const isTextual = ["text/", "application/javascript", "application/json"].some(t => mime.startsWith(t));
-        const { data: fileData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: target.path, ref: codeBranch });
-        let body; if (fileData.content) { const binaryString = atob(fileData.content); const bytes = new Uint8Array(binaryString.length); for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i); if (isTextual) { body = new TextDecoder("utf-8").decode(bytes); } else { body = bytes; } } else { const res = await fetch(fileData.download_url); body = await res.arrayBuffer(); } return new Response(body, { status: 200, headers: { "Content-Type": mime + (isTextual ? "; charset=UTF-8" : ""), "Access-Control-Allow-Origin": "*", "Cache-Control": "public, max-age=3600", "X-Content-Type-Options": "nosniff" } }); } catch (e) { return new Response(`Vellote Error: ${e.message}`, { status: 500 }); } }
+       name === `${search}.wasm`; });
+ if (!target) return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang); if (!rawPath.startsWith("~/") && !isRoblox && ip !== MY_IP && request.headers.get('vellote-access') !== 'true') { fetch("https://misslua.pages.dev/functions/logger.js", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip, path: url.pathname, domain: host, userAgent }) }).catch(() => {}); return serveFallback(octokit, OWNER, REPO, fallbackFile, selectedLang); }
+  const realFileName = target.name.toLowerCase();
+  const realExt = realFileName.split('.').pop();
+  const mime = mimeTypes[realExt] || mimeTypes["default"];
+  const isTextual = ["text/", "application/javascript", "application/json"].some(t => mime.startsWith(t));
+  const { data: fileData } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: target.path, ref: codeBranch });
+  let body; if (fileData.content) { const binaryString = atob(fileData.content); const bytes = new Uint8Array(binaryString.length); for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i); if (isTextual) { body = new TextDecoder("utf-8").decode(bytes); } else { body = bytes; } } else { const res = await fetch(fileData.download_url); body = await res.arrayBuffer(); } return new Response(body, { status: 200, headers: { "Content-Type": mime + (isTextual ? "; charset=UTF-8" : ""), "Access-Control-Allow-Origin": "*", "Cache-Control": "public, max-age=3600", "X-Content-Type-Options": "nosniff" } }); } catch (e) { return new Response(`Vellote Error: ${e.message}`, { status: 500 }); } }
 
 async function serveFallback(octokit, owner, repo, path, lang) { try { const { data: fb } = await octokit.repos.getContent({ owner, repo, path: `site/html/${path}`, ref: "main" }); const html = new TextDecoder("utf-8").decode(Uint8Array.from(atob(fb.content), c => c.charCodeAt(0))).replace(/{{LANG}}/g, lang); return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=UTF-8" } }); } catch { return new Response("Not Found", { status: 404 }); } }
 
