@@ -138,12 +138,12 @@ try {
             
 } else {
     const rawRoutes = {
-        "tools/UIcreator":     "tools/guic/index.html",
-        "forum":               "forum/home.html",
-        "forum/auth":          "forum/auth.html",
-        "forum/create":        "forum/create.html",
-        "catalog":             "catalog.html",
-        "tools":               "tools/home.html",
+        "forum":                          "forum/home.html",
+        "forum/auth":                     "forum/auth.html",
+        "forum/create":                   "forum/create.html",
+        "catalog":                        "catalog.html",
+        "tools":                          "tools/home.html",
+        "tools/ui/creator":               "tools/guic/index.html",
         "tools/luau/obfuscator":          "tools/luau/obfuscator.html",
         "tools/luau/minifycator":         "tools/luau/minifycator.html",
         "tools/custom.syntax/luaz":       "tools/cs/LuaZ_obfuscator.html",
