@@ -67,37 +67,52 @@ export async function onRequest(context) {
         return serveDocsFallback(octokit, OWNER, REPO, docFile, selectedLang);
     }
 
+// --- GUI CREATOR СТАТИЧЕСКИЕ ФАЙЛЫ (через /v3/ss/) ---
+if (rawPath.startsWith("v3/ss/tools/guic/")) {
+    // Получаем путь после v3/ss/tools/guic/
+    let filePath = rawPath.replace("v3/ss/tools/guic/", "");
+    
+    // Если путь пустой или заканчивается на / - отдаем index.html
+    if (!filePath || filePath === "" || filePath.endsWith("/")) {
+        filePath = "index.html";
+    }
+    
+    const ext = filePath.split('.').pop();
     const mimeTypes = {
-        "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "jpe": "image/jpeg",
-        "gif": "image/gif", "bmp": "image/bmp", "webp": "image/webp", "avif": "image/avif",
-        "apng": "image/apng", "svg": "image/svg+xml", "svgz": "image/svg+xml", "ico": "image/x-icon",
-        "tif": "image/tiff", "tiff": "image/tiff", "heic": "image/heic", "heif": "image/heif",
-        "html": "text/html", "htm": "text/html", "css": "text/css", "js": "application/javascript",
-        "mjs": "application/javascript", "ts": "application/typescript",
-        "txt": "text/plain", "log": "text/plain", "ini": "text/plain", "cfg": "text/plain",
-        "md": "text/markdown", "csv": "text/csv", "json": "application/json", "xml": "application/xml",
-        "yaml": "text/yaml", "yml": "text/yaml",
-        "lua": "text/plain", "luaz": "text/plain", "py": "text/x-python", "java": "text/x-java-source", 
-        "c": "text/x-c", "cpp": "text/x-c++", 
-        "cs": "text/plain", "go": "text/plain", "rs": "text/plain",
-        "php": "application/x-httpd-php", "rb": "text/plain", "sh": "application/x-sh",
-        "bat": "application/x-msdownload", "ps1": "text/plain",
-        "mp3": "audio/mpeg", "wav": "audio/wav", "ogg": "audio/ogg", "aac": "audio/aac",
-        "m4a": "audio/mp4", "flac": "audio/flac",
-        "mp4": "video/mp4", "webm": "video/webm", "mov": "video/quicktime", "avi": "video/x-msvideo",
-        "mkv": "video/x-matroska",
-        "ttf": "font/ttf", "otf": "font/otf", "woff": "font/woff", "woff2": "font/woff2",
-        "zip": "application/zip", "rar": "application/vnd.rar", "7z": "application/x-7z-compressed",
-        "tar": "application/x-tar", "gz": "application/gzip", "bz2": "application/x-bzip2",
-        "xz": "application/x-xz", "iso": "application/x-iso9660-image",
-        "pdf": "application/pdf", "doc": "application/msword",
-        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "xls": "application/vnd.ms-excel",
-        "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "exe": "application/octet-stream", "msi": "application/octet-stream", "dll": "application/octet-stream",
-        "bin": "application/octet-stream", "apk": "application/vnd.android.package-archive",
-        "wasm": "application/wasm", "default": "application/octet-stream"
-};
+        'css': 'text/css',
+        'js': 'application/javascript',
+        'html': 'text/html',
+        'json': 'application/json',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'svg': 'image/svg+xml',
+        'ico': 'image/x-icon'
+    };
+    const mime = mimeTypes[ext] || 'text/plain';
+    
+    try {
+        const { data: file } = await octokit.repos.getContent({
+            owner: OWNER, 
+            repo: REPO, 
+            path: `site/guic/${filePath}`, 
+            ref: "main"
+        });
+        
+        const content = atob(file.content);
+        
+        return new Response(content, {
+            status: 200,
+            headers: {
+                "Content-Type": mime + (ext === 'js' || ext === 'css' ? "; charset=UTF-8" : ""),
+                "Access-Control-Allow-Origin": "*",
+                "Cache-Control": "public, max-age=3600"
+            }
+        });
+    } catch (e) {
+        console.log(`GUIC file not found: site/guic/${filePath}`);
+        return new Response(`File not found: ${filePath}`, { status: 404 });
+    }
+}
 
 try {
         let gitHubPath = "";
@@ -138,6 +153,7 @@ try {
             
 } else {
     const rawRoutes = {
+       "tools/guic":                     "tools/guic/index.html",
         "forum":                          "forum/home.html",
         "forum/auth":                     "forum/auth.html",
         "forum/create":                   "forum/create.html",
