@@ -139,6 +139,7 @@ try {
 } else {
     // --- RAW PATH РОУТИНГ ---
     const rawRoutes = {
+        "tools/UIcreator":     "tools/guic/index.html",
         "forum":               "forum/home.html",
         "forum/auth":          "forum/auth.html",
         "forum/create":        "forum/create.html",
