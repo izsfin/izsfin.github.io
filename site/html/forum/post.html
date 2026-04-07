@@ -3,332 +3,364 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vellote Docs | Post</title>
+<title>Vellote Forum | Post</title>
 <link rel="icon" type="image/png" href="/site/html/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-    :root { 
-        --primary: #ff0073; 
-        --bg-dark: #050204;
-        --card-bg: rgba(15, 10, 13, 0.6);
-        --inner-bg: rgba(255, 255, 255, 0.03);
-    }
+:root { --primary: #ff0073; --bg: #050204; --card: rgba(12,8,11,0.85); --border: rgba(255,255,255,0.06); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans-serif; min-height: 100vh; overflow-x: hidden; animation: fadeIn 0.35s ease forwards; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+.bg-grid { position: fixed; inset: 0; z-index: -3; background-color: #050204; background-image: linear-gradient(rgba(209,209,209,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(209,209,209,0.04) 1px, transparent 1px); background-size: 40px 40px; }
+.bg-svg { position: fixed; inset: 0; z-index: -2; background-image: url("/site/html/tools/bg.svg"); background-size: cover; background-position: center; opacity: 0.55; }
+.bg-fade { position: fixed; inset: 0; z-index: -1; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(5,2,4,0) 0%, rgba(5,2,4,0.85) 100%); }
 
-    body { 
-        background-color: var(--bg-dark); 
-        color: #d1d1d1; 
-        font-family: 'Poppins', sans-serif; 
-        min-height: 100vh; 
-        overflow-x: hidden; /* Убирает горизонтальный скролл от блобов */
-        animation: fadeIn 0.35s ease forwards;
-    }
+/* ── TOPBAR ── */
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: rgba(5,2,4,0.75); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 8px; }
+.topbar-logo { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; text-decoration: none; margin-right: 24px; }
+.topbar-nav { display: flex; align-items: center; gap: 4px; flex: 2; justify-content: center; font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
+.topbar-right { flex: 1; display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
+.btn-back { font-size: 10px; font-weight: 700; padding: 7px 16px; border-radius: 8px; border: 1px solid var(--border); background: none; color: rgba(255,255,255,0.4); text-decoration: none; transition: 0.2s; letter-spacing: 1px; text-transform: uppercase; }
+.btn-back:hover { color: white; border-color: rgba(255,255,255,0.2); }
+.user-chip { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: rgba(255,145,207,0.8); text-transform: uppercase; }
 
-    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+/* ── LAYOUT ── */
+.main { padding: 68px 24px 100px; max-width: 860px; margin: 0 auto; position: relative; z-index: 2; }
 
-    /* ── ФОНОВЫЕ СЛОИ (КАК НА МЕЙНЕ) ── */
-    .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; z-index: -5; }
-    .bg-grid { 
-        position: fixed; inset: 0; 
-        background-image: linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px); 
-        background-size: 50px 50px; 
-        mask-image: radial-gradient(circle at center,black 30%,transparent 80%);
-        -webkit-mask-image: radial-gradient(circle at center,black 30%,transparent 80%);
-        z-index: -4; 
-    }
-    .blob { 
-        position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08; 
-        animation: floatBlob 20s infinite alternate cubic-bezier(0.4,0,0.2,1); 
-        z-index: -3; pointer-events: none; /* Чтобы не мешали кликам */
-    }
-    .blob-1 { top:-10%; left:-10%; width:50vw; height:50vw; background: radial-gradient(circle,var(--primary),transparent 70%); }
-    .blob-2 { bottom:-10%; right:-10%; width:60vw; height:60vw; background: radial-gradient(circle,var(--primary),transparent 70%); animation-delay:-5s; }
-    @keyframes floatBlob { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(10%,10%) scale(1.1)} }
-    
-    .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%),rgba(255,255,255,0.05) 0%,transparent 100%); z-index: -2; pointer-events: none; }
+/* ── BREADCRUMB ── */
+.breadcrumb { display: flex; align-items: center; gap: 8px; padding: 16px 0 0; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+.breadcrumb a { color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: white; }
+.breadcrumb-sep { color: rgba(255,255,255,0.1); }
 
-    /* ── TOPBAR ── */
-    .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 52px; background: rgba(15,10,13,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; padding: 0 28px; }
-    .topbar-logo { font-size: 11px; font-weight: 800; color: white; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; flex: 1; }
-    .topbar-nav { display: flex; align-items: center; gap: 4px; flex: 2; justify-content: center; }
-    .topbar-link { font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.3); border: none; background: none; cursor: pointer; font-family: inherit; transition: 0.2s; }
-    .topbar-link:hover { color: white; }
-    .topbar-right { flex: 1; display: flex; justify-content: flex-end; }
-    .btn-back { font-size: 10px; font-weight: 700; padding: 7px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: none; color: rgba(255,255,255,0.4); text-decoration: none; transition: 0.2s; }
-    .btn-back:hover { color: white; border-color: rgba(255,255,255,0.2); }
+/* ── POST ── */
+.post-wrap { border: 1px solid var(--border); border-radius: 12px; background: var(--card); overflow: hidden; margin-top: 14px; }
+.post-header { padding: 24px 28px 20px; border-bottom: 1px solid var(--border); }
+.post-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.post-author-badge { font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 9px; border-radius: 5px; background: rgba(255,0,115,0.08); border: 1px solid rgba(255,0,115,0.2); color: var(--primary); }
+.post-date { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.2); }
+.post-title { font-size: 24px; font-weight: 800; color: white; line-height: 1.25; margin-bottom: 8px; }
+.post-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; max-width: 600px; }
 
-    /* ── MAIN ── */
-    .main { padding: 90px 24px 150px; max-width: 1000px; margin: 0 auto; position: relative; z-index: 2; }
+.post-body { display: grid; grid-template-columns: 1fr 220px; gap: 0; }
+@media(max-width:640px) { .post-body { grid-template-columns: 1fr; } .post-img-col { display: none; } }
 
-    /* ── POST CARD (FRAME 175 STYLE) ── */
-    .post-card { 
-        background: var(--card-bg); 
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.05); 
-        border-radius: 16px; 
-        padding: 40px; 
-    }
-    .post-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-    .post-author { color: var(--primary); }
-    .post-sep { color: rgba(255,255,255,0.1); font-weight: 400; }
-    .post-date { color: rgba(255,255,255,0.25); }
+.post-text-col { padding: 24px 28px; border-right: 1px solid var(--border); font-size: 12px; line-height: 1.85; color: rgba(255,255,255,0.65); }
+.post-text-col h1 { font-size: 20px; font-weight: 800; color: white; margin: 20px 0 10px; }
+.post-text-col h2 { font-size: 16px; font-weight: 700; color: rgba(255,255,255,0.9); margin: 18px 0 8px; }
+.post-text-col h3 { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.8); margin: 14px 0 6px; }
+.post-text-col h4 { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin: 12px 0 4px; }
+.post-text-col p { margin-bottom: 12px; }
+.post-text-col strong { color: rgba(255,255,255,0.9); font-weight: 700; }
+.post-text-col em { color: rgba(255,255,255,0.7); font-style: italic; }
+.post-text-col u { text-decoration: underline; text-decoration-color: rgba(255,0,115,0.4); }
+.post-text-col a { color: var(--primary); text-decoration: none; }
+.post-text-col a:hover { text-decoration: underline; }
+.post-text-col blockquote { border-left: 2px solid rgba(255,0,115,0.3); padding-left: 14px; margin: 12px 0; color: rgba(255,255,255,0.4); font-style: italic; }
+.post-text-col code { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 1px 6px; font-size: 11px; font-family: 'Courier New',monospace; color: rgba(255,145,207,0.8); }
+.post-text-col pre { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 16px; margin: 14px 0; overflow-x: auto; }
+.post-text-col pre code { background: none; border: none; padding: 0; font-size: 11px; color: rgba(255,255,255,0.6); }
+.post-text-col ul { padding-left: 18px; margin-bottom: 12px; }
+.post-text-col li { margin-bottom: 4px; }
+.spoiler-wrap { margin: 12px 0; }
+.spoiler-toggle { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; font-family: 'Poppins',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,0.35); cursor: pointer; transition: all 0.2s; }
+.spoiler-toggle:hover { color: white; border-color: rgba(255,255,255,0.15); }
+.spoiler-content { display: none; margin-top: 8px; padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; color: rgba(255,255,255,0.6); }
+.spoiler-content.open { display: block; }
 
-    .post-title { font-size: 32px; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 8px; }
-    .post-desc { font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 35px; max-width: 600px; }
+.post-img-col { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.post-img-box { width: 100%; aspect-ratio: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.post-img-box img { width: 100%; height: 100%; object-fit: cover; }
+.no-img { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
 
-    /* Layout: Text Left, Image Right */
-    .post-flex { display: flex; gap: 40px; align-items: flex-start; }
-    .post-text { flex: 1; font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.6); }
-    
-    .post-img-side { width: 300px; flex-shrink: 0; }
-    .post-preview { 
-        width: 100%; aspect-ratio: 1/1; 
-        background: rgba(255,255,255,0.02); 
-        border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 4px; 
-        display: flex; align-items: center; justify-content: center; 
-    }
-    .no-preview { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.1); text-transform: lowercase; }
-    .post-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+/* ── LOADING ── */
+.post-loading { padding: 80px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.12); }
 
-    /* Skeleton lines for the "no-text" effect */
-    .line { height: 7px; background: rgba(255,255,255,0.03); border-radius: 4px; margin-bottom: 14px; }
-    .line.w-full { width: 100%; }
-    .line.w-mid { width: 85%; }
-    .line.w-short { width: 60%; }
+/* ── THREAD DIVIDER ── */
+.thread-divider { display: flex; align-items: center; gap: 14px; margin: 28px 0 0; }
+.thread-divider-line { flex: 1; height: 1px; background: var(--border); }
+.thread-divider-label { font-size: 9px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.15); }
 
-    /* ── COMMENTS ── */
-    .comments-wrap { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); }
-    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); margin-bottom: 20px; }
-    .comment-box { display: flex; gap: 15px; }
-    .comment-input { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 15px; color: white; font-family: inherit; font-size: 12px; outline: none; }
-    .comment-btn { border: 1px solid var(--primary); background: none; color: var(--primary); padding: 0 30px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-    .comment-btn:hover { background: var(--primary); color: white; }
+/* ── COMMENTS ── */
+.comments-section { border: 1px solid var(--border); border-radius: 12px; background: var(--card); overflow: hidden; margin-top: 4px; }
+.comments-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.comments-title { font-size: 9px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+.comments-count { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.2); }
 
-    /* ── BOTTOM NAV (SAME AS MAIN) ── */
-    .bottom-nav {
-        position: fixed; bottom: 25px; left: 25px;
-        background: rgba(15, 10, 13, 0.5); backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 12px; padding: 10px 20px;
-        display: flex; gap: 25px; z-index: 10; align-items: center;
-    }
-    .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); text-decoration: none; transition: 0.3s; }
-    .nav-link:hover { color: white; }
-    .nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
-    .lang-btn { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.2); cursor: pointer; }
-    .lang-btn.active { color: var(--primary); }
+.comment-item { display: grid; grid-template-columns: 44px 1fr; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.comment-item:last-child { border-bottom: none; }
+.comment-num { padding: 16px 0; display: flex; align-items: flex-start; justify-content: center; border-right: 1px solid rgba(255,255,255,0.04); font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.1); padding-top: 18px; }
+.comment-body { padding: 14px 18px; }
+.comment-top { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+.comment-author { font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,145,207,0.7); }
+.comment-date { font-size: 9px; color: rgba(255,255,255,0.15); }
+.comment-text { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.65; }
 
-    .bottom-credit { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.15); text-transform: uppercase; z-index: 10; }
+.no-comments { padding: 32px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
+
+/* ── REPLY BOX ── */
+.reply-box { border-top: 1px solid var(--border); padding: 16px 20px; display: flex; gap: 12px; align-items: flex-start; background: rgba(255,255,255,0.01); }
+.reply-avatar { width: 32px; height: 32px; border-radius: 7px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.2); text-transform: uppercase; flex-shrink: 0; }
+.reply-inner { flex: 1; display: flex; gap: 10px; align-items: flex-end; }
+.reply-input { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-family: 'Poppins',sans-serif; font-size: 11px; color: white; outline: none; resize: none; transition: border-color 0.2s; min-height: 40px; }
+.reply-input:focus { border-color: rgba(255,0,115,0.3); }
+.reply-input::placeholder { color: rgba(255,255,255,0.18); }
+.reply-btn { padding: 10px 18px; border-radius: 8px; border: 1px solid rgba(255,0,115,0.3); background: rgba(255,0,115,0.08); color: var(--primary); font-family: 'Poppins',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+.reply-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+.reply-msg { font-size: 9px; font-weight: 700; color: rgba(255,145,207,0.7); margin-top: 6px; min-height: 12px; }
+.reply-msg.err { color: rgba(248,113,113,0.7); }
+
+/* ── OTHER POSTS ── */
+.other-section { border: 1px solid var(--border); border-radius: 12px; background: var(--card); overflow: hidden; margin-top: 4px; }
+.other-head { padding: 12px 20px; border-bottom: 1px solid var(--border); font-size: 9px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+.other-scroll { display: flex; flex-direction: column; }
+.mini-row { display: flex; align-items: center; gap: 14px; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); text-decoration: none; color: inherit; transition: background 0.15s; }
+.mini-row:last-child { border-bottom: none; }
+.mini-row:hover { background: rgba(255,255,255,0.02); }
+.mini-thumb { width: 40px; height: 40px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.mini-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.mini-np { font-size: 7px; color: rgba(255,255,255,0.12); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.mini-info { flex: 1; min-width: 0; }
+.mini-title { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.75); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-author { font-size: 9px; font-weight: 700; color: rgba(255,145,207,0.5); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav { position: fixed; bottom: 25px; left: 25px; background: rgba(5,2,4,0.7); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 12px; padding: 10px 20px; display: flex; gap: 25px; z-index: 10; align-items: center; }
+.nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); text-decoration: none; transition: 0.3s; }
+.nav-link:hover { color: white; }
+.nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
+.lang-btn { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.2); cursor: pointer; background: none; border: none; font-family: 'Poppins',sans-serif; }
+.lang-btn.active { color: var(--primary); }
+.bottom-credit { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.1); text-transform: uppercase; z-index: 10; }
 </style>
 </head>
 <body>
-    <div class="bg-base"></div>
-    <div class="bg-grid"></div>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div id="glow" class="bg-glow"></div>
+<div class="bg-grid"></div>
+<div class="bg-svg"></div>
+<div class="bg-fade"></div>
 
-    <nav class="topbar">
-        <a href="/" class="topbar-logo">Docs Home</a>
-        <div class="topbar-nav">
-            <button class="topbar-link">Login</button>
-            <span style="color:rgba(255,255,255,0.1); margin: 0 5px;">\</span>
-            <button class="topbar-link">Register & Create</button>
-        </div>
-        <div class="topbar-right">
-            <a href="/" class="btn-back">← Back</a>
-        </div>
-    </nav>
+<nav class="topbar">
+  <a href="/docs" class="topbar-logo">Vellote</a>
+  <div class="topbar-nav">
+    <span id="topbar-postname" style="color:rgba(255,255,255,0.25)">Post</span>
+  </div>
+  <div class="topbar-right">
+    <span class="user-chip" id="user-chip" style="display:none"></span>
+    <a href="/docs" class="btn-back">← Back</a>
+  </div>
+</nav>
 
-    <div class="main">
-        <div id="postArea">
-            <div class="post-card">
-                <div class="post-meta">
-                    <span class="post-author">0XSQUAD</span>
-                    <span class="post-sep">|</span>
-                    <span class="post-date">21.03.2026</span>
-                </div>
-                <div class="post-title">Post title here</div>
-                <div class="post-desc">Short description of the post goes here. This area is for a brief summary.</div>
-                
-                <div class="post-flex">
-                    <div class="post-text">
-                        <div class="line w-full"></div><div class="line w-full"></div><div class="line w-mid"></div>
-                        <div class="line w-full"></div><div class="line w-full"></div><div class="line w-short"></div>
-                        <div class="line w-full"></div><div class="line w-mid"></div><div class="line w-full"></div>
-                        <div class="line w-full"></div><div class="line w-short"></div><div class="line w-full"></div>
-                    </div>
-                    <div class="post-img-side">
-                        <div class="post-preview">
-                            <span class="no-preview">no preview</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="main">
+  <div class="breadcrumb">
+    <a href="/docs">Forum</a>
+    <span class="breadcrumb-sep">/</span>
+    <span id="bc-title">Post</span>
+  </div>
 
-        <div class="comments-wrap">
-            <div class="section-label">Comments</div>
-            <div class="comment-box">
-                <textarea class="comment-input" placeholder="Leave a comment..." rows="1"></textarea>
-                <button class="comment-btn">Send →</button>
-            </div>
-        </div>
+  <div id="postArea">
+    <div class="post-wrap"><div class="post-loading">Loading...</div></div>
+  </div>
+
+  <div class="thread-divider" id="divComments" style="display:none">
+    <div class="thread-divider-line"></div>
+    <div class="thread-divider-label">Replies</div>
+    <div class="thread-divider-line"></div>
+  </div>
+
+  <div class="comments-section" id="commentsSection" style="display:none">
+    <div class="comments-header">
+      <span class="comments-title">Comments</span>
+      <span class="comments-count" id="commentsCount"></span>
     </div>
-
-    <nav class="bottom-nav">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/catalog" class="nav-link">Catalog</a>
-        <a href="/obfuscator" class="nav-link">Obfuscator</a>
-        <a href="/getkey" class="nav-link">Authentication</a>
-        <a href="/status" class="nav-link">Status</a>
-        <a href="/discord" class="nav-link" target="_blank">Discord</a>
-        <div class="nav-divider"></div>
-        <div class="lang-box">
-            <span class="lang-btn active">RU</span>
-            <span class="lang-btn">EN</span>
+    <div id="commentList"></div>
+    <div class="reply-box">
+      <div class="reply-avatar" id="reply-avatar">?</div>
+      <div style="flex:1">
+        <div class="reply-inner">
+          <textarea class="reply-input" id="commentText" placeholder="Write a reply..." rows="1"></textarea>
+          <button class="reply-btn" onclick="sendComment()">Reply</button>
         </div>
-    </nav>
+        <div class="reply-msg" id="commentMsg"></div>
+      </div>
+    </div>
+  </div>
 
-    <div class="bottom-credit">0xSquad © 2026</div>
+  <div class="thread-divider" id="divOther" style="display:none">
+    <div class="thread-divider-line"></div>
+    <div class="thread-divider-label">More Posts</div>
+    <div class="thread-divider-line"></div>
+  </div>
+
+  <div class="other-section" id="otherSection" style="display:none">
+    <div class="other-head">Other Posts</div>
+    <div class="other-scroll" id="otherScroll"></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/catalog" class="nav-link">Catalog</a>
+  <a href="/obfuscator" class="nav-link">Obfuscator</a>
+  <a href="/getkey" class="nav-link">Auth</a>
+  <a href="/status" class="nav-link">Status</a>
+  <a href="https://discord.gg/TRPZg4Xfkq" class="nav-link" target="_blank">Discord</a>
+  <div class="nav-divider"></div>
+  <div style="display:flex;gap:10px">
+    <span class="lang-btn active">RU</span>
+    <span class="lang-btn">EN</span>
+  </div>
+</nav>
+<div class="bottom-credit">© 2026 Vellote. All rights reserved.</div>
 
 <script>
-window.addEventListener('mousemove', e => {
-  document.body.style.setProperty('--x', e.clientX+'px');
-  document.body.style.setProperty('--y', e.clientY+'px');
-});
-
 let currentUser = null;
-try { currentUser = JSON.parse(localStorage.getItem('nq-docs-user')||'null'); } catch(e){}
+try { currentUser = JSON.parse(localStorage.getItem('nq-docs-user')||'null'); } catch(e) {}
 if (currentUser) {
-  document.getElementById('btn-login').style.display='none';
-  document.getElementById('btn-register').style.display='none';
-  document.getElementById('btn-create').style.display='';
-  document.getElementById('user-chip').style.display='';
-  document.getElementById('user-chip').textContent=currentUser.username;
+  document.getElementById('user-chip').style.display = '';
+  document.getElementById('user-chip').textContent = currentUser.username;
+  document.getElementById('reply-avatar').textContent = currentUser.username.slice(0,2).toUpperCase();
 }
 
 function getPostId() {
   const m = window.location.pathname.match(/\/post\/(.+)/);
   return m ? decodeURIComponent(m[1]) : null;
 }
-
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function parseText(raw) {
   if (!raw) return '';
   let s = String(raw);
-  s = s.replace(/\|\|(.+?)\|\|/gs,(_,t)=>{
-    const id='sp'+Math.random().toString(36).slice(2);
-    return `<div class="spoiler-wrap"><button class="spoiler-toggle" onclick="toggleSpoiler('${id}')"><span class="spoiler-icon">▶</span> Spoiler</button><div class="spoiler-content" id="${id}">${t.trim()}</div></div>`;
+  s = s.replace(/\|\|(.+?)\|\|/gs, (_,t) => {
+    const id = 'sp'+Math.random().toString(36).slice(2);
+    return `<div class="spoiler-wrap"><button class="spoiler-toggle" onclick="toggleSpoiler('${id}')">▶ Spoiler</button><div class="spoiler-content" id="${id}">${t.trim()}</div></div>`;
   });
-  s=s.replace(/```([\s\S]*?)```/g,(_,c)=>`<pre><code>${esc(c.trim())}</code></pre>`);
-  s=s.replace(/`([^`]+)`/g,(_,c)=>`<code>${esc(c)}</code>`);
-  s=s.replace(/^###([^\n]+)/gm,(_,t)=>`<h3>${t.trim()}</h3>`);
-  s=s.replace(/^##([^\n]+)/gm,(_,t)=>`<h2>${t.trim()}</h2>`);
-  s=s.replace(/^#-([^\n]+)/gm,(_,t)=>`<h4>${t.trim()}</h4>`);
-  s=s.replace(/^#([^\n]+)/gm,(_,t)=>`<h1>${t.trim()}</h1>`);
-  s=s.replace(/^>{1,3}([^\n]+)/gm,(_,t)=>`<blockquote>${t.trim()}</blockquote>`);
-  s=s.replace(/\*\*(.+?)\*\*/g,(_,t)=>`<strong>${t}</strong>`);
-  s=s.replace(/\*(.+?)\*/g,(_,t)=>`<em>${t}</em>`);
-  s=s.replace(/__(.+?)__/g,(_,t)=>`<u>${t}</u>`);
-  s=s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,(_,t,u)=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`);
-  s=s.replace(/^(\s*)[*\-] (.+)/gm,(_,ind,item)=>`<li style="margin-left:${ind.length*12}px">${item}</li>`);
-  s=s.replace(/(<li[\s\S]*?<\/li>)+/g,m=>`<ul>${m}</ul>`);
-  s=s.replace(/\n{2,}/g,'</p><p>');
-  s=s.replace(/\n/g,'<br>');
-  s=`<p>${s}</p>`;
-  s=s.replace(/<p>\s*<\/p>/g,'');
-  return s;
+  s = s.replace(/```([\s\S]*?)```/g, (_,c) => `<pre><code>${esc(c.trim())}</code></pre>`);
+  s = s.replace(/`([^`]+)`/g, (_,c) => `<code>${esc(c)}</code>`);
+  s = s.replace(/^###([^\n]+)/gm, (_,t) => `<h3>${t.trim()}</h3>`);
+  s = s.replace(/^##([^\n]+)/gm, (_,t) => `<h2>${t.trim()}</h2>`);
+  s = s.replace(/^#-([^\n]+)/gm, (_,t) => `<h4>${t.trim()}</h4>`);
+  s = s.replace(/^#([^\n]+)/gm, (_,t) => `<h1>${t.trim()}</h1>`);
+  s = s.replace(/^>{1,3}([^\n]+)/gm, (_,t) => `<blockquote>${t.trim()}</blockquote>`);
+  s = s.replace(/\*\*(.+?)\*\*/g, (_,t) => `<strong>${t}</strong>`);
+  s = s.replace(/\*(.+?)\*/g, (_,t) => `<em>${t}</em>`);
+  s = s.replace(/__(.+?)__/g, (_,t) => `<u>${t}</u>`);
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_,t,u) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`);
+  s = s.replace(/^(\s*)[*\-] (.+)/gm, (_,ind,item) => `<li style="margin-left:${ind.length*12}px">${item}</li>`);
+  s = s.replace(/(<li[\s\S]*?<\/li>)+/g, m => `<ul>${m}</ul>`);
+  s = s.replace(/\n{2,}/g,'</p><p>');
+  s = s.replace(/\n/g,'<br>');
+  return `<p>${s}</p>`.replace(/<p>\s*<\/p>/g,'');
 }
 
-function toggleSpoiler(id){
-  const c=document.getElementById(id);
-  c.classList.toggle('open');
-  c.previousElementSibling.classList.toggle('open');
+function toggleSpoiler(id) {
+  document.getElementById(id).classList.toggle('open');
 }
 
 async function loadPost() {
   const id = getPostId();
-  if (!id) { document.getElementById('postArea').innerHTML='<div class="loading">Post not found</div>'; return; }
+  if (!id) { document.getElementById('postArea').innerHTML='<div class="post-wrap"><div class="post-loading">Post not found</div></div>'; return; }
   try {
     const r = await fetch(`/api/docs/universal?action=post&id=${encodeURIComponent(id)}`);
+    if (!r.ok) throw new Error('HTTP '+r.status);
     const d = await r.json();
-    if (!d.ok||!d.post) { document.getElementById('postArea').innerHTML='<div class="loading">Post not found</div>'; return; }
+    if (!d.ok || !d.post) { document.getElementById('postArea').innerHTML='<div class="post-wrap"><div class="post-loading">Post not found</div></div>'; return; }
     const p = d.post;
-    document.title = `${p.PostName} — Vellote Docs`;
-    document.getElementById('postArea').innerHTML=`
-      <div class="post-meta">
-        <span class="post-author">${esc(p.Author)}</span>
-        <span class="post-date">${p.Date||''}</span>
+    document.title = `${p.PostName} — Vellote Forum`;
+    document.getElementById('topbar-postname').textContent = p.PostName;
+    document.getElementById('bc-title').textContent = p.PostName;
+    document.getElementById('postArea').innerHTML = `
+      <div class="post-wrap">
+        <div class="post-header">
+          <div class="post-meta">
+            <span class="post-author-badge">${esc(p.Author)}</span>
+            <span class="post-date">${p.Date||''}</span>
+          </div>
+          <div class="post-title">${esc(p.PostName)}</div>
+          <div class="post-desc">${esc(p.PostDesc)}</div>
+        </div>
+        <div class="post-body">
+          <div class="post-text-col">${parseText(p.PostText)}</div>
+          <div class="post-img-col">
+            <div class="post-img-box">
+              ${p.PostImg ? `<img src="${p.PostImg}" alt="">` : `<span class="no-img">No preview</span>`}
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="post-title">${esc(p.PostName)}</div>
-      <div class="post-desc">${esc(p.PostDesc)}</div>
-      <div class="post-img">
-        ${p.PostImg?`<img src="${p.PostImg}" alt="">`:`<div class="post-img-placeholder">No preview</div>`}
-      </div>
-      <div class="post-text">${parseText(p.PostText)}</div>
     `;
-    document.getElementById('divComments').style.display='';
-    document.getElementById('commentsSection').style.display='';
+    document.getElementById('divComments').style.display = '';
+    document.getElementById('commentsSection').style.display = '';
     loadComments(id);
     loadOtherPosts(p.Author, id);
   } catch(e) {
-    document.getElementById('postArea').innerHTML='<div class="loading">Failed to load</div>';
+    document.getElementById('postArea').innerHTML = '<div class="post-wrap"><div class="post-loading">Failed to load post</div></div>';
   }
 }
 
 async function loadComments(postId) {
   try {
-    const r=await fetch(`/api/docs/universal?action=comments&id=${encodeURIComponent(postId)}`);
-    const d=await r.json();
-    const list=document.getElementById('commentList');
-    const comments=d.comments||[];
-    if (!comments.length){list.innerHTML='<div class="no-comments">No comments yet</div>';return;}
-    list.innerHTML=comments.map(c=>`
+    const r = await fetch(`/api/docs/universal?action=comments&id=${encodeURIComponent(postId)}`);
+    const d = await r.json();
+    const comments = d.comments || [];
+    document.getElementById('commentsCount').textContent = comments.length + ' repl' + (comments.length===1?'y':'ies');
+    const list = document.getElementById('commentList');
+    if (!comments.length) { list.innerHTML = '<div class="no-comments">No replies yet</div>'; return; }
+    list.innerHTML = comments.map((c, i) => `
       <div class="comment-item">
-        <div class="comment-top"><span class="comment-author">${esc(c.author)}</span><span class="comment-date">${c.date||''}</span></div>
-        <div class="comment-text">${esc(c.text)}</div>
-      </div>`).join('');
-  } catch(e){}
+        <div class="comment-num">#${i+1}</div>
+        <div class="comment-body">
+          <div class="comment-top">
+            <span class="comment-author">${esc(c.author)}</span>
+            <span class="comment-date">${c.date||''}</span>
+          </div>
+          <div class="comment-text">${esc(c.text)}</div>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {}
 }
 
-async function sendComment(){
-  const text=document.getElementById('commentText').value.trim();
-  const msg=document.getElementById('commentMsg');
-  if(!text){msg.textContent='Write something';return;}
-  msg.textContent='Sending...';
-  const postId=getPostId();
-  const body={postId,text};
-  if(currentUser){body.username=currentUser.username;body.token=currentUser.token||'';}
-  try{
-    const r=await fetch('/api/docs/universal?action=comment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const d=await r.json();
-    if(d.ok){document.getElementById('commentText').value='';msg.textContent='Sent!';await loadComments(postId);setTimeout(()=>{msg.textContent='';},2000);}
-    else msg.textContent=d.error||'Error';
-  }catch(e){msg.textContent='Network error';}
+async function sendComment() {
+  const text = document.getElementById('commentText').value.trim();
+  const msg = document.getElementById('commentMsg');
+  if (!text) { msg.textContent='Write something'; msg.className='reply-msg err'; return; }
+  if (!currentUser) { msg.textContent='Login to reply'; msg.className='reply-msg err'; return; }
+  msg.textContent='Sending...'; msg.className='reply-msg';
+  const postId = getPostId();
+  try {
+    const r = await fetch('/api/docs/universal?action=comment', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({postId, text, username: currentUser.username, token: currentUser.token||''})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      document.getElementById('commentText').value='';
+      msg.textContent='Reply sent!'; msg.className='reply-msg ok';
+      await loadComments(postId);
+      setTimeout(() => { msg.textContent=''; }, 2000);
+    } else { msg.textContent=d.error||'Error'; msg.className='reply-msg err'; }
+  } catch(e) { msg.textContent='Network error'; msg.className='reply-msg err'; }
 }
 
-async function loadOtherPosts(author,currentId){
-  try{
-    const r=await fetch('/api/docs/universal?action=posts&fresh=1');
-    const d=await r.json();
-    const posts=(d.posts||[]).filter(p=>p.id!==currentId);
-    if(!posts.length)return;
-    document.getElementById('divOther').style.display='';
-    document.getElementById('otherSection').style.display='';
-    document.getElementById('otherScroll').innerHTML=posts.map(p=>`
-      <a class="mini-card" href="/post/${encodeURIComponent(p.id)}">
-        <div class="mini-preview">${p.img?`<img src="${p.img}" alt="">`:`<span class="mini-no-prev">No preview</span>`}</div>
-        <div class="mini-body">
+async function loadOtherPosts(author, currentId) {
+  try {
+    const r = await fetch('/api/docs/universal?action=posts&fresh=1');
+    const d = await r.json();
+    const posts = (d.posts||[]).filter(p => p.id !== currentId).slice(0, 6);
+    if (!posts.length) return;
+    document.getElementById('divOther').style.display = '';
+    document.getElementById('otherSection').style.display = '';
+    document.getElementById('otherScroll').innerHTML = posts.map(p => `
+      <a class="mini-row" href="/post/${encodeURIComponent(p.id)}">
+        <div class="mini-thumb">${p.img ? `<img src="${p.img}" alt="">` : `<span class="mini-np">No img</span>`}</div>
+        <div class="mini-info">
           <div class="mini-title">${esc(p.name)}</div>
           <div class="mini-author">${esc(p.author)}</div>
-          <div class="mini-desc">${esc(p.desc)}</div>
         </div>
-      </a>`).join('');
-  }catch(e){}
+      </a>
+    `).join('');
+  } catch(e) {}
 }
 
 loadPost();
