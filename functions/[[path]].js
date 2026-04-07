@@ -137,7 +137,6 @@ try {
             gitHubPath = "site/catalog" + (parts.length > 0 ? "/" + parts.join('/') : "");
             
 } else {
-    // --- RAW PATH РОУТИНГ ---
     const rawRoutes = {
         "tools/UIcreator":     "tools/guic/index.html",
         "forum":               "forum/home.html",
