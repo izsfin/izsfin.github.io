@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Studio Web Edition</title>
-    <link rel="stylesheet" href="/tools/guic/style.css">
-    <base href="/tools/guic/">
+    <link rel="stylesheet" href="https://misslua.pages.dev/v3/ss/tools/guic/style.css">
     <style>
         * {
             margin: 0;
@@ -23,7 +22,6 @@
             overflow: hidden;
         }
         
-        /* Сайдбар с затемнением */
         .sidebar {
             width: 320px;
             min-width: 320px;
@@ -59,7 +57,6 @@
             background: rgba(0, 0, 0, 0.2);
         }
         
-        /* Вьюпорт с таким же фоном */
         .viewport {
             flex-grow: 1;
             position: relative;
@@ -70,7 +67,6 @@
             user-select: none;
         }
         
-        /* Холст */
         #canvas-origin {
             position: absolute;
             top: 0;
@@ -79,7 +75,6 @@
             pointer-events: none;
         }
         
-        /* ScreenGui с полупрозрачным фоном */
         #screen-gui {
             width: 800px;
             height: 450px;
@@ -92,7 +87,6 @@
             backdrop-filter: blur(2px);
         }
         
-        /* Объекты */
         .rbx-obj {
             position: absolute;
             pointer-events: auto !important;
@@ -102,7 +96,6 @@
             transition: outline 0.1s;
         }
         
-        /* Выделение */
         .selected-visual {
             outline: 2px solid #00a2ff !important;
             outline-offset: 2px;
@@ -110,7 +103,6 @@
             z-index: 999;
         }
         
-        /* Направляющие */
         .guide {
             position: absolute;
             background-color: #00a2ff;
@@ -123,7 +115,6 @@
         .guide-v { width: 1px; height: 100%; top: 0; }
         .guide-h { height: 1px; width: 100%; left: 0; }
         
-        /* Панель управления */
         .top-control-panel {
             position: absolute;
             top: 15px;
@@ -166,7 +157,6 @@
             font-size: 12px;
         }
         
-        /* Панель инструментов */
         .tools-panel {
             position: absolute;
             top: 80px;
@@ -216,7 +206,6 @@
             transform: scale(1.02);
         }
         
-        /* Explorer стили */
         .explorer-item {
             transition: background 0.1s ease;
             font-family: 'Segoe UI', monospace;
@@ -252,7 +241,6 @@
             border-color: #00a2ff !important;
         }
         
-        /* Стартовый экран */
         #startup-screen {
             position: fixed;
             top: 0;
@@ -322,7 +310,6 @@
             color: #555;
         }
         
-        /* Стили для свойств */
         .prop-row:hover {
             background: rgba(255, 255, 255, 0.03);
         }
@@ -388,13 +375,13 @@
         </div>
     </div>
 
-    <script src="tools/guic/app.js"></script>
-    <script src="tools/guic/ui_elements.js"></script> 
-    <script src="tools/guic/properties.js"></script>
-    <script src="tools/guic/snapping.js"></script>
-    <script src="tools/guic/explorer.js"></script>
-    <script src="tools/guic/viewport.js"></script>
-    <script src="export_engine.js"></script> 
+    <script src="https://misslua.pages.dev/v3/ss/tools/guic/app.js"></script>
+    <script src="https://misslua.pages.dev/v3/ss/tools/guic/ui_elements.js"></script> 
+    <script src="https://misslua.pages.dev/v3/ss/tools/guic/properties.js"></script>
+    <script src="https://misslua.pages.dev/v3/ss/tools/guic/snapping.js"></script>
+    <script src="https://misslua.pages.dev/v3/ss/tools/guic/explorer.js"></script>
+    <script src="https://misslua.pages.dev/v3/ss/tools/guic/viewport.js"></script>
+    <script src="https://misslua.pages.dev/v3/ss/tools/guic/export_engine.js"></script>
 
     <script>
         window.onload = () => {
