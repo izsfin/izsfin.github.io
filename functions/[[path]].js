@@ -60,7 +60,8 @@ export async function onRequest(context) {
         "editor": "site/html/tools/guic/index.html",
         "tools/ui/crator": "site/html/tools/guic/index.html",
         "": "site/html/main.html",
-        "catalog": "site/html/catalog.html",
+        "catalog":  "site/catalog/html/catalog.html",
+        "catalog/": "site/catalog/html/catalog-item.html",
     };
 
     let gitHubPath = ""; 

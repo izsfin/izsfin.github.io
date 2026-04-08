@@ -16,8 +16,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: var(--bg-dark); color: #d1d1d1; font-family: 'Poppins', sans-serif; height: 100vh; overflow: hidden; }
-
-        /* === ФОН С БЛОБАМИ (из catalog_NEW__.html) === */
         .bg-base { position: fixed; inset: 0; background-image: url("/site/html/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
         .bg-grid {
             position: fixed; inset: 0;
@@ -39,8 +37,6 @@
             100% { transform: translate(5%, 5%) scale(1.1); }
         }
         .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x,50%) var(--y,50%), rgba(255,255,255,0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
-
-        /* === LAYOUT === */
         .main { position: relative; z-index: 2; padding: 36px 36px 120px; height: 100vh; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
         .main::-webkit-scrollbar { display: none; }
         .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }

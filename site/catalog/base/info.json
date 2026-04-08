@@ -3,8 +3,8 @@
     {
       "id": "kawaii-neutral-black-cat-ears",
       "name": "Kawaii Neutral Black Cat Ears",
-      "author": "hux9z",
-      "preview": "v3/sc/kNBCE/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/kNBCE/preview.png",
       "command": "js(\"Black Cat Ears\")",
       "category": "Accessories",
       "type": "Head"
@@ -12,8 +12,8 @@
     {
       "id": "black-beanie",
       "name": "Black Beanie",
-      "author": "hux9z",
-      "preview": "v3/sc/BlackBeanie/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/BlackBeanie/preview.png",
       "command": "js(\"Black Beanie\")",
       "category": "Accessories",
       "type": "Head"
@@ -21,8 +21,8 @@
     {
       "id": "black-balaclava-fisher-hat",
       "name": "Black Balaclava Fisher Hat",
-      "author": "hux9z",
-      "preview": "v3/sc/balaclava/fisher-hat/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/balaclava/fisher-hat/preview.png",
       "command": "js(\"Black Balaclava Fisher Hat\")",
       "category": "Accessories",
       "type": "Head"
@@ -30,8 +30,8 @@
     {
       "id": "emo-spiked-shades",
       "name": "Emo Spiked Shades",
-      "author": "hux9z",
-      "preview": "v3/sc/EmoSpikedShades/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/EmoSpikedShades/preview.png",
       "command": "js(\"Emo Spiked Shades\")",
       "category": "Accessories",
       "type": "Face"
@@ -39,8 +39,8 @@
     {
       "id": "white-polarized-sunglasses",
       "name": "White Polarized Sunglasses",
-      "author": "hux9z",
-      "preview": "v3/sc/polarizedSG/white/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/polarizedSG/white/preview.png",
       "command": "js(\"White Polarized Sunglasses\")",
       "category": "Accessories",
       "type": "Face"
@@ -48,8 +48,8 @@
     {
       "id": "pink-polarized-sunglasses",
       "name": "Pink Polarized Sunglasses",
-      "author": "hux9z",
-      "preview": "v3/sc/polarizedSG/pink/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/polarizedSG/pink/preview.png",
       "command": "js(\"Pink Polarized Sunglasses\")",
       "category": "Accessories",
       "type": "Face"
@@ -57,8 +57,8 @@
     {
       "id": "black-neck-mask_low",
       "name": "Black Neck Mask (Low)",
-      "author": "hux9z",
-      "preview": "v3/sc/neck-mask/black/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/neck-mask/black/preview.png",
       "command": "js(\"Black Neck Mask (Low)\")",
       "category": "Accessories",
       "type": "Face"
@@ -66,8 +66,8 @@
     {
       "id": "white-ski-mask",
       "name": "White Ski Mask",
-      "author": "hux9z",
-      "preview": "v3/sc/neck-mask/white/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/neck-mask/white/preview.png",
       "command": "js(\"White Ski Mask\")",
       "category": "Accessories",
       "type": "Face"
@@ -75,8 +75,8 @@
     {
       "id": "guns-x-alien",
       "name": "Gunslinger & Alien",
-      "author": "hux9z",
-      "preview": "v3/sc/GxA/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/GxA/preview.png",
       "command": "js(\"Guns & Alien\")",
       "category": "Characters",
       "type": "body"
@@ -84,8 +84,8 @@
     {
       "id": "pal-face-classic",
       "name": "Pal Face",
-      "author": "hux9z",
-      "preview": "v3/sc/PalFace/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/PalFace/preview.png",
       "command": "js(\"Pal Face Static\")",
       "category": "Characters",
       "type": "face"
@@ -93,8 +93,8 @@
     {
       "id": "pal-face",
       "name": "Pal Face",
-      "author": "hux9z",
-      "preview": "v3/sc/PalFace/NSpreview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/PalFace/NSpreview.png",
       "command": "js(\"Pal Face\")",
       "category": "Characters",
       "type": "dhead"
@@ -102,80 +102,80 @@
     {
       "id": "purple-bape-v1",
       "name": "Purple Bape #1",
-      "author": "hux9z",
-      "preview": "v3/sc/bape/purple/v.1/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/bape/purple/v.1/preview.png",
       "command": "js(\"Purple Bape\")",
       "category": "Outfits"
     },
     {
       "id": "purple-bape-v2",
       "name": "Purple Bape #2",
-      "author": "hux9z",
-      "preview": "v3/sc/bape/purple/v.2/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/bape/purple/v.2/preview.png",
       "command": "js(\"Purple Bape\")",
       "category": "Outfits"
     },
     {
       "id": "black-bape",
       "name": "Black Bape",
-      "author": "hux9z",
-      "preview": "v3/sc/bape/black/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/bape/black/preview.png",
       "command": "js(\"Black Bape\")",
       "category": "Outfits"
     },
     {
       "id": "blue-bape-v1",
       "name": "Blue Bape #1",
-      "author": "hux9z",
-      "preview": "v3/sc/bape/blue/v.1/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/bape/blue/v.1/preview.png",
       "command": "js(\"Blue Bape #1\")",
       "category": "Outfits"
     },
     {
       "id": "blue-bape-v2",
       "name": "Blue Bape #2",
-      "author": "hux9z",
-      "preview": "v3/sc/bape/blue/v.2/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/bape/blue/v.2/preview.png",
       "command": "js(\"Blue Bape #2\")",
       "category": "Outfits"
     },
     {
       "id": "black-camo-v1",
       "name": "Black Camo #1",
-      "author": "hux9z",
-      "preview": "v3/sc/Millitary/BlackCamo/v1/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/Millitary/BlackCamo/v1/preview.png",
       "command": "js(\"Black Camo #1\")",
       "category": "Outfits"
     },
     {
       "id": "black-camo-v2",
       "name": "Black Camo #2",
-      "author": "hux9z",
-      "preview": "v3/sc/Millitary/BlackCamo/v2/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/Millitary/BlackCamo/v2/preview.png",
       "command": "js(\"Black Camo #2\")",
       "category": "Outfits"
     },
     {
       "id": "blue-camo",
       "name": "Blue Camo",
-      "author": "hux9z",
-      "preview": "v3/sc/Millitary/BlueCamo/preview.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/Millitary/BlueCamo/preview.png",
       "command": "js(\"Blue Camo\")",
       "category": "Outfits"
     },
     {
       "id": "classic-camo",
       "name": "Classic Camo",
-      "author": "hux9z",
-      "preview": "v3/sc/Millitary/ClassicCamo/preview.png",
-      "command": "js(\"Classic Camo\")",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/Millitary/ClassicCamo/preview.png",
+      "command": "cmd(\"Classic Camo\")",
       "category": "Outfits"
     },
     {
       "id": "loader",
       "name": "Loader",
-      "author": "hux9z",
-      "preview": "v3/sc/hux9z/assets/Loader.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/mister.lerp/assets/Loader.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/loader\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -183,8 +183,8 @@
     {
       "id": "aqusu-mobile",
       "name": "Aqusu Mobile",
-      "author": "hux9z",
-      "preview": "v3/sc/hux9z/assets/",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/mister.lerp/assets/",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/mobile\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -192,8 +192,8 @@
     {
       "id": "aqusu-pc.cerberus",
       "name": "Aqusu PC | Cerberus",
-      "author": "hux9z",
-      "preview": "v3/sc/hux9z/assets/PC.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/mister.lerp/assets/PC.png",
       "command": "loadstring(game:HttpGet(\"https://aqusu.pages.dev/pcU\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -201,8 +201,8 @@
     {
       "id": "aqusu-pc.aquxui",
       "name": "Aqusu PC | OurUI",
-      "author": "hux9z",
-      "preview": "v3/sc/hux9z/assets/PC.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/mister.lerp/assets/PC.png",
       "command": "loadstring(game:HttpGet(\"https://aqusu.pages.dev/pcX\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -210,8 +210,8 @@
     {
       "id": "aqusu-legacy",
       "name": "Aqusu  [Legacy]",
-      "author": "hux9z",
-      "preview": "v3/sc/hux9z/assets/Legacy.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/mister.lerp/assets/Legacy.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/legacy\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -219,17 +219,17 @@
       {
       "id": "soon",
       "name": "soon",
-      "author": "hux9z",
-      "preview": "v3/sc/hux9z/assets/Premium.png",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/mister.lerp/assets/Premium.png",
       "command": "soon",
       "category": "Scripts",
       "type": "Official Software"
     },
     {
-      "id": "js32",
-      "name": "JS ³²",
-      "author": "hux9z",
-      "preview": "v3/sc/hux9z/assets/xms.png",
+      "id": "cmd-release",
+      "name": "CMD | Release 3.2.0",
+      "author": "mister.lerp",
+      "preview": "site/catalog/items/PalFace/preview.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/js\"))()",
       "category": "Scripts",
       "type": "Official Software"
