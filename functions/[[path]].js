@@ -17,11 +17,8 @@ export async function onRequest(context) {
     const MY_IP = "77.52.212.190";
 
     let codeBranch = "main";
-    if (rawPath === "$" || rawPath.startsWith("$/")) {
-        codeBranch = "off";
-        rawPath = rawPath.replace(/^\$?\/?/, ""); 
-    }
-    else if (host.includes("misslua")) { codeBranch = "off"; }
+    if (host.includes("official-misslua")) { codeBranch = "off"; }
+    else if (host.includes("v1-mlexpert")) { codeBranch = "main";}
     else if (host.includes("cdn-misslua")) { codeBranch = "cdn"; }
     else if (host.includes("api-misslua")) { codeBranch = "api"; }
     else if (host.includes("raw.misslua")) { codeBranch = "raw"; }
