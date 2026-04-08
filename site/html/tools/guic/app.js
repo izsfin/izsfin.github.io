@@ -2,7 +2,7 @@ const EngineLoader = {
     async loadAll() {
         console.log("🛠️ Запуск системы UI: Elements & Modify...");
         
-        await this.injectScript('UIE/src.js');
+        await this.injectScript('https://misslua.pages.dev/site/html/tools/guic/UIE/src.js');
 
         await Promise.all([
             this.loadCategory('UIE'),

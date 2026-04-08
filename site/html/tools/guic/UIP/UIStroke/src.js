@@ -1,16 +1,26 @@
 (function() {
     const MetaData = {
-        ElementName: "UICorner",
+        ElementName: "UIStroke",
         ElementProperties: {
-            CornerRadius: 8
+            Thickness: 2,
+            Color: "#ffffff",
+            ApplyStrokeMode: "Frame"
         },
         Apply: (dom, props) => {
-            if (dom) {
-                const radius = props.CornerRadius || 8;
-                dom.style.borderRadius = radius + 'px';
-                dom.style.overflow = 'hidden';
-                console.log(`✅ UICorner applied to ${dom.id || 'element'}: radius ${radius}px`);
+            if (!dom) return;
+            const thickness = props.Thickness || 2;
+            const color = props.Color || '#ffffff';
+            const mode = props.ApplyStrokeMode || 'Frame';
+
+            if (mode === 'Frame') {
+                dom.style.outline = `${thickness}px solid ${color}`;
+                dom.style.outlineOffset = '0px';
+                dom.style.webkitTextStroke = '';
+            } else if (mode === 'Text') {
+                dom.style.outline = '';
+                dom.style.webkitTextStroke = `${thickness}px ${color}`;
             }
+            console.log(`✅ UIStroke (${mode}) applied to ${dom.id}: ${thickness}px ${color}`);
         }
     };
 
