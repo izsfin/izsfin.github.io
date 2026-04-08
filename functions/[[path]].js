@@ -19,10 +19,19 @@ export async function onRequest(context) {
     const isRoblox = ua.includes("roblox") || request.headers.get('ml-access') === 'true';
     const isSpecialUA = ua.includes("ml/sa");
     if (!isOwner && !isRoblox && !isSpecialUA && !hasSecret) {  const logData = { body: { ip, path: url.pathname, domain: host, userAgent }, method: 'POST' };  const mockRes = { status: () => ({ json: () => {}, end: () => {} }) };  waitUntil(loggerHandler(logData, mockRes).catch(() => {}));  return new Response("Access Denied", { status: 403 }); }
-    const paths = {
+     const paths = {
+        "ui/creator/x/style":    "site/html/tools/guic/style.css",
+        "ui/creator/x/core":     "site/html/tools/guic/app.js",
+        "ui/creator/x/elements": "site/html/tools/guic/ui_elements.js",
+        "ui/creator/x/props":    "site/html/tools/guic/properties.js",
+        "ui/creator/x/snapping": "site/html/tools/guic/snapping.js",
+        "ui/creator/x/explorer": "site/html/tools/guic/explorer.js",
+        "ui/creator/x/viewport": "site/html/tools/guic/viewport.js",
+        "ui/creator/x/export":   "site/html/tools/guic/export_engine.js",
     };
     const directMappings = {
         "editor"  : "site/html/tools/guic/index.html",
+        "tools/ui/crator" : "site/html/tools/guic/index.html",
         ""        : "site/html/main.html",
         "catalog" : "site/html/catalog.html",
     };
