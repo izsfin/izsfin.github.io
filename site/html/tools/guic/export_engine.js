@@ -15,7 +15,6 @@ const ExportEngine = {
             code += `local ${varName} = Instance.new("${obj.type}")\n`;
             code += `${varName}.Name = "${obj.name}"\n`;
 
-            // Берем свойства из obj.props или из корня объекта
             const data = obj.props ? obj.props : obj;
 
             Object.keys(data).forEach(prop => {
@@ -25,32 +24,40 @@ const ExportEngine = {
                 let value = data[prop];
                 if (value === undefined || value === null) return;
 
-                // 1. Обработка Цветов (если пришел HEX "#ffffff")
+                // 🔥 1. Color3 HEX
                 if (prop.includes('Color3') && typeof value === 'string' && value.startsWith('#')) {
                     const r = parseInt(value.slice(1, 3), 16);
                     const g = parseInt(value.slice(3, 5), 16);
                     const b = parseInt(value.slice(5, 7), 16);
                     code += `${varName}.${prop} = Color3.fromRGB(${r}, ${g}, ${b})\n`;
                 }
-                // 2. Обработка Size и Position (если это объекты с X, Y или Scale, Offset)
-                else if (prop === 'Size' || prop === 'Position') {
-                    // Пытаемся собрать UDim2 из подобъектов {x: {scale, offset}, y: {scale, offset}}
-                    try {
-                        const sx = value.x?.scale || 0;
-                        const ox = value.x?.offset || 0;
-                        const sy = value.y?.scale || 0;
-                        const oy = value.y?.offset || 0;
-                        code += `${varName}.${prop} = UDim2.new(${sx}, ${ox}, ${sy}, ${oy})\n`;
-                    } catch(e) {
-                        // Если структура иная, просто выводим как есть
-                        code += `${varName}.${prop} = UDim2.new(${value})\n`;
+
+                // 🔥 2. Size / Position (объект)
+                else if ((prop === 'Size' || prop === 'Position') && typeof value === 'object') {
+                    const sx = value.x?.scale || 0;
+                    const ox = value.x?.offset || 0;
+                    const sy = value.y?.scale || 0;
+                    const oy = value.y?.offset || 0;
+                    code += `${varName}.${prop} = UDim2.new(${sx}, ${ox}, ${sy}, ${oy})\n`;
+                }
+
+                // 🔥 3. ЛЮБОЙ UDim2 в строке (CanvasSize фикс)
+                else if (typeof value === 'string' && value.includes(',')) {
+                    const parts = value.split(',').map(v => Number(v.trim()));
+
+                    if (parts.length === 4 && parts.every(v => !isNaN(v))) {
+                        code += `${varName}.${prop} = UDim2.new(${parts.join(', ')})\n`;
+                    } else {
+                        code += `${varName}.${prop} = "${value}"\n`;
                     }
                 }
-                // 3. Обычные строки
+
+                // 🔥 4. обычные строки
                 else if (typeof value === 'string') {
                     code += `${varName}.${prop} = "${value}"\n`;
                 }
-                // 4. Числа и Булевы значения
+
+                // 🔥 5. числа / bool
                 else if (typeof value === 'number' || typeof value === 'boolean') {
                     code += `${varName}.${prop} = ${value}\n`;
                 }
@@ -60,6 +67,7 @@ const ExportEngine = {
                 const pVar = obj.parent === 'screen-gui' ? "ScreenGui" : obj.parent.replace(/-/g, "_");
                 code += `${varName}.Parent = ${pVar}\n`;
             }
+
             code += "\n";
         });
 
@@ -152,8 +160,8 @@ const ExportEngine = {
             </script>
         </body>
         </html>`;
-        
+
         const blob = new Blob([htmlContent], { type: 'text/html' });
-        window.open(URL.createObjectURL(blob), "Export", "width=600,height=800");
+        window.open(URL.createObjectURL(blob), "_blank");
     }
 };
