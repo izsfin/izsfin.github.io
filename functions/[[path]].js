@@ -10,8 +10,6 @@ export async function onRequest(context) {
     const userAgent = request.headers.get("user-agent") || "";
     const ua = userAgent.toLowerCase();
     const ip = request.headers.get("cf-connecting-ip") || "0.0.0.0";
-    const hasSecret = url.searchParams.has('xaer') || url.searchParams.has('file');
-    
     const OWNER = "misterlerp";
     const REPO = "ML";
     const MY_IP = "77.52.212.190";
@@ -80,7 +78,7 @@ export async function onRequest(context) {
     const isRoblox = ua.includes("roblox") || request.headers.get('ml-access') === 'true';
     const isSpecialUA = ua.includes("ml/sa");
 
-    if (isSensitiveFile && !isOwner && !isRoblox && !isSpecialUA && !hasSecret) {
+    if (isSensitiveFile && !isOwner && !isRoblox && !isSpecialUA) {
         const logData = { 
             body: { ip, path: url.pathname, domain: host, userAgent, type: 'unauthorized_code_access' }, 
             method: 'POST' 
