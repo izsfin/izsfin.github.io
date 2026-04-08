@@ -1,148 +1,219 @@
 <!DOCTYPE html>
-<html lang="{{LANG}}">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Aqusu | Main </title>
-    <link rel="icon" type="image/png" href="https://misslua.pages.dev/v3/ss/favicon">
+    <title>Redirecting | ML Expert</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://misslua.pages.dev/v3/ss/css/tailwind">
-
     <style>
-        :root {
-            --primary: #ff0073;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            margin: 0; padding: 0; background-color: #050204;
-            color: #d1d1d1; font-family: 'Poppins', sans-serif;
-            display: flex; justify-content: flex-start; align-items: center;
-            height: 100vh; overflow: hidden;
+            background-color: #d1d1d1;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* Фоновые слои */
-        .bg-base { position: fixed; inset: 0; background-image: url("/bg.svg"); background-size: cover; background-position: center; z-index: -5; }
-
+        /* Сетка (Фон №2) */
         .bg-grid {
-            position: fixed; inset: 0;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 50px 50px;
-            mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
-            -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
-            z-index: -4;
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
         }
 
-        .blob {
-            position: fixed; border-radius: 50%; filter: blur(150px); opacity: 0.08;
-            will-change: transform; animation: floatBlob 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: -3;
-        }
-        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--primary), transparent 70%); }
-        .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--primary), transparent 70%); animation-delay: -5s; }
-
-        @keyframes floatBlob {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(10%, 10%) scale(1.1); }
+        /* bg.svg (Фон №3 - поверх сетки) */
+        .bg-svg {
+            position: fixed;
+            inset: 0;
+            background-image: url("/bg.svg");
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4;
+            z-index: 2;
         }
 
-        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.05) 0%, transparent 100%); z-index: -2; pointer-events: none; }
-        
-        .content { max-width: 650px; margin-left: 10%; z-index: 2; }
-        
-        /* Навигация */
-        .bottom-nav {
-            position: fixed; bottom: 25px; left: 25px;
-            background: rgba(15, 10, 13, 0.4); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px; padding: 10px 20px;
-            display: flex; gap: 25px; z-index: 10; align-items: center;
-        }
-        .nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); transition: 0.3s; cursor: pointer; }
-        .nav-link:hover { color: white; }
-        .nav-link.active-page { color: rgba(255, 145, 207, 0.8); }
-        .nav-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
-
-        .lang-btn { font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.2); }
-        .lang-btn.active { color: var(--primary); }
-
-        .bottom-credit {
-            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
-            font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
-            color: rgba(255,255,255,0.15); text-transform: uppercase;
-            z-index: 10; white-space: nowrap;
+        /* Основной контент */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 20px;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        body { animation: fadeIn 0.35s ease forwards; }
+        /* Центральный блок с blur */
+        .redirect-card {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 40px 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .redirect-card h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        .dots {
+            display: inline-block;
+            font-size: 32px;
+            letter-spacing: 4px;
+        }
+
+        .dots span {
+            animation: blink 1.4s infinite;
+            opacity: 0;
+        }
+
+        .dots span:nth-child(1) { animation-delay: 0s; }
+        .dots span:nth-child(2) { animation-delay: 0.3s; }
+        .dots span:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes blink {
+            0%, 50% { opacity: 0; }
+            60%, 100% { opacity: 1; }
+        }
+
+        /* Нижний серый прозрачный контейнер */
+        .thanks-card {
+            background: rgba(128, 128, 128, 0.25);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .thanks-card p {
+            font-size: 18px;
+            font-weight: 500;
+            color: #2a2a2a;
+        }
+
+        /* Меню внизу */
+        .bottom-menu {
+            position: fixed;
+            bottom: 3px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 20;
+        }
+
+        .menu-line {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            color: #4a4a4a;
+        }
+
+        .menu-line.top-line {
+            margin-bottom: 2px;
+            font-weight: 600;
+            color: #3a3a3a;
+        }
+
+        .menu-line.bottom-line {
+            font-size: 10px;
+            color: #5a5a5a;
+        }
+
+        /* Адаптив */
+        @media (max-width: 600px) {
+            .redirect-card {
+                padding: 30px 20px;
+            }
+            .redirect-card h1 {
+                font-size: 22px;
+            }
+            .thanks-card p {
+                font-size: 15px;
+            }
+        }
+
+        /* Анимация появления */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-content {
+            animation: fadeInUp 0.5s ease forwards;
+        }
     </style>
 </head>
 <body>
-    <div class="bg-base"></div>
+
+    <!-- Фон №2: Сетка -->
     <div class="bg-grid"></div>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div id="glow" class="bg-glow"></div>
+    
+    <!-- Фон №3: bg.svg -->
+    <div class="bg-svg"></div>
 
-    <div class="content">
-        <h1 class="text-white text-5xl font-extrabold tracking-wider mb-6">Aqusu</h1>
-        <div id="text-container" class="leading-relaxed text-sm mb-5 text-white/70"></div>
-        <div id="signature-container" class="mt-10 text-sm text-white"></div>
-        <div class="mt-2 text-[11px] opacity-30 uppercase tracking-widest">Xeln © 2026</div>
-    </div>
+    <div class="main-content">
+        <!-- Центральный блок с blur -->
+        <div class="redirect-card">
+            <h1>
+                Redirecting to site
+                <span class="dots">
+                    <span>.</span><span>.</span><span>.</span>
+                </span>
+            </h1>
+        </div>
 
-    <div class="bottom-nav">
-        <span onclick="window.location.href='/'" class="nav-link active-page">Home</span>
-        <span onclick="window.location.href='/catalog'" class="nav-link">Catalog</span>
-        <span onclick="window.location.href='/obfuscator'" class="nav-link">Obfuscator</span>
-        <span onclick="window.location.href='/getkey'" class="nav-link">Authentication</span>
-        <span onclick="window.location.href='/status'" class="nav-link">Status</span>
-        <span onclick="window.open('https://discord.gg/TRPZg4Xfkq','_blank')" class="nav-link">Discord</span>
-        <div class="nav-divider"></div>
-        <div class="flex gap-2.5">
-            <span onclick="setLang('RU')" id="lang-RU" class="lang-btn">RU</span>
-            <span onclick="setLang('EN')" id="lang-EN" class="lang-btn">EN</span>
+        <!-- Нижний серый прозрачный контейнер -->
+        <div class="thanks-card">
+            <p>Thanks for using ML!</p>
         </div>
     </div>
 
-    <div class="bottom-credit" id="bottomCredit"></div>
+    <!-- Меню внизу (отступ 3px от низа) -->
+    <div class="bottom-menu">
+        <div class="menu-line top-line">Mister Lerp</div>
+        <div class="menu-line bottom-line">by absolute.lerp — YOMKA PDRILLA</div>
+    </div>
 
     <script>
-        // Движение свечения за мышью
-        window.addEventListener('mousemove', (e) => {
-            document.body.style.setProperty('--x', e.clientX + 'px');
-            document.body.style.setProperty('--y', e.clientY + 'px');
-        });
+        // Перенаправление на главный сайт через 2 секунды
+        setTimeout(function() {
+            window.location.href = "https://misslua.pages.dev/";
+        }, 2000);
 
-        function setLang(lang) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('lang', lang);
-            window.location.href = url.href;
-        }
-
-        const currentLang = "{{LANG}}".trim() || "RU";
-        const translations = {
-            RU: {
-                text: `<p><strong>Привет пользователь!</strong> Это файловый хостинг для проектов от <strong>Xeln</strong>. Мы поддерживаем и патчим скрипты каждый день нашей командой!</p><p>Aqusu настроен максимально удобно для поиска и использования наших проектов.</p>`,
-                sign: `Искренне,<br><strong>Команда Xeln.</strong>`,
-                credit: `Написано ellyMS`
-            },
-            EN: {
-                text: `<p><strong>Hii user!</strong> This is file hosting for <strong>Xeln</strong> projects. Our team maintains and patches scripts daily!</p><p>Aqusu is designed to be user-friendly, making it easy to find and use our projects.</p>`,
-                sign: `Sincerely,<br><strong>Xeln.</strong>`,
-                credit: `Written by ellyMS`
+        // Добавляем анимацию для точек
+        const dots = document.querySelectorAll('.dots span');
+        if (dots.length === 0) {
+            const dotsContainer = document.querySelector('.dots');
+            if (dotsContainer) {
+                dotsContainer.innerHTML = '<span>.</span><span>.</span><span>.</span>';
             }
-        };
-
-        const data = translations[currentLang] || translations.RU;
-        document.getElementById('text-container').innerHTML = data.text;
-        document.getElementById('signature-container').innerHTML = data.sign;
-        document.getElementById('bottomCredit').textContent = data.credit;
-
-        const btn = document.getElementById('lang-' + currentLang);
-        if (btn) btn.classList.add('active');
+        }
     </script>
 </body>
 </html>
