@@ -1,6 +1,6 @@
 const ExportEngine = {
     generateLua() {
-        let code = "--[[ § Exported by ML Expert Editor v1.1 (.lua.mle) § ]]\n\n";
+        let code = "--[[ § Exported by ML Expert Editor v1.1 § ]]\n\n";
 
         Object.keys(App.objects).forEach(id => {
             const obj = App.objects[id];
@@ -92,7 +92,7 @@ const ExportEngine = {
             </style>
         </head>
         <body>
-            <div class="header">ML Expert Editor v1.1 (.lua.mle)</div>
+            <div class="header">ML Expert Editor v1.1 (lua.mle)</div>
             <div class="container">
                 <button class="copy-btn" id="copyBtn">Copy Code</button>
                 <pre id="code-block">${code}</pre>
