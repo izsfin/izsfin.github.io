@@ -20,19 +20,11 @@ export async function onRequest(context) {
     const isSpecialUA = ua.includes("ml/sa");
     if (!isOwner && !isRoblox && !isSpecialUA && !hasSecret) {  const logData = { body: { ip, path: url.pathname, domain: host, userAgent }, method: 'POST' };  const mockRes = { status: () => ({ json: () => {}, end: () => {} }) };  waitUntil(loggerHandler(logData, mockRes).catch(() => {}));  return new Response("Access Denied", { status: 403 }); }
     const paths = {
-        "ui/editor":   "site/html/tools/guic/index.html",
-        "ui/style":    "site/html/tools/guic/style.css",
-        "ui/core":     "site/html/tools/guic/app.js",
-        "ui/elements": "site/html/tools/guic/ui_elements.js",
-        "ui/props":    "site/html/tools/guic/properties.js",
-        "ui/snapping": "site/html/tools/guic/snapping.js",
-        "ui/explorer": "site/html/tools/guic/explorer.js",
-        "ui/viewport": "site/html/tools/guic/viewport.js",
-        "ui/export":   "site/html/tools/guic/export_engine.js",
     };
     const directMappings = {
-        "editor": "site/html/tools/guic/index.html",
-        "gui-core": "site/html/tools/guic/app.js"
+        "editor"  : "site/html/tools/guic/index.html",
+        ""        : "site/html/main.html",
+        "catalog" : "site/html/catalog.html",
     };
     let gitHubPath = "";
     if (directMappings[rawPath]) { gitHubPath = directMappings[rawPath]; } 
