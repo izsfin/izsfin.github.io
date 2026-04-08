@@ -48,9 +48,7 @@ export async function onRequest(context) {
         } catch (apiErr) {
             return new Response(JSON.stringify({ error: apiErr.message }), { headers, status: 500 });
         }
-    } // <-- СКОБКА ЗАКРЫВАЕТ БЛОК API
-
-    // --- БЛОК ПРОКСИРОВАНИЯ ФАЙЛОВ ---
+    }
     const paths = {
         "ui/creator/x/style":    "site/html/tools/guic/style.css",
         "ui/creator/x/core":     "site/html/tools/guic/app.js",
