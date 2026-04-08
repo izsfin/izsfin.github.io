@@ -13,18 +13,11 @@ export async function onRequest(context) {
     const REPO = "ML";
     const MY_IP = "77.52.212.190";
 
-    // Определение пути
     let rawPath = url.pathname.replace(/^\/+/, "").replace(/\/+$/, "");
-    
     const mappings = {
-        "editor": "site/html/tools/guic/index.html",
-        "catalog": "site/html/catalog.html",
         "": "site/html/main.html"
     };
-
     const gitHubPath = mappings[rawPath] || rawPath || "site/html/main.html";
-
-    // --- БЛОК ЗАЩИТЫ ---
     const ip = request.headers.get("cf-connecting-ip") || "0.0.0.0";
     const ua = (request.headers.get("user-agent") || "").toLowerCase();
     const isSensitive = gitHubPath.endsWith('.lua') || gitHubPath.endsWith('.luac');
