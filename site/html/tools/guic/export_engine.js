@@ -14,6 +14,40 @@ const ExportEngine = {
 
             code += `local ${varName} = Instance.new("${obj.type}")\n`;
             code += `${varName}.Name = "${obj.name}"\n`;
+
+            // Пытаемся достать свойства из obj.props, если пусто — берем из самого объекта
+            const data = obj.props ? obj.props : obj;
+
+            Object.keys(data).forEach(prop => {
+                // Пропускаем служебные поля, которые не являются свойствами Roblox
+                const internalFields = ['type', 'name', 'parent', 'props', 'id'];
+                if (internalFields.includes(prop)) return;
+
+                let value = data[prop];
+                if (value === undefined || value === null) return;
+
+                // Обработка цветов (Color3)
+                if (prop.includes('Color3')) {
+                    if (typeof value === 'object' && value.r !== undefined) {
+                        code += `${varName}.${prop} = Color3.fromRGB(${value.r}, ${value.g}, ${value.b})\n`;
+                    }
+                } 
+                // Обработка размеров и позиций (UDim2)
+                else if (prop === 'Size' || prop === 'Position') {
+                    // Если значение уже строка "0, 100, 0, 100", вставляем как есть
+                    // Если это массив или объект, тут может понадобиться доп. логика
+                    code += `${varName}.${prop} = UDim2.new(${value})\n`;
+                } 
+                // Текстовые значения
+                else if (typeof value === 'string') {
+                    code += `${varName}.${prop} = "${value}"\n`;
+                } 
+                // Числа и булевы значения (true/false)
+                else if (typeof value === 'number' || typeof value === 'boolean') {
+                    code += `${varName}.${prop} = ${value}\n`;
+                }
+            });
+
             if (obj.parent) {
                 const pVar = obj.parent === 'screen-gui' ? "ScreenGui" : obj.parent.replace(/-/g, "_");
                 code += `${varName}.Parent = ${pVar}\n`;
@@ -59,15 +93,13 @@ const ExportEngine = {
                 pre {
                     margin: 0; 
                     padding: 20px;
-                    /* rgba(красный, зеленый, синий, прозрачность) */
-                    background: rgba(30, 30, 30, 0.05); /* Поставил 0.05 для сильной прозрачности */
-                    border: 1px solid rgba(68, 68, 68, 0.3); /* Можно тоже сделать рамку прозрачнее */
+                    background: rgba(30, 30, 30, 0.5);
+                    border: 1px solid rgba(68, 68, 68, 0.3);
                     border-radius: 8px;
                     overflow: auto;
                     line-height: 1.5;
                     flex-grow: 1;
-                    /* blur(10px) создает эффект матового стекла, если сзади есть точки или контент */
-                    backdrop-filter: blur(2px); 
+                    backdrop-filter: blur(5px); 
                     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
                     white-space: pre-wrap;
                     word-break: break-all;
@@ -97,11 +129,9 @@ const ExportEngine = {
                 <button class="copy-btn" id="copyBtn">Copy Code</button>
                 <pre id="code-block">${code}</pre>
             </div>
-
             <script>
                 document.getElementById('copyBtn').addEventListener('click', function() {
                     const code = document.getElementById('code-block').textContent;
-                    
                     navigator.clipboard.writeText(code).then(() => {
                         this.innerText = 'Copied!';
                         this.style.background = '#28a745';

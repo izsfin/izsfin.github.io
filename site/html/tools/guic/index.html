@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Studio Web Edition</title>
+    <title>ML Expert Studio [Web Edition]</title>
     <link rel="stylesheet" href="https://misslua.pages.dev/site/html/tools/guic/style.css">
     <style>
         * {
@@ -335,14 +335,14 @@
 <body>
     <div id="startup-screen">
         <div class="startup-content">
-            <h1>ML UI Creator</h1>
+            <h1>ML Expert Editor</h1>
             <p>Welcome to UI Creator</p>
             <div class="startup-buttons">
                 <button onclick="Startup.newProject()">New UI</button>
                 <button onclick="document.getElementById('file-input').click()">Load UI (.lua.mle)</button>
             </div>
             <input type="file" id="file-input" style="display:none" accept=".mle" onchange="FileSystem.loadProject(this.files[0])">
-            <div class="credits">by abused.electro</div>
+            <div class="credits">by absolute.lerp</div>
         </div>
     </div>
 
@@ -385,7 +385,7 @@
 
     <script>
         window.onload = () => {
-            console.log("🚀 Движок запущен!");
+            console.log("Engine Started");
             
             if (!window.App) {
                 window.App = {
