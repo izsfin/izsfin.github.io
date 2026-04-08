@@ -95,7 +95,8 @@ export async function onRequest(context) {
         const realExt = gitHubPath.split('.').pop().toLowerCase();
         const mimeTypes = { 
             'html': 'text/html', 'css': 'text/css', 'js': 'application/javascript', 
-            'json': 'application/json', 'lua': 'text/plain', 'png': 'image/png' 
+            'json': 'application/json', 'lua': 'text/plain', 'png': 'image/png', 
+            'css': 'text/css', 'ico': 'image/x-icon',  
         };
 
         const mime = mimeTypes[realExt] || "application/octet-stream";
