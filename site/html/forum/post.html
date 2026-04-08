@@ -261,7 +261,7 @@ async function loadPost() {
   const id = getPostId();
   if (!id) { document.getElementById('postArea').innerHTML='<div class="post-wrap"><div class="post-loading">Post not found</div></div>'; return; }
   try {
-    const r = await fetch(`http://misslua.pages.dev/functions/docs/universal.js?action=post&id=${encodeURIComponent(id)}`);
+    const r = await fetch(`https://misslua.pages.dev/functions/docs/universal.js?action=post&id=${encodeURIComponent(id)}`);
     if (!r.ok) throw new Error('HTTP '+r.status);
     const d = await r.json();
     if (!d.ok || !d.post) { document.getElementById('postArea').innerHTML='<div class="post-wrap"><div class="post-loading">Post not found</div></div>'; return; }
@@ -300,7 +300,7 @@ async function loadPost() {
 
 async function loadComments(postId) {
   try {
-    const r = await fetch(`http://misslua.pages.dev/functions/docs/universal.js?action=comments&id=${encodeURIComponent(postId)}`);
+    const r = await fetch(`https://misslua.pages.dev/functions/docs/universal.js?action=comments&id=${encodeURIComponent(postId)}`);
     const d = await r.json();
     const comments = d.comments || [];
     document.getElementById('commentsCount').textContent = comments.length + ' repl' + (comments.length===1?'y':'ies');
@@ -329,7 +329,7 @@ async function sendComment() {
   msg.textContent='Sending...'; msg.className='reply-msg';
   const postId = getPostId();
   try {
-    const r = await fetch('http://misslua.pages.dev/functions/docs/universal.js?action=comment', {
+    const r = await fetch('https://misslua.pages.dev/functions/docs/universal.js?action=comment', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({postId, text, username: currentUser.username, token: currentUser.token||''})
     });
@@ -345,7 +345,7 @@ async function sendComment() {
 
 async function loadOtherPosts(author, currentId) {
   try {
-    const r = await fetch('http://misslua.pages.dev/functions/docs/universal.js?action=posts&fresh=1');
+    const r = await fetch('https://misslua.pages.dev/functions/docs/universal.js?action=posts&fresh=1');
     const d = await r.json();
     const posts = (d.posts||[]).filter(p => p.id !== currentId).slice(0, 6);
     if (!posts.length) return;
