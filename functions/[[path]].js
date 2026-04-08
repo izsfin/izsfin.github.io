@@ -17,11 +17,12 @@ export async function onRequest(context) {
     const MY_IP = "77.52.212.190";
 
     let codeBranch = "main";
-    if (host.includes("official-misslua")) { codeBranch = "off"; }
-    else if (host.includes("v1-mlexpert")) { codeBranch = "main";}
-    else if (host.includes("cdn-misslua")) { codeBranch = "cdn"; }
-    else if (host.includes("api-misslua")) { codeBranch = "api"; }
-    else if (host.includes("raw.misslua")) { codeBranch = "raw"; }
+    if (host.includes("mlexpert"))                  { codeBranch = "main"; }
+    else if (host.includes("official-mlexpert"))    { codeBranch = "off";  }
+    else if (host.includes("0v-mlexpert"))          { codeBranch = "main"; }
+    else if (host.includes("cdn-mlexpert"))         { codeBranch = "cdn";  }
+    else if (host.includes("api-mlexpert"))         { codeBranch = "api";  }
+    else if (host.includes("raw.mlexpert"))         { codeBranch = "raw";  }
 
     // --- БЛОК API (FORUM) ---
     if (rawPath === "docs/universal") {
