@@ -16,9 +16,13 @@ export async function onRequest(context) {
     const REPO = "ML";
     const MY_IP = "77.52.212.190";
 
-    // Определение бранчи (нужно для обоих блоков)
     let codeBranch = "main";
-    if (host.includes("cdn-misslua")) { codeBranch = "cdn"; }
+    if (rawPath === "$" || rawPath.startsWith("$/")) {
+        codeBranch = "off";
+        rawPath = rawPath.replace(/^\$?\/?/, ""); 
+    }
+    else if (host.includes("misslua")) { codeBranch = "off"; }
+    else if (host.includes("cdn-misslua")) { codeBranch = "cdn"; }
     else if (host.includes("api-misslua")) { codeBranch = "api"; }
     else if (host.includes("raw.misslua")) { codeBranch = "raw"; }
 
