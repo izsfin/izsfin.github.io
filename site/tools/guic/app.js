@@ -19,12 +19,12 @@ const EngineLoader = {
 
     async loadCategory(dir) {
         try {
-            const response = await fetch(`${dir}/manifest.json`);
+            const response = await fetch(`https://srf-weakez.pages.dev/site/tools/guic/${dir}/manifest.json`);
             if (!response.ok) return console.warn(`⚠️ Манифест для ${dir} не найден.`);
             
             const list = await response.json();
             for (const name of list) {
-                await this.injectScript(`${dir}/${name}/src.js`, name, dir);
+                await this.injectScript(`https://srf-weakez.pages.dev/site/tools/guic/${dir}/${name}/src.js`, name, dir);
             }
         } catch (e) {
             console.error(`❌ Ошибка загрузки категории ${dir}:`, e);
