@@ -262,17 +262,20 @@ const PropertiesEngine = {
         `;
 
         if (obj.type === 'UICorner') {
-            const radius = props.CornerRadius !== undefined ? props.CornerRadius : 8;
-            html += `
+         const radius = props.CornerRadius !== undefined ? props.CornerRadius : 8;
+         html += `
                 <div style="margin-bottom:12px;">
                     <label style="display:block; color:#aaa; font-size:10px; margin-bottom:4px;">CORNER RADIUS (${radius}px)</label>
                     <div style="display:flex; gap:8px; align-items:center;">
                         <input type="range" min="0" max="200" step="1" value="${radius}"
                                style="flex:1; cursor:pointer;"
-                               oninput="PropertiesEngine.updateEffectProp('${obj.id}', 'CornerRadius', this.value, 'number'); this.previousElementSibling.innerText = 'CORNER RADIUS (' + this.value + 'px)'; this.nextElementSibling.value = this.value">
+                               oninput="PropertiesEngine.updateEffectProp('${obj.id}', 'CornerRadius', this.value, 'number'); 
+                                        this.closest('.margin-bottom\\:12px').querySelector('label').innerText = 'CORNER RADIUS (' + this.value + 'px)'; 
+                                        this.nextElementSibling.value = this.value">
                         <input type="number" value="${radius}" min="0" max="200"
                                style="width:60px; background:#333; border:1px solid #555; color:#fff; padding:6px; border-radius:4px; text-align:center;"
-                               onchange="PropertiesEngine.updateEffectProp('${obj.id}', 'CornerRadius', this.value, 'number'); this.previousElementSibling.value = this.value">
+                               onchange="PropertiesEngine.updateEffectProp('${obj.id}', 'CornerRadius', this.value, 'number'); 
+                                         this.previousElementSibling.value = this.value">
                     </div>
                 </div>
             `;
@@ -357,6 +360,22 @@ const PropertiesEngine = {
         if (effect) {
             effect.name = newName;
             if (window.ExplorerEngine) window.ExplorerEngine.render();
+        }
+    },
+
+        // Пример функции обновления CornerRadius
+    updateCornerRadius(val) {
+        const activeId = App.activeId;
+        const obj = App.objects[activeId];
+        if (obj && obj.type === 'UICorner') {
+            obj.props.CornerRadius = parseInt(val) || 0;
+            const parentObj = App.objects[obj.parent];
+            if (parentObj && parentObj.dom) {
+                const moduleData = window.RegistryP['UICorner'];
+                if (moduleData && moduleData.Apply) {
+                    moduleData.Apply(parentObj.dom, obj.props);
+                }
+            }
         }
     },
 
