@@ -42,6 +42,7 @@ const PropertiesEngine = {
         const bgTransparency = obj.props?.BackgroundTransparency !== undefined ? obj.props.BackgroundTransparency : 0;
         const clipsDescendants = obj.props?.ClipsDescendants || false;
         const isTextLabel = obj.type === 'TextLabel';
+        const isImageLabel = obj.type === 'ImageLabel';
 
         let textFields = '';
         if (isTextLabel) {
@@ -71,6 +72,21 @@ const PropertiesEngine = {
                                style="width:60px; background:#333; border:1px solid #555; color:#fff; padding:6px; border-radius:4px; text-align:center;"
                                onchange="PropertiesEngine.updateTextProp('TextSize', this.value); this.previousElementSibling.value = this.value">
                     </div>
+                </div>
+            `;
+        }
+
+        let imageFields = '';
+        if (isImageLabel) {
+            const imageVal = obj.props?.Image || '';
+            imageFields = `
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; color:#aaa; font-size:10px; margin-bottom:4px;">IMAGE (URL or Base64)</label>
+                    <textarea
+                           style="width:100%; height:60px; background:#333; border:1px solid #555; color:#fff; padding:6px; border-radius:4px; box-sizing:border-box; font-size:10px; font-family:monospace; resize:vertical;"
+                           onchange="PropertiesEngine.updateImageProp('Image', this.value)"
+                           placeholder="https://... или rbxasset:// или Base64 без префикса">${imageVal}</textarea>
+                    <div style="color:#666; font-size:9px; margin-top:4px;">💡 Поддержка: URL, rbxasset://, или Base64 строка</div>
                 </div>
             `;
         }
@@ -128,6 +144,7 @@ const PropertiesEngine = {
                                onchange="PropertiesEngine.updateBackgroundTransparency(this.value); this.previousElementSibling.value = this.value">
                     </div>
                 </div>
+                ${imageFields}
                 ${textFields}
                 <div style="margin-bottom:12px;">
                     <label style="display:flex; align-items:center; cursor:pointer;">
@@ -189,7 +206,7 @@ const PropertiesEngine = {
                     </label>
                 </div>
                 <div style="color:#555; font-size:10px; margin-top:8px; padding-top:8px; border-top:1px solid #333;">
-                    Size: 800 × 450 px
+                    Size: 800 × 450 px (Fixed canvas size)
                 </div>
             </div>
         `;
@@ -378,6 +395,32 @@ const PropertiesEngine = {
             const sz = parseInt(value);
             obj.props.TextSize = sz;
             obj.dom.style.fontSize = sz + 'px';
+        }
+    },
+
+    updateImageProp(prop, value) {
+        const obj = window.App.objects[window.App.activeId];
+        if (!obj || !obj.dom || obj.type !== 'ImageLabel') return;
+        if (!obj.props) obj.props = {};
+
+        if (prop === 'Image') {
+            obj.props.Image = value;
+            
+            // Обновляем картинку
+            if (value && value.trim() !== '') {
+                let imageUrl = value;
+                if (value.startsWith('data:image') || 
+                    value.startsWith('http://') || 
+                    value.startsWith('https://') ||
+                    value.startsWith('rbxasset://')) {
+                    imageUrl = value;
+                } else if (value.length > 50 && !value.includes(' ')) {
+                    imageUrl = `data:image/png;base64,${value}`;
+                }
+                obj.dom.style.backgroundImage = `url('${imageUrl}')`;
+            } else {
+                obj.dom.style.backgroundImage = "url('https://via.placeholder.com/100')";
+            }
         }
     },
 

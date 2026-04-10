@@ -6,33 +6,44 @@ const SnappingEngine = {
         const el = obj.dom;
         const parent = el.parentElement;
         
-        // Получаем текущую позицию в момент начала драга
-        let currentLeft = el.offsetLeft;
-        let currentTop = el.offsetTop;
+        // Получаем начальную позицию элемента
+        let startLeft = el.offsetLeft;
+        let startTop = el.offsetTop;
         
+        // Запоминаем начальные позиции ВСЕХ детей
         const children = this.getChildren(id);
+        const childrenStartPos = {};
+        children.forEach(childId => {
+            const childObj = window.App.objects[childId];
+            if (childObj && childObj.dom) {
+                childrenStartPos[childId] = {
+                    left: childObj.dom.offsetLeft,
+                    top: childObj.dom.offsetTop
+                };
+            }
+        });
         
         const gv = document.getElementById('g-v');
         const gh = document.getElementById('g-h');
 
-        let lastX = e.clientX;
-        let lastY = e.clientY;
+        let startX = e.clientX;
+        let startY = e.clientY;
         let isDragging = false;
 
         const move = (ev) => {
             isDragging = true;
             const zoom = window.App.zoom || 1;
             
-            // Вычисляем смещение от последнего положения мыши
-            const dx = (ev.clientX - lastX) / zoom;
-            const dy = (ev.clientY - lastY) / zoom;
+            // Вычисляем общее смещение от начальной точки
+            const totalDx = (ev.clientX - startX) / zoom;
+            const totalDy = (ev.clientY - startY) / zoom;
 
-            // Новая позиция = текущая позиция + смещение
-            let newLeft = currentLeft + dx;
-            let newTop = currentTop + dy;
+            // Новая позиция = начальная позиция + общее смещение
+            let newLeft = startLeft + totalDx;
+            let newTop = startTop + totalDy;
 
             // Примагничивание
-            const snapDist = 1;
+            const snapDist = 10;
             if (gv) gv.style.display = 'none';
             if (gh) gh.style.display = 'none';
 
@@ -44,13 +55,9 @@ const SnappingEngine = {
             const targetsX = [0, (parentWidth - elWidth) / 2, parentWidth - elWidth];
             const targetsY = [0, (parentHeight - elHeight) / 2, parentHeight - elHeight];
 
-            let snappedX = false;
-            let snappedY = false;
-
             targetsX.forEach((t, i) => {
                 if (Math.abs(newLeft - t) < snapDist) {
                     newLeft = t;
-                    snappedX = true;
                     if (gv) {
                         gv.style.display = 'block';
                         gv.style.left = (i === 0 ? "0%" : (i === 1 ? "50%" : "100%"));
@@ -61,7 +68,6 @@ const SnappingEngine = {
             targetsY.forEach((t, i) => {
                 if (Math.abs(newTop - t) < snapDist) {
                     newTop = t;
-                    snappedY = true;
                     if (gh) {
                         gh.style.display = 'block';
                         gh.style.top = (i === 0 ? "0%" : (i === 1 ? "50%" : "100%"));
@@ -69,33 +75,22 @@ const SnappingEngine = {
                 }
             });
 
-            // Применяем новую позицию
+            // Применяем новую позицию к элементу
             el.style.left = newLeft + 'px';
             el.style.top = newTop + 'px';
             
-            // Обновляем текущую позицию для следующего шага
-            currentLeft = newLeft;
-            currentTop = newTop;
+            // Перемещаем детей относительно ИХ начальной позиции + общее смещение родителя
+            const deltaX = newLeft - startLeft;
+            const deltaY = newTop - startTop;
             
-            // Перемещаем детей (сохраняя их относительную позицию)
-            const deltaX = newLeft - currentLeft;
-            const deltaY = newTop - currentTop;
-            
-            if (Math.abs(deltaX) > 0.1 || Math.abs(deltaY) > 0.1) {
-                children.forEach(childId => {
-                    const childObj = window.App.objects[childId];
-                    if (childObj && childObj.dom) {
-                        const childLeft = parseFloat(childObj.dom.style.left) || 0;
-                        const childTop = parseFloat(childObj.dom.style.top) || 0;
-                        childObj.dom.style.left = (childLeft + deltaX) + 'px';
-                        childObj.dom.style.top = (childTop + deltaY) + 'px';
-                    }
-                });
-            }
-
-            // Обновляем последние координаты мыши
-            lastX = ev.clientX;
-            lastY = ev.clientY;
+            children.forEach(childId => {
+                const childObj = window.App.objects[childId];
+                const startPos = childrenStartPos[childId];
+                if (childObj && childObj.dom && startPos) {
+                    childObj.dom.style.left = (startPos.left + deltaX) + 'px';
+                    childObj.dom.style.top = (startPos.top + deltaY) + 'px';
+                }
+            });
         };
 
         const stop = () => {
@@ -107,15 +102,30 @@ const SnappingEngine = {
             
             if (isDragging) {
                 // Сохраняем финальную позицию в props
+                const finalLeft = parseFloat(el.style.left) || 0;
+                const finalTop = parseFloat(el.style.top) || 0;
+                
                 if (!obj.props.Position) obj.props.Position = {};
-                obj.props.Position.X = currentLeft;
-                obj.props.Position.Y = currentTop;
+                obj.props.Position.X = finalLeft;
+                obj.props.Position.Y = finalTop;
+                
+                // Сохраняем позиции детей
+                children.forEach(childId => {
+                    const childObj = window.App.objects[childId];
+                    if (childObj && childObj.dom) {
+                        const childLeft = parseFloat(childObj.dom.style.left) || 0;
+                        const childTop = parseFloat(childObj.dom.style.top) || 0;
+                        if (!childObj.props.Position) childObj.props.Position = {};
+                        childObj.props.Position.X = childLeft;
+                        childObj.props.Position.Y = childTop;
+                    }
+                });
                 
                 // Обновляем Properties один раз после драга
                 if (window.PropertiesEngine) {
                     window.PropertiesEngine.render();
                 }
-                console.log(`✅ ${obj.name} перемещен на (${currentLeft}, ${currentTop})`);
+                console.log(`✅ ${obj.name} перемещен на (${finalLeft}, ${finalTop})`);
             }
         };
 

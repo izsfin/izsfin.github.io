@@ -1,24 +1,32 @@
 const ExportEngine = {
     generateLua() {
         let code = "--[[ § Exported by ML Expert Editor v1.1 § ]]\n\n";
+        const varMap = {}; // Маппинг id -> имя переменной
 
+        // Сначала создаём ScreenGui
+        code += `local ScreenGui = Instance.new("ScreenGui")\n`;
+        code += `ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")\n\n`;
+        varMap['screen-gui'] = 'ScreenGui';
+
+        // Генерируем код для всех объектов
         Object.keys(App.objects).forEach(id => {
-            const obj = App.objects[id];
-            const varName = id.replace(/-/g, "_");
+            if (id === 'screen-gui') return;
             
-            if (id === 'screen-gui') {
-                code += `local ScreenGui = Instance.new("ScreenGui")\n`;
-                code += `ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")\n\n`;
-                return;
-            }
+            const obj = App.objects[id];
+            if (obj.isEffect) return; // Эффекты обработаем отдельно
+            
+            // Используем имя объекта вместо obj_N
+            const safeName = obj.name.replace(/[^a-zA-Z0-9_]/g, '_');
+            const varName = safeName || id.replace(/-/g, "_");
+            varMap[id] = varName;
 
             code += `local ${varName} = Instance.new("${obj.type}")\n`;
             code += `${varName}.Name = "${obj.name}"\n`;
 
-            const data = obj.props ? obj.props : obj;
+            const data = obj.props || {};
 
             Object.keys(data).forEach(prop => {
-                const internalFields = ['type', 'name', 'parent', 'props', 'id'];
+                const internalFields = ['type', 'name', 'parent', 'props', 'id', 'dom', 'effects'];
                 if (internalFields.includes(prop)) return;
 
                 let value = data[prop];
@@ -32,13 +40,11 @@ const ExportEngine = {
                     code += `${varName}.${prop} = Color3.fromRGB(${r}, ${g}, ${b})\n`;
                 }
 
-                // 🔥 2. Size / Position (объект)
-                else if ((prop === 'Size' || prop === 'Position') && typeof value === 'object') {
-                    const sx = value.x?.scale || 0;
-                    const ox = value.x?.offset || 0;
-                    const sy = value.y?.scale || 0;
-                    const oy = value.y?.offset || 0;
-                    code += `${varName}.${prop} = UDim2.new(${sx}, ${ox}, ${sy}, ${oy})\n`;
+                // 🔥 2. Size / Position (объект с X, Y)
+                else if ((prop === 'Size' || prop === 'Position') && typeof value === 'object' && value.X !== undefined) {
+                    const ox = value.X || 0;
+                    const oy = value.Y || 0;
+                    code += `${varName}.${prop} = UDim2.new(0, ${ox}, 0, ${oy})\n`;
                 }
 
                 // 🔥 3. ЛЮБОЙ UDim2 в строке (CanvasSize фикс)
@@ -52,20 +58,67 @@ const ExportEngine = {
                     }
                 }
 
-                // 🔥 4. обычные строки
+                // 🔥 4. Image (пропускаем пустые или добавляем Base64)
+                else if (prop === 'Image' && typeof value === 'string') {
+                    if (value && value.trim() !== '') {
+                        code += `${varName}.${prop} = "${value}"\n`;
+                    }
+                }
+
+                // 🔥 5. обычные строки
                 else if (typeof value === 'string') {
                     code += `${varName}.${prop} = "${value}"\n`;
                 }
 
-                // 🔥 5. числа / bool
+                // 🔥 6. числа / bool
                 else if (typeof value === 'number' || typeof value === 'boolean') {
                     code += `${varName}.${prop} = ${value}\n`;
                 }
             });
 
+            // Parent
             if (obj.parent) {
-                const pVar = obj.parent === 'screen-gui' ? "ScreenGui" : obj.parent.replace(/-/g, "_");
+                const pVar = varMap[obj.parent] || obj.parent.replace(/-/g, "_");
                 code += `${varName}.Parent = ${pVar}\n`;
+            }
+
+            // Эффекты (UICorner, UIStroke, UIGradient)
+            if (obj.effects && obj.effects.length > 0) {
+                obj.effects.forEach(effect => {
+                    const effectObj = App.objects[effect.id];
+                    if (!effectObj) return;
+                    
+                    const effectVarName = `${varName}_${effectObj.type}`;
+                    code += `\nlocal ${effectVarName} = Instance.new("${effectObj.type}")\n`;
+                    code += `${effectVarName}.Name = "${effectObj.name}"\n`;
+                    
+                    const effectProps = effectObj.props || {};
+                    Object.keys(effectProps).forEach(eProp => {
+                        let eValue = effectProps[eProp];
+                        if (eValue === undefined || eValue === null) return;
+                        
+                        if (eProp === 'CornerRadius' && effectObj.type === 'UICorner') {
+                            code += `${effectVarName}.${eProp} = UDim.new(0, ${eValue})\n`;
+                        } else if (eProp === 'Color' && typeof eValue === 'string' && eValue.startsWith('#')) {
+                            const r = parseInt(eValue.slice(1, 3), 16);
+                            const g = parseInt(eValue.slice(3, 5), 16);
+                            const b = parseInt(eValue.slice(5, 7), 16);
+                            code += `${effectVarName}.${eProp} = Color3.fromRGB(${r}, ${g}, ${b})\n`;
+                        } else if ((eProp === 'Color1' || eProp === 'Color2') && typeof eValue === 'string' && eValue.startsWith('#')) {
+                            const r = parseInt(eValue.slice(1, 3), 16);
+                            const g = parseInt(eValue.slice(3, 5), 16);
+                            const b = parseInt(eValue.slice(5, 7), 16);
+                            // UIGradient использует ColorSequence, но для простоты выводим как Color3
+                            code += `${effectVarName}.${eProp} = Color3.fromRGB(${r}, ${g}, ${b})\n`;
+                        } else if (typeof eValue === 'number' || typeof eValue === 'boolean') {
+                            code += `${effectVarName}.${eProp} = ${eValue}\n`;
+                        } else if (typeof eValue === 'string') {
+                            code += `${effectVarName}.${eProp} = "${eValue}"\n`;
+                        }
+                    });
+                    
+                    code += `${effectVarName}.Parent = ${varName}\n`;
+                });
             }
 
             code += "\n";
