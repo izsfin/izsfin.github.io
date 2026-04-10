@@ -1,30 +1,35 @@
 const ExportEngine = {
     generateLua() {
         let code = "--[[ § Exported by ML Expert Editor v1.1 § ]]\n\n";
-        const varMap = {}; // Маппинг id -> имя переменной
+        const varMap = {}; 
 
-        // Сначала создаём ScreenGui
+        // 1. Инициализируем ScreenGui сразу
         code += `local ScreenGui = Instance.new("ScreenGui")\n`;
         code += `ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")\n\n`;
         varMap['screen-gui'] = 'ScreenGui';
 
-        // Генерируем код для всех объектов
         Object.keys(App.objects).forEach(id => {
-            if (id === 'screen-gui') return;
-            
             const obj = App.objects[id];
-            if (obj.isEffect) return; // Эффекты обработаем отдельно
-            
-            // Используем имя объекта вместо obj_N
-            const safeName = obj.name.replace(/[^a-zA-Z0-9_]/g, '_');
-            const varName = safeName || id.replace(/-/g, "_");
-            varMap[id] = varName;
+            if (obj.isEffect) return;
 
-            code += `local ${varName} = Instance.new("${obj.type}")\n`;
-            code += `${varName}.Name = "${obj.name}"\n`;
+            let varName; // Объявляем переменную здесь
+
+            // 2. Если это наш ScreenGui, просто берем имя переменной. 
+            // Если нет — создаем новый объект.
+            if (id === 'screen-gui') {
+                varName = 'ScreenGui';
+            } else {
+                const safeName = obj.name.replace(/[^a-zA-Z0-9_]/g, '_');
+                varName = safeName || id.replace(/-/g, "_");
+                varMap[id] = varName;
+
+                code += `local ${varName} = Instance.new("${obj.type}")\n`;
+                code += `${varName}.Name = "${obj.name}"\n`;
+            }
 
             const data = obj.props || {};
 
+            // 3. Теперь этот цикл свойств сработает и для ScreenGui!
             Object.keys(data).forEach(prop => {
                 const internalFields = ['type', 'name', 'parent', 'props', 'id', 'dom', 'effects'];
                 if (internalFields.includes(prop)) return;
@@ -32,57 +37,44 @@ const ExportEngine = {
                 let value = data[prop];
                 if (value === undefined || value === null) return;
 
-                // 🔥 1. Color3 HEX
+                // Цвета (HEX -> Color3)
                 if (prop.includes('Color3') && typeof value === 'string' && value.startsWith('#')) {
                     const r = parseInt(value.slice(1, 3), 16);
                     const g = parseInt(value.slice(3, 5), 16);
                     const b = parseInt(value.slice(5, 7), 16);
                     code += `${varName}.${prop} = Color3.fromRGB(${r}, ${g}, ${b})\n`;
                 }
-
-                // 🔥 2. Size / Position (объект с X, Y)
+                // Размер и Позиция
                 else if ((prop === 'Size' || prop === 'Position') && typeof value === 'object' && value.X !== undefined) {
                     const ox = value.X || 0;
                     const oy = value.Y || 0;
                     code += `${varName}.${prop} = UDim2.new(0, ${ox}, 0, ${oy})\n`;
                 }
-
-                // 🔥 3. ЛЮБОЙ UDim2 в строке (CanvasSize фикс)
+                // UDim2 из строки
                 else if (typeof value === 'string' && value.includes(',')) {
                     const parts = value.split(',').map(v => Number(v.trim()));
-
                     if (parts.length === 4 && parts.every(v => !isNaN(v))) {
                         code += `${varName}.${prop} = UDim2.new(${parts.join(', ')})\n`;
                     } else {
                         code += `${varName}.${prop} = "${value}"\n`;
                     }
                 }
-
-                // 🔥 4. Image (пропускаем пустые или добавляем Base64)
-                else if (prop === 'Image' && typeof value === 'string') {
-                    if (value && value.trim() !== '') {
-                        code += `${varName}.${prop} = "${value}"\n`;
-                    }
-                }
-
-                // 🔥 5. обычные строки
+                // Остальное (строки, числа, булевы)
                 else if (typeof value === 'string') {
                     code += `${varName}.${prop} = "${value}"\n`;
                 }
-
-                // 🔥 6. числа / bool
                 else if (typeof value === 'number' || typeof value === 'boolean') {
                     code += `${varName}.${prop} = ${value}\n`;
                 }
             });
 
-            // Parent
-            if (obj.parent) {
+            // 4. Установка родителя (пропускаем для ScreenGui, т.к. задали выше)
+            if (obj.parent && id !== 'screen-gui') {
                 const pVar = varMap[obj.parent] || obj.parent.replace(/-/g, "_");
                 code += `${varName}.Parent = ${pVar}\n`;
             }
 
-            // Эффекты (UICorner, UIStroke, UIGradient)
+            // 5. Обработка эффектов
             if (obj.effects && obj.effects.length > 0) {
                 obj.effects.forEach(effect => {
                     const effectObj = App.objects[effect.id];
@@ -104,19 +96,12 @@ const ExportEngine = {
                             const g = parseInt(eValue.slice(3, 5), 16);
                             const b = parseInt(eValue.slice(5, 7), 16);
                             code += `${effectVarName}.${eProp} = Color3.fromRGB(${r}, ${g}, ${b})\n`;
-                        } else if ((eProp === 'Color1' || eProp === 'Color2') && typeof eValue === 'string' && eValue.startsWith('#')) {
-                            const r = parseInt(eValue.slice(1, 3), 16);
-                            const g = parseInt(eValue.slice(3, 5), 16);
-                            const b = parseInt(eValue.slice(5, 7), 16);
-                            // UIGradient использует ColorSequence, но для простоты выводим как Color3
-                            code += `${effectVarName}.${eProp} = Color3.fromRGB(${r}, ${g}, ${b})\n`;
-                        } else if (typeof eValue === 'number' || typeof eValue === 'boolean') {
-                            code += `${effectVarName}.${eProp} = ${eValue}\n`;
-                        } else if (typeof eValue === 'string') {
-                            code += `${effectVarName}.${eProp} = "${eValue}"\n`;
+                        } else {
+                            // ... остальные свойства эффектов ...
+                            if (typeof eValue === 'number' || typeof eValue === 'boolean') code += `${effectVarName}.${eProp} = ${eValue}\n`;
+                            else if (typeof eValue === 'string') code += `${effectVarName}.${eProp} = "${eValue}"\n`;
                         }
                     });
-                    
                     code += `${effectVarName}.Parent = ${varName}\n`;
                 });
             }
