@@ -270,7 +270,7 @@ const PropertiesEngine = {
                         <input type="range" min="0" max="200" step="1" value="${radius}"
                                style="flex:1; cursor:pointer;"
                                oninput="PropertiesEngine.updateEffectProp('${obj.id}', 'CornerRadius', this.value, 'number'); 
-                                        this.closest('.margin-bottom\\:12px').querySelector('label').innerText = 'CORNER RADIUS (' + this.value + 'px)'; 
+                                    this.closest('div').parentElement.querySelector('label').innerText = 'CORNER RADIUS (' + this.value + 'px)';"
                                         this.nextElementSibling.value = this.value">
                         <input type="number" value="${radius}" min="0" max="200"
                                style="width:60px; background:#333; border:1px solid #555; color:#fff; padding:6px; border-radius:4px; text-align:center;"
