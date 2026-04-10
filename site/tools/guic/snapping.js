@@ -43,7 +43,7 @@ const SnappingEngine = {
             let newTop = startTop + totalDy;
 
             // Примагничивание
-            const snapDist = 10;
+            const snapDist = 1;
             if (gv) gv.style.display = 'none';
             if (gh) gh.style.display = 'none';
 
