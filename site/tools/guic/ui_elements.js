@@ -67,16 +67,17 @@ const UIElements = {
             effects: []
         };
 
-        if (moduleData && moduleData.Init && el) {
-            moduleData.Init(el, App.objects[id].props);
-        }
+        if (moduleData && moduleData.Init) { moduleData.Init(el, App.objects[id].props); }
+        if (isMod && moduleData.Apply) {
+         const parentObj = App.objects[parentId];
+         if (parentObj && parentObj.dom) { moduleData.Apply(parentObj.dom, App.objects[id].props); } }
+             
 
         if (window.ExplorerEngine) {
             window.ExplorerEngine.render();
             window.ExplorerEngine.select(id);
         }
-        
-        // Убираем setTimeout вызов PropertiesEngine - он вызовется через select
+
     },
 
     delete(id) {
