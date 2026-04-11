@@ -32,6 +32,7 @@ export async function onRequest(context) {
       "ui/creator/x/export":   "site/tools/guic/export_engine.js",
    };
    const directMappings = {
+    "": "site/main.html",
     "editor": "site/tools/guic/index.html",
     "tools/ui/crator": "site/tools/guic/index.html",
     "catalog":  "site/catalog/html/catalog.html",
