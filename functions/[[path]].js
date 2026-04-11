@@ -35,8 +35,8 @@ export async function onRequest(context) {
     "": "site/main.html",
     "editor": "site/tools/guic/index.html",
     "tools/ui/crator": "site/tools/guic/index.html",
-    "catalog":  "site/catalog/html/catalog.html",
-    "catalog/": "site/catalog/html/catalog-item.html",
+    "catalog":  "site/catalog/catalog.html",
+    "catalog/": "site/catalog/catalog-item.html",
    };
    let gitHubPath = "";  if (isRootAccess) { gitHubPath = "site/redict.html"; }  else if (directMappings[internalPath]) {  gitHubPath = directMappings[internalPath];  }  else if (paths[internalPath]) {  gitHubPath = paths[internalPath];  }  else {  gitHubPath = internalPath;  }
    const requestedExt = gitHubPath.split('.').pop().toLowerCase();
