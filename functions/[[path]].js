@@ -38,7 +38,7 @@ export async function onRequest(context) {
     "catalog":  "site/catalog/catalog.html",
     "catalog/": "site/catalog/catalog-item.html",
    };
-   let gitHubPath = "";  if (isRootAccess) { gitHubPath = "site/redict.html"; }  else if (directMappings[internalPath]) {  gitHubPath = directMappings[internalPath];  }  else if (paths[internalPath]) {  gitHubPath = paths[internalPath];  }  else {  gitHubPath = internalPath;  }
+   let gitHubPath = "";  if (isRootAccess) { gitHubPath = "site/main.html"; }  else if (directMappings[internalPath]) {  gitHubPath = directMappings[internalPath];  }  else if (paths[internalPath]) {  gitHubPath = paths[internalPath];  }  else {  gitHubPath = internalPath;  }
    const requestedExt = gitHubPath.split('.').pop().toLowerCase();
    const isSensitiveFile = requestedExt === 'lua' || requestedExt === 'luam';
    const isOwner = ip === MY_IP;
