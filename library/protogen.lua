@@ -1,19 +1,15 @@
--- ProtogenUI Library
--- Syntax: local UI = loadstring(game:HttpGet("..."))()
+--[[ $$ Protogen Library || by its.lerp | v1.0.0 || Thanks for using :) $$ ]]
 
 local ProtogenUI = {}
 ProtogenUI.__index = ProtogenUI
 
--- // Services
 local Players         = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService    = game:GetService("TweenService")
 local RunService      = game:GetService("RunService")
-
 local LocalPlayer = Players.LocalPlayer
 local Mouse       = LocalPlayer:GetMouse()
 
--- // Utility
 local function Color(hex)
     hex = hex:gsub("#", "")
     return Color3.fromRGB(
@@ -67,7 +63,6 @@ local function makeDraggable(frame, handle)
     end)
 end
 
--- // Palette
 local C = {
     BG           = Color("111111"),
     BG_ELEMENT   = Color("202020"),
@@ -83,7 +78,6 @@ local C = {
 local FONT   = Font.new("rbxasset://fonts/families/Inconsolata.json", Enum.FontWeight.Regular)
 local FONT_SZ = 13
 
--- // Stroke helper
 local function addStroke(inst, color, thickness, transparency)
     local s = Instance.new("UIStroke")
     s.Color = color or C.SEPARATOR
@@ -123,9 +117,6 @@ local function newLabel(parent, text, size, xAlign)
     return l
 end
 
--- ============================================================
--- // Window.Create
--- ============================================================
 function ProtogenUI.Create(cfg)
     cfg = cfg or {}
     local title   = cfg.Title   or "ProtogenUI"
@@ -135,7 +126,6 @@ function ProtogenUI.Create(cfg)
         keybind = Enum.KeyCode[keybind] or Enum.KeyCode.RightShift
     end
 
-    -- ScreenGui
     local sg = Instance.new("ScreenGui")
     sg.Name = "ProtogenUI"
     sg.ResetOnSpawn = false
@@ -144,7 +134,6 @@ function ProtogenUI.Create(cfg)
     pcall(function() sg.Parent = LocalPlayer:WaitForChild("PlayerGui") end)
     if not sg.Parent then sg.Parent = game:GetService("CoreGui") end
 
-    -- Background
     local bg = Instance.new("Frame")
     bg.Name = "Background"
     bg.Size = UDim2.new(0, 340, 0, 500)
@@ -155,7 +144,6 @@ function ProtogenUI.Create(cfg)
     addCorner(bg, 6)
     addStroke(bg, C.STROKE, 1.5)
 
-    -- TitleContainerFrame
     local titleCont = Instance.new("Frame")
     titleCont.Name = "TitleContainerFrame"
     titleCont.Size = UDim2.new(1,0,0,32)
@@ -164,7 +152,6 @@ function ProtogenUI.Create(cfg)
     titleCont.Parent = bg
     addCorner(titleCont, 6)
 
-    -- fix bottom corners of title
     local titleBotFix = Instance.new("Frame")
     titleBotFix.Size = UDim2.new(1,0,0.5,0)
     titleBotFix.Position = UDim2.new(0,0,0.5,0)
@@ -173,7 +160,6 @@ function ProtogenUI.Create(cfg)
     titleBotFix.ZIndex = 0
     titleBotFix.Parent = titleCont
 
-    -- TitleLabel
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "TitleLabel"
     titleLabel.Size = UDim2.new(1,0,1,0)
@@ -186,10 +172,8 @@ function ProtogenUI.Create(cfg)
     titleLabel.ZIndex = 2
     titleLabel.Parent = titleCont
 
-    -- Draggable via title
     makeDraggable(bg, titleCont)
 
-    -- TabContainerFrame
     local tabCont = Instance.new("Frame")
     tabCont.Name = "TabContainerFrame"
     tabCont.Size = UDim2.new(1,0,0,26)
@@ -198,7 +182,6 @@ function ProtogenUI.Create(cfg)
     tabCont.BorderSizePixel = 0
     tabCont.Parent = bg
 
-    -- Separators
     local function makeSep(name, size, pos)
         local s = Instance.new("Frame")
         s.Name = name
@@ -213,7 +196,6 @@ function ProtogenUI.Create(cfg)
     makeSep("RightSeparator", UDim2.new(0,1,1,0), UDim2.new(1,-1,0,0))
     makeSep("UpSeparator",    UDim2.new(1,0,0,1), UDim2.new(0,0,0,0))
 
-    -- Tab layout inside tabCont
     local tabLayout = Instance.new("UIListLayout")
     tabLayout.FillDirection = Enum.FillDirection.Horizontal
     tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -221,7 +203,6 @@ function ProtogenUI.Create(cfg)
     tabLayout.Parent = tabCont
     addPadding(tabCont, 3, 3, 4, 4)
 
-    -- TabContentFrame
     local tabContent = Instance.new("Frame")
     tabContent.Name = "TabContentFrame"
     tabContent.Size = UDim2.new(1,0,1,-58)
@@ -231,7 +212,6 @@ function ProtogenUI.Create(cfg)
     tabContent.ClipsDescendants = true
     tabContent.Parent = bg
 
-    -- Keybind toggle visibility
     local visible = true
     UserInputService.InputBegan:Connect(function(input, gp)
         if gp then return end
@@ -241,7 +221,6 @@ function ProtogenUI.Create(cfg)
         end
     end)
 
-    -- Window object
     local Window = {}
     Window._sg          = sg
     Window._bg          = bg
@@ -250,15 +229,11 @@ function ProtogenUI.Create(cfg)
     Window._tabs        = {}
     Window._activeTab   = nil
 
-    -- ============================================================
-    -- // Window:TabCreate
-    -- ============================================================
     function Window:TabCreate(cfg2)
         cfg2 = cfg2 or {}
         local tabTitle   = cfg2.Title       or "Tab"
         local openOnStart = cfg2.OpenOnStart ~= false
 
-        -- TabLabel button
         local tabBtn = Instance.new("TextButton")
         tabBtn.Name = "TabLabel"
         tabBtn.AutoButtonColor = false
@@ -271,7 +246,6 @@ function ProtogenUI.Create(cfg)
         tabBtn.Parent = self._tabCont
         addCorner(tabBtn, 3)
 
-        -- Content holder for this tab (Tab2ContainerFrame lives here)
         local contentHolder = Instance.new("Frame")
         contentHolder.Name = "ContentHolder_"..tabTitle
         contentHolder.Size = UDim2.new(1,0,1,0)
@@ -279,7 +253,6 @@ function ProtogenUI.Create(cfg)
         contentHolder.Visible = false
         contentHolder.Parent = self._tabContent
 
-        -- Inner scroll
         local scroll = Instance.new("ScrollingFrame")
         scroll.Name = "Scroll"
         scroll.Size = UDim2.new(1,0,1,0)
@@ -297,7 +270,6 @@ function ProtogenUI.Create(cfg)
         scrollLayout.Parent = scroll
         addPadding(scroll, 6, 6, 6, 6)
 
-        -- Tab object
         local Tab = {}
         Tab._btn      = tabBtn
         Tab._holder   = contentHolder
@@ -307,12 +279,11 @@ function ProtogenUI.Create(cfg)
         Tab._sections = {}
 
         local function setActive(t)
-            -- deactivate all
             for _, tb in ipairs(self._tabs) do
                 tb._btn.BackgroundColor3 = C.BG_INACTIVE
                 tb._holder.Visible = false
             end
-            -- activate selected
+
             t._btn.BackgroundColor3 = C.BG_ELEMENT
             t._holder.Visible = true
             self._activeTab = t
@@ -328,15 +299,11 @@ function ProtogenUI.Create(cfg)
             setActive(Tab)
         end
 
-        -- ============================================================
-        -- // Tab:SectionCreate
-        -- ============================================================
         function Tab:SectionCreate(cfg3)
             cfg3 = cfg3 or {}
             local t1 = cfg3.Title_1 or "Section"
             local t2 = cfg3.Title_2 or nil
 
-            -- Tab2ContainerFrame  (outer wrapper with sub-tabs if t2 exists)
             local secOuter = Instance.new("Frame")
             secOuter.Name = "Tab2ContainerFrame"
             secOuter.Size = UDim2.new(1,0,0,0)
@@ -352,7 +319,6 @@ function ProtogenUI.Create(cfg)
             secOuterLayout.Padding = UDim.new(0,0)
             secOuterLayout.Parent = secOuter
 
-            -- Section header row
             local secHeader = Instance.new("Frame")
             secHeader.Name = "SectionHeader"
             secHeader.Size = UDim2.new(1,0,0,24)
@@ -369,7 +335,6 @@ function ProtogenUI.Create(cfg)
             secHeaderLayout.Parent = secHeader
             addPadding(secHeader, 2, 2, 4, 4)
 
-            -- Content frames (one per sub-tab, or just one if no t2)
             local panes = {}
 
             local function makePane(name, idx)
@@ -402,7 +367,6 @@ function ProtogenUI.Create(cfg)
                 panes[t2] = pane2
             end
 
-            -- Sub-tab buttons
             local activePaneRef = { v = pane1 }
 
             local function makeSubTabBtn(label, pane, lo)
@@ -422,7 +386,6 @@ function ProtogenUI.Create(cfg)
                     activePaneRef.v.Visible = false
                     pane.Visible = true
                     activePaneRef.v = pane
-                    -- recolor all sub btns
                     for _, ch in ipairs(secHeader:GetChildren()) do
                         if ch:IsA("TextButton") then
                             ch.BackgroundColor3 = C.BG_INACTIVE
@@ -436,22 +399,17 @@ function ProtogenUI.Create(cfg)
             makeSubTabBtn(t1, pane1, 1)
             if t2 then makeSubTabBtn(t2, pane2, 2) end
 
-            -- Section object returned
             local Section = {}
             Section._secOuter = secOuter
             Section._panes    = panes
             Section._activePane = pane1
             Section._tab      = self
 
-            -- helper: get current pane
             local function getPane(paneName)
                 if paneName then return panes[paneName] end
                 return activePaneRef.v
             end
 
-            -- --------------------------------------------------------
-            -- // Section:AddLabel
-            -- --------------------------------------------------------
             function Section:AddLabel(cfg4)
                 cfg4 = cfg4 or {}
                 local word    = cfg4.Word    or "Label"
@@ -510,9 +468,6 @@ function ProtogenUI.Create(cfg)
                 return Elem
             end
 
-            -- --------------------------------------------------------
-            -- // Section:AddToggle
-            -- --------------------------------------------------------
             function Section:AddToggle(cfg4)
                 cfg4 = cfg4 or {}
                 local label    = cfg4.Title    or "Toggle"
@@ -529,7 +484,6 @@ function ProtogenUI.Create(cfg)
                 fr.BorderSizePixel = 0
                 fr.Parent = pane
 
-                -- Background (toggle track)
                 local bg2 = Instance.new("Frame")
                 bg2.Name = "Background"
                 bg2.Size = UDim2.new(0,36,0,18)
@@ -540,7 +494,6 @@ function ProtogenUI.Create(cfg)
                 addCorner(bg2, 9)
                 addStroke(bg2, C.SEPARATOR, 1)
 
-                -- Included (thumb)
                 local thumb = Instance.new("Frame")
                 thumb.Name = "Included"
                 thumb.Size = UDim2.new(0,12,0,12)
@@ -550,7 +503,6 @@ function ProtogenUI.Create(cfg)
                 thumb.Parent = bg2
                 addCorner(thumb, 6)
 
-                -- Label
                 local lbl = Instance.new("TextLabel")
                 lbl.Name = "Label"
                 lbl.BackgroundTransparency = 1
@@ -597,9 +549,6 @@ function ProtogenUI.Create(cfg)
                 return Elem
             end
 
-            -- --------------------------------------------------------
-            -- // Section:AddSlider
-            -- --------------------------------------------------------
             function Section:AddSlider(cfg4)
                 cfg4 = cfg4 or {}
                 local label    = cfg4.Title    or "Slider"
@@ -618,7 +567,6 @@ function ProtogenUI.Create(cfg)
                 fr.BorderSizePixel = 0
                 fr.Parent = pane
 
-                -- Title
                 local titleLbl = Instance.new("TextLabel")
                 titleLbl.Name = "Title"
                 titleLbl.BackgroundTransparency = 1
@@ -630,7 +578,6 @@ function ProtogenUI.Create(cfg)
                 titleLbl.TextXAlignment = Enum.TextXAlignment.Left
                 titleLbl.Parent = fr
 
-                -- Separator (outer border)
                 local sep = Instance.new("Frame")
                 sep.Name = "Separator"
                 sep.Size = UDim2.new(1,0,0,18)
@@ -641,7 +588,6 @@ function ProtogenUI.Create(cfg)
                 addCorner(sep, 4)
                 addStroke(sep, C.SEPARATOR, 1)
 
-                -- Background (track)
                 local track = Instance.new("Frame")
                 track.Name = "Background"
                 track.Size = UDim2.new(1,-2,1,-2)
@@ -652,7 +598,6 @@ function ProtogenUI.Create(cfg)
                 track.Parent = sep
                 addCorner(track, 3)
 
-                -- Highlighted
                 local hl = Instance.new("Frame")
                 hl.Name = "Highlighted"
                 hl.Size = UDim2.new((val-min)/(max-min),0,1,0)
@@ -661,7 +606,6 @@ function ProtogenUI.Create(cfg)
                 hl.Parent = track
                 addCorner(hl, 3)
 
-                -- Holder (number display)
                 local holder = Instance.new("TextLabel")
                 holder.Name = "Holder"
                 holder.BackgroundTransparency = 1
@@ -674,7 +618,6 @@ function ProtogenUI.Create(cfg)
                 holder.ZIndex = 3
                 holder.Parent = sep
 
-                -- Drag logic
                 local sliding = false
                 sep.InputBegan:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -707,9 +650,6 @@ function ProtogenUI.Create(cfg)
                 return Elem
             end
 
-            -- --------------------------------------------------------
-            -- // Section:AddTextBox
-            -- --------------------------------------------------------
             function Section:AddTextBox(cfg4)
                 cfg4 = cfg4 or {}
                 local label      = cfg4.Title       or "TextBox"
@@ -777,9 +717,6 @@ function ProtogenUI.Create(cfg)
                 return Elem
             end
 
-            -- --------------------------------------------------------
-            -- // Section:AddColorPicker
-            -- --------------------------------------------------------
             function Section:AddColorPicker(cfg4)
                 cfg4 = cfg4 or {}
                 local label    = cfg4.Title    or "ColorPicker"
@@ -796,7 +733,6 @@ function ProtogenUI.Create(cfg)
                 fr.BorderSizePixel = 0
                 fr.Parent = pane
 
-                -- Row
                 local row = Instance.new("Frame")
                 row.Size = UDim2.new(1,0,0,16)
                 row.BackgroundTransparency = 1
@@ -813,7 +749,6 @@ function ProtogenUI.Create(cfg)
                 titleLbl.TextXAlignment = Enum.TextXAlignment.Left
                 titleLbl.Parent = row
 
-                -- SelectedColor swatch
                 local swatch = Instance.new("Frame")
                 swatch.Name = "SelectedColor"
                 swatch.Size = UDim2.new(0,40,0,14)
@@ -824,7 +759,6 @@ function ProtogenUI.Create(cfg)
                 addCorner(swatch, 3)
                 addStroke(swatch, C.SEPARATOR, 1)
 
-                -- HEX input row
                 local inputRow = Instance.new("Frame")
                 inputRow.Size = UDim2.new(1,0,0,18)
                 inputRow.Position = UDim2.new(0,0,0,20)
@@ -859,7 +793,7 @@ function ProtogenUI.Create(cfg)
                 hexPrefix.Parent = bgBox2
 
                 local hexBox = Instance.new("TextBox")
-                hexBox.Name = "RBox" -- named RBox for compat
+                hexBox.Name = "RBox"
                 hexBox.Size = UDim2.new(1,-14,1,0)
                 hexBox.Position = UDim2.new(0,14,0,0)
                 hexBox.BackgroundTransparency = 1
@@ -906,9 +840,6 @@ function ProtogenUI.Create(cfg)
                 return Elem
             end
 
-            -- --------------------------------------------------------
-            -- // Section:AddDropdown
-            -- --------------------------------------------------------
             function Section:AddDropdown(cfg4)
                 cfg4 = cfg4 or {}
                 local label    = cfg4.Title    or "Dropdown"
@@ -929,7 +860,6 @@ function ProtogenUI.Create(cfg)
                 fr.ClipsDescendants = false
                 fr.Parent = pane
 
-                -- Title
                 local titleLbl = Instance.new("TextLabel")
                 titleLbl.Name = "Title"
                 titleLbl.BackgroundTransparency = 1
@@ -941,7 +871,6 @@ function ProtogenUI.Create(cfg)
                 titleLbl.TextXAlignment = Enum.TextXAlignment.Left
                 titleLbl.Parent = fr
 
-                -- Separator (header)
                 local sep3 = Instance.new("Frame")
                 sep3.Name = "Separator"
                 sep3.Size = UDim2.new(1,0,0,18)
@@ -961,7 +890,6 @@ function ProtogenUI.Create(cfg)
                 headerBg.Parent = sep3
                 addCorner(headerBg, 3)
 
-                -- Holder label
                 local holderLbl = Instance.new("TextLabel")
                 holderLbl.Name = "Holder"
                 holderLbl.BackgroundTransparency = 1
@@ -975,7 +903,6 @@ function ProtogenUI.Create(cfg)
                 holderLbl.Parent = headerBg
                 addPadding(holderLbl, 0,0,4,0)
 
-                -- Arrow
                 local arrow = Instance.new("TextLabel")
                 arrow.BackgroundTransparency = 1
                 arrow.Text = "▾"
@@ -988,7 +915,6 @@ function ProtogenUI.Create(cfg)
                 arrow.ZIndex = 3
                 arrow.Parent = headerBg
 
-                -- Dropdown Background (list)
                 local listBg = Instance.new("Frame")
                 listBg.Name = "Background"
                 listBg.Size = UDim2.new(1,0,0,0)
@@ -1008,7 +934,6 @@ function ProtogenUI.Create(cfg)
                 listLayout.Parent = listBg
                 addPadding(listBg, 2,2,2,2)
 
-                -- populate options
                 for i, opt in ipairs(options) do
                     local optBtn = Instance.new("TextButton")
                     optBtn.AutoButtonColor = false
@@ -1036,10 +961,8 @@ function ProtogenUI.Create(cfg)
                     end)
                 end
 
-                -- update list height
                 listBg.Size = UDim2.new(1,0,0, #options * 20 + 4)
 
-                -- open/close
                 local headerBtn = Instance.new("TextButton")
                 headerBtn.Size = UDim2.new(1,0,1,0)
                 headerBtn.BackgroundTransparency = 1
@@ -1070,7 +993,6 @@ function ProtogenUI.Create(cfg)
                         if ch:IsA("TextButton") then ch:Destroy() end
                     end
                     for i, opt in ipairs(opts) do
-                        -- rebuild (same logic as above)
                         local ob = Instance.new("TextButton")
                         ob.AutoButtonColor = false
                         ob.Size = UDim2.new(1,0,0,18)
