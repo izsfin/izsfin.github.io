@@ -1,4 +1,4 @@
---[[ $$ Protogen Library || by its.lerp | v0.0.1 in dev || thanks for using :) $$ ]]
+--[[ $$ Protogen Library || by its.lerp | v0.0.1 in dev || thanks for using :)s $$ ]]
 
 local ProtogenUI = {}
 ProtogenUI.__index = ProtogenUI
