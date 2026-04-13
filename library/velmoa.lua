@@ -1,5 +1,4 @@
--- mewixUI | Lightweight Roblox UI Library
--- Usage: local UI = loadstring(...)()
+--[[ $$ Velmoa UI - Library || by its.lerp | v0.0.2 = in dev || thanks for using :) $$ ]]
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -9,9 +8,6 @@ local CoreGui = game:GetService("CoreGui")
 local UI = {}
 UI.__index = UI
 
--- ============================================================
--- THEME
--- ============================================================
 local T = {
     bg        = Color3.fromRGB(18, 18, 22),
     bgRow     = Color3.fromRGB(26, 26, 32),
@@ -30,9 +26,6 @@ local T = {
     inputBg   = Color3.fromRGB(30, 30, 38),
 }
 
--- ============================================================
--- HELPERS
--- ============================================================
 local function corner(parent, rad)
     local c = Instance.new("UICorner", parent)
     c.CornerRadius = UDim.new(0, rad or 6)
@@ -59,27 +52,20 @@ local function label(parent, props)
     return l
 end
 
--- ============================================================
--- WINDOW
--- ============================================================
 function UI.new(opts)
     opts = opts or {}
     local title   = opts.Title   or "UI"
     local keybind = opts.Keybind or "Insert"
-
-    -- cleanup old
     local existing = CoreGui:FindFirstChild("mewixUI_" .. title)
     if existing then existing:Destroy() end
-
     local gui = Instance.new("ScreenGui")
     gui.Name = "mewixUI_" .. title
     gui.ResetOnSpawn = false
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     gui.Parent = CoreGui
-
     local main = Instance.new("Frame", gui)
     main.Name = "Main"
-    main.Size = UDim2.new(0, 280, 0, 46) -- растёт по контенту
+    main.Size = UDim2.new(0, 280, 0, 46)
     main.Position = UDim2.new(0.5, -140, 0.5, -165)
     main.BackgroundColor3 = T.bg
     main.BorderSizePixel = 0
@@ -87,8 +73,6 @@ function UI.new(opts)
     main.Draggable = true
     corner(main, 8)
     stroke(main, T.stroke, 1)
-
-    -- title bar
     local bar = Instance.new("Frame", main)
     bar.Size = UDim2.new(1, 0, 0, 36)
     bar.BackgroundColor3 = T.titleBar
@@ -100,7 +84,6 @@ function UI.new(opts)
     barFix.BackgroundColor3 = T.titleBar
     barFix.BorderSizePixel = 0
 
-    -- icon
     local xOff = 10
     if opts.Icon then
         local ico = Instance.new("ImageLabel", bar)
@@ -130,7 +113,6 @@ function UI.new(opts)
     label(closeBtn, { text = "×", size = 16, font = Enum.Font.GothamBold, color = Color3.new(1,1,1) })
     closeBtn.MouseButton1Click:Connect(function() main.Visible = false end)
 
-    -- content scroll
     local content = Instance.new("Frame", main)
     content.Name = "Content"
     content.Position = UDim2.new(0, 10, 0, 40)
@@ -142,7 +124,6 @@ function UI.new(opts)
     layout.SortOrder = Enum.SortOrder.LayoutOrder
     layout.Padding = UDim.new(0, 5)
 
-    -- авторазмер окна
     local pad = Instance.new("UIPadding", content)
     pad.PaddingBottom = UDim.new(0, 8)
 
@@ -150,7 +131,6 @@ function UI.new(opts)
         main.Size = UDim2.new(0, 280, 0, layout.AbsoluteContentSize.Y + 40 + 8 + 5)
     end)
 
-    -- keybind
     UserInputService.InputBegan:Connect(function(inp, gpe)
         if gpe then return end
         local ok, key = pcall(function() return Enum.KeyCode[keybind] end)
@@ -159,17 +139,12 @@ function UI.new(opts)
         end
     end)
 
-    -- window object
     local win = { _content = content, _order = 0, _gui = gui }
-
     function win:_nextOrder()
         self._order += 1
         return self._order
     end
 
-    -- --------------------------------------------------------
-    -- SECTION
-    -- --------------------------------------------------------
     function win:Section(name)
         local order = self:_nextOrder()
 
@@ -185,9 +160,6 @@ function UI.new(opts)
 
         local sec = { _win = self }
 
-        -- ----------------------------------------------------
-        -- TOGGLE
-        -- ----------------------------------------------------
         function sec:Toggle(labelText, default, onChange)
             local o = self._win:_nextOrder()
             local row = Instance.new("Frame", content)
@@ -243,9 +215,6 @@ function UI.new(opts)
             return api
         end
 
-        -- ----------------------------------------------------
-        -- SLIDER
-        -- ----------------------------------------------------
         function sec:Slider(labelText, min, max, default, increment, onChange)
             local o = self._win:_nextOrder()
             local row = Instance.new("Frame", content)
@@ -319,9 +288,6 @@ function UI.new(opts)
             end)
         end
 
-        -- ----------------------------------------------------
-        -- DROPDOWN
-        -- ----------------------------------------------------
         function sec:Dropdown(labelText, options, default, onChange)
             local o = self._win:_nextOrder()
             local row = Instance.new("Frame", content)
