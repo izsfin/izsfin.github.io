@@ -37,6 +37,7 @@ export async function onRequest(context) {
     "tools/ui/crator": "site/tools/guic/index.html",
     "catalog":  "site/catalog/catalog.html",
     "catalog/": "site/catalog/catalog-item.html",
+    "forum": "site/forum/home.html",
    };
    let gitHubPath = "";  if (isRootAccess) { gitHubPath = "site/main.html"; }  else if (directMappings[internalPath]) {  gitHubPath = directMappings[internalPath];  }  else if (paths[internalPath]) {  gitHubPath = paths[internalPath];  }  else {  gitHubPath = internalPath;  }
    const requestedExt = gitHubPath.split('.').pop().toLowerCase();
