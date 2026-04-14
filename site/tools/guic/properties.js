@@ -269,9 +269,7 @@ const PropertiesEngine = {
                     <div style="display:flex; gap:8px; align-items:center;">
                         <input type="range" min="0" max="200" step="1" value="${radius}"
                                style="flex:1; cursor:pointer;"
-                               oninput="PropertiesEngine.updateEffectProp('${obj.id}', 'CornerRadius', this.value, 'number'); 
-                                    this.closest('div').parentElement.querySelector('label').innerText = 'CORNER RADIUS (' + this.value + 'px)';"
-                                        this.nextElementSibling.value = this.value">
+                               oninput="PropertiesEngine.updateEffectProp('${obj.id}', 'CornerRadius', this.value, 'number'); this.closest('div').parentElement.querySelector('label').innerText = 'CORNER RADIUS (' + this.value + 'px)'; this.nextElementSibling.value = this.value">
                         <input type="number" value="${radius}" min="0" max="200"
                                style="width:60px; background:#333; border:1px solid #555; color:#fff; padding:6px; border-radius:4px; text-align:center;"
                                onchange="PropertiesEngine.updateEffectProp('${obj.id}', 'CornerRadius', this.value, 'number'); 
@@ -363,7 +361,6 @@ const PropertiesEngine = {
         }
     },
 
-        // Пример функции обновления CornerRadius
     updateCornerRadius(val) {
         const activeId = App.activeId;
         const obj = App.objects[activeId];
@@ -391,9 +388,23 @@ const PropertiesEngine = {
 
         const parentObj = window.App.objects[effect.parent];
         if (parentObj && parentObj.dom) {
-            const moduleData = window.RegistryP ? window.RegistryP[effect.type] : null;
-            if (moduleData && moduleData.Apply) {
-                moduleData.Apply(parentObj.dom, effect.props);
+            if (effect.type === 'UICorner') {
+                parentObj.dom.style.borderRadius = (effect.props.CornerRadius || 0) + 'px';
+            } else if (effect.type === 'UIStroke') {
+                const thickness = effect.props.Thickness || 1;
+                const color = effect.props.Color || '#ffffff';
+                parentObj.dom.style.outline = `${thickness}px solid ${color}`;
+                parentObj.dom.style.outlineOffset = `-${thickness}px`;
+            } else if (effect.type === 'UIGradient') {
+                const r = effect.props.Rotation || 0;
+                const c1 = effect.props.Color1 || '#ff0000';
+                const c2 = effect.props.Color2 || '#0000ff';
+                parentObj.dom.style.background = `linear-gradient(${r}deg, ${c1}, ${c2})`;
+            } else {
+                const moduleData = window.RegistryP ? window.RegistryP[effect.type] : null;
+                if (moduleData && moduleData.Apply) {
+                    moduleData.Apply(parentObj.dom, effect.props);
+                }
             }
         }
         console.log(`✨ ${effect.type}.${prop} =`, newValue);
@@ -424,8 +435,7 @@ const PropertiesEngine = {
 
         if (prop === 'Image') {
             obj.props.Image = value;
-            
-            // Обновляем картинку
+
             if (value && value.trim() !== '') {
                 let imageUrl = value;
                 if (value.startsWith('data:image') || 

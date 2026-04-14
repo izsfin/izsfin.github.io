@@ -83,8 +83,34 @@ const UIElements = {
     delete(id) {
         if (id === 'screen-gui' || !App.objects[id]) return;
 
-        if (App.objects[id].dom) {
-            App.objects[id].dom.remove();
+        const obj = App.objects[id];
+
+        // Если это эффект — сбрасываем CSS на родителе
+        if (obj.isEffect) {
+            const parentObj = App.objects[obj.parent];
+            if (parentObj && parentObj.dom) {
+                if (obj.type === 'UICorner') {
+                    parentObj.dom.style.borderRadius = '';
+                } else if (obj.type === 'UIStroke') {
+                    parentObj.dom.style.outline = '';
+                    parentObj.dom.style.outlineOffset = '';
+                } else if (obj.type === 'UIGradient') {
+                    const bg = parentObj.props?.BackgroundColor3 || '#ffffff';
+                    const t = parentObj.props?.BackgroundTransparency || 0;
+                    const r = parseInt(bg.slice(1,3), 16);
+                    const g = parseInt(bg.slice(3,5), 16);
+                    const b = parseInt(bg.slice(5,7), 16);
+                    parentObj.dom.style.background = '';
+                    parentObj.dom.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${1 - t})`;
+                }
+                if (parentObj.effects) {
+                    parentObj.effects = parentObj.effects.filter(e => e.id !== id);
+                }
+            }
+        }
+
+        if (obj.dom) {
+            obj.dom.remove();
         }
 
         Object.keys(App.objects).forEach(key => {
