@@ -31,10 +31,14 @@ export async function onRequest(context) {
         const headersJSON = { "Content-Type": "application/json; charset=UTF-8", "Access-Control-Allow-Origin": "*" };
         try {
             if (action === 'posts') {
-                const { data } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: 'docs/index.json' });
-                return new Response(githubDecode(data.content), { headers: headersJSON });
-            }
-        } catch (e) {
+    try {
+        const { data } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: 'docs/index.json' });
+        return new Response(githubDecode(data.content), { headers: headersJSON });
+    } catch (e) {
+        return new Response(JSON.stringify({ error: e.message, status: e.status }), { status: 500, headers: headersJSON });
+     }
+   }
+ } catch (e) {
             return new Response(JSON.stringify({ error: "GitHub API Error", details: e.message }), { status: 404, headers: headersJSON });
         }
     }
