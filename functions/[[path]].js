@@ -40,7 +40,7 @@ export async function onRequest(context) {
 
     const pages = {
         "": "site/main.html",
-        "forum": "site/forum/home.html",      // ← исправлена опечатка
+        "docs": "site/forum/home.html",      // ← исправлена опечатка
         "forum/post": "site/forum/post.html",
         "auth": "site/auth.html",
         "catalog": "site/catalog/catalog.html"
