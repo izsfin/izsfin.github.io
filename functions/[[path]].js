@@ -84,7 +84,7 @@ export async function onRequest(context) {
         "":            "site/forum/home.html",
         "forum":       "site/forum/home.html",
         "forum/post":  "site/forum/post.html",
-        "create/":     "site/forum/create.html",
+        "forum/create": "site/forum/create.html",
         "auth":        "site/forum/auth.html",
         "catalog":     "site/catalog/catalog.html"
     };
