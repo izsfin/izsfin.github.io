@@ -1,7 +1,7 @@
-import { handleGetPosts, handleGetSinglePost } from '/routes/posts.js';
-import { handleCreatePost } from '/routes/create.js';
-import { handleAuth } from '/routes/auth.js';
-import { getOctokit, OWNER, REPO } from '/lib/shared.js'; // Импортируем из твоего shared.js
+import { handleGetPosts, handleGetSinglePost } from './routes/posts.js';
+import { handleCreatePost } from './routes/create.js';
+import { handleAuth } from './routes/auth.js';
+import { getOctokit, OWNER, REPO } from './lib/shared.js';
 
 export async function onRequest(context) {
     const { request, env } = context;
