@@ -1,7 +1,7 @@
 import { Octokit } from "@octokit/rest";
-import { authToAcc }                    from './forum/AuthToAcc.js';
-import { createPost }                   from './forum/CreatePost.js';
-import { loadPosts, loadPost, loadComments, addComment } from './forum/PostLoad.js';
+import { authToAcc }                    from './functions/forum/AuthToAcc.js';
+import { createPost }                   from './functions/forum/CreatePost.js';
+import { loadPosts, loadPost, loadComments, addComment } from './functions/forum/PostLoad.js';
 const OWNER = "odesseu";
 const REPO  = "hosting";
 
