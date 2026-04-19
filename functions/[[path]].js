@@ -10,7 +10,6 @@ export async function onRequest(context) {
     const { request, env } = context;
     const url = new URL(request.url);
 
-    // ← редирект ЗДЕСЬ, внутри функции
     if (url.pathname !== '/' && url.pathname.endsWith('/')) {
         return Response.redirect(url.origin + url.pathname.slice(0, -1) + url.search, 301);
     }
@@ -18,7 +17,6 @@ export async function onRequest(context) {
     const octokit = new Octokit({ auth: env.GITHUB_TOKEN });
     const action = url.searchParams.get('action');
     let rawPath = url.pathname.replace(/^\/+|\/+$/g, "");
-
 
     const OWNER = "odesseu";
     const REPO = "hosting";
@@ -30,28 +28,56 @@ export async function onRequest(context) {
     if (action) {
         const headersJSON = { "Content-Type": "application/json; charset=UTF-8", "Access-Control-Allow-Origin": "*" };
         try {
+            // Показывает схему таблицы posts
+            if (action === 'debug') {
+                const result = await env.DB.prepare("PRAGMA table_info(posts)").all();
+                return new Response(JSON.stringify(result), { headers: headersJSON });
+            }
+
             if (action === 'posts') {
-    try {
-        const { data } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: 'docs/index.json' });
-        return new Response(githubDecode(data.content), { headers: headersJSON });
-    } catch (e) {
-        return new Response(JSON.stringify({ error: e.message, status: e.status }), { status: 500, headers: headersJSON });
-     }
-   }
- } catch (e) {
-            return new Response(JSON.stringify({ error: "GitHub API Error", details: e.message }), { status: 404, headers: headersJSON });
+                // Читаем из D1 — колонки подправь после debug
+                const result = await env.DB.prepare("SELECT * FROM posts ORDER BY rowid DESC").all();
+                return new Response(JSON.stringify({ posts: result.results }), { headers: headersJSON });
+            }
+
+            if (action === 'post') {
+                const id = url.searchParams.get('id');
+                const result = await env.DB.prepare("SELECT * FROM posts WHERE id = ?").bind(id).first();
+                if (!result) return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: headersJSON });
+                return new Response(JSON.stringify({ post: result }), { headers: headersJSON });
+            }
+
+            if (action === 'comments') {
+                const id = url.searchParams.get('id');
+                const result = await env.DB.prepare("SELECT * FROM comments WHERE post_id = ? ORDER BY rowid ASC").bind(id).all();
+                return new Response(JSON.stringify({ comments: result.results }), { headers: headersJSON });
+            }
+
+            if (action === 'comment' && request.method === 'POST') {
+                const body = await request.json();
+                const { postId, text, username } = body;
+                if (!postId || !text || !username) return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400, headers: headersJSON });
+                const date = new Date().toISOString().slice(0, 10);
+                await env.DB.prepare("INSERT INTO comments (post_id, author, text, date) VALUES (?, ?, ?, ?)").bind(postId, username, text, date).run();
+                return new Response(JSON.stringify({ ok: true }), { headers: headersJSON });
+            }
+
+            return new Response(JSON.stringify({ error: 'Action not found' }), { status: 404, headers: headersJSON });
+
+        } catch (e) {
+            return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: headersJSON });
         }
     }
 
     const pages = {
         "": "site/main.html",
-        "docs": "site/forum/home.html",      // ← исправлена опечатка
+        "forum": "site/forum/home.html",
         "forum/post": "site/forum/post.html",
+        "docs": "site/forum/home.html",
         "auth": "site/auth.html",
         "catalog": "site/catalog/catalog.html"
     };
 
-    // Матчим точно или по префиксу (для /forum/post/some-id)
     let pageKey = rawPath in pages ? rawPath : null;
     if (!pageKey) {
         for (const key of Object.keys(pages)) {
