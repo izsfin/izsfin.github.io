@@ -338,7 +338,7 @@ async function doRegister() {
   } catch(e) { msg.textContent='Network error'; msg.className='modal-msg err'; }
 }
 
-function goCreate() { window.location.href = '/create'; }
+function goCreate() { window.location.href = '/forum/create'; }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function setLang(l) { document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent===l)); }
 

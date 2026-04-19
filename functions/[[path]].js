@@ -81,12 +81,12 @@ export async function onRequest(context) {
 
     // ── HTML страницы ──
     const pages = {
-        "":            "site/forum/home.html",
-        "forum":       "site/forum/home.html",
-        "forum/post":  "site/forum/post.html",
+        "":             "site/forum/home.html",
+        "forum":        "site/forum/home.html",
+        "forum/post":   "site/forum/post.html",
         "forum/create": "site/forum/create.html",
-        "auth":        "site/forum/auth.html",
-        "catalog":     "site/catalog/catalog.html"
+        "auth":         "site/forum/auth.html",
+        "catalog":      "site/catalog/catalog.html"
     };
 
     let pageKey = rawPath in pages ? rawPath : null;
