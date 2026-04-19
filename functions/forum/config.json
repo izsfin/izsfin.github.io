@@ -10,7 +10,7 @@
     "forum": true,
     "auth": true,
     "verifyAuthors": false,
-    "authorsFile": "site/forum/authors.json"
+    "authorsFile": "functions/forum/VerifiedAccounts.json.txt"
   },
 
   "limits": {

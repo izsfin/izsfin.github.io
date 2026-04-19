@@ -19,7 +19,6 @@ export async function loadPosts(env, headers) {
     return new Response(JSON.stringify({ posts }), { headers });
 }
 
-// Один пост по ID
 export async function loadPost(url, env, headers, request) {
     const id = url.searchParams.get('id');
     if (!id) {
