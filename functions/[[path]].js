@@ -15,7 +15,9 @@ export async function onRequest(context) {
     // Нормализуем путь: убираем слэши и приводим к нижнему регистру
     let rawPath = url.pathname.replace(/^\/+/, "").replace(/\/+$/, "").toLowerCase();
     const action = url.searchParams.get('action');
-    
+    if (rawPath.startsWith("site/")) {
+        return context.next(); 
+    }
     const OWNER = "odesseu";
     const REPO = "hosting";
     const headersJSON = { 
@@ -49,7 +51,6 @@ export async function onRequest(context) {
         }
     }
 
-    // ── БЛОК СТРАНИЦ (HTML) ──
     const pages = {
         "": "site/main.html",
         "forum": "site/forum/home.html",
