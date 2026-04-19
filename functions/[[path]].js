@@ -138,7 +138,8 @@ export async function onRequest(context) {
         "forum/post": "site/forum/post.html",
         "docs": "site/forum/home.html",
         "auth": "site/auth.html",
-        "catalog": "site/catalog/catalog.html"
+        "catalog": "site/catalog/catalog.html",
+        "create": "site/forum/create.html"   
     };
 
     let pageKey = rawPath in pages ? rawPath : null;
