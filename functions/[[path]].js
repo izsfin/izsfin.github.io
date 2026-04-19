@@ -22,14 +22,8 @@ export async function onRequest(context) {
    if (internalPath === "docs/universal") { const action = url.searchParams.get('action'); const headers = {  "Content-Type": "application/json; charset=UTF-8",  "Access-Control-Allow-Origin": "*",  "Cache-Control": "no-cache"  };
    try { if (action === 'posts') { const { data: indexData } = await octokit.repos.getContent({  owner: OWNER, repo: REPO, path: 'docs/index.json', ref: codeBranch  }); const content = atob(indexData.content); return new Response(content, { headers, status: 200 }); } return new Response(JSON.stringify({ error: "Invalid action" }), { headers, status: 400 }); } catch (apiErr) { return new Response(JSON.stringify({ error: apiErr.message }), { headers, status: 500 }); } }
    const paths = {
-      "ui/creator/x/style":    "site/tools/guic/style.css",
-      "ui/creator/x/core":     "site/tools/guic/app.js",
-      "ui/creator/x/elements": "site/tools/guic/ui_elements.js",
-      "ui/creator/x/props":    "site/tools/guic/properties.js",
-      "ui/creator/x/snapping": "site/tools/guic/snapping.js",
-      "ui/creator/x/explorer": "site/tools/guic/explorer.js",
-      "ui/creator/x/viewport": "site/tools/guic/viewport.js",
-      "ui/creator/x/export":   "site/tools/guic/export_engine.js",
+       "forum/post": "site/forum/post.html",
+        "forum": "site/forum/main.html",
    };
    const directMappings = {
     "": "site/main.html",
