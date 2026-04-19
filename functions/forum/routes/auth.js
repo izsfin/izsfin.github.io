@@ -1,4 +1,4 @@
-import { hashPassword } from '/lib/shared.js';
+import { hashPassword } from './lib/shared.js';
 
 export async function handleAuth(req, env, headers) {
     const { subaction, username, password } = await req.json();
