@@ -6,6 +6,11 @@ function githubDecode(base64) {
     return new TextDecoder().decode(bytes);
 }
 
+
+if (url.pathname !== '/' && url.pathname.endsWith('/')) {
+   return Response.redirect(url.origin + url.pathname.slice(0, -1) + url.search, 301);
+}
+
 export async function onRequest(context) {
     const { request, env } = context;
     const url = new URL(request.url);
