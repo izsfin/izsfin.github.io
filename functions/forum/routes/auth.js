@@ -1,32 +1,58 @@
-import { handleGetPosts, handleGetSinglePost } from './routes/posts.js';
-import { handleCreatePost } from './routes/create.js';
-import { handleAuth } from './routes/auth.js';
+import { hashPassword } from '/lib/shared.js';
 
-export async function onRequest(context) {
-    const { request, env } = context;
-    const url = new URL(request.url);
-    const action = url.searchParams.get('action');
+export async function handleAuth(req, env, headers) {
+    const { subaction, username, password } = await req.json();
 
-    const headers = { 
-        "Content-Type": "application/json; charset=UTF-8", 
-        "Access-Control-Allow-Origin": "*" 
-    };
+    // 1. Валидация входных данных
+    if (!username || !password) {
+        return new Response(JSON.stringify({ error: 'Username and password required' }), { status: 400, headers });
+    }
 
+    // 2. Хешируем пароль (соль берется из env в shared.js)
+    const hashed = await hashPassword(password, env); 
+    const expiresAt = Math.floor(Date.now() / 1000) + 86400; // Сессия на 24 часа (в секундах)
+
+    // --- РЕГИСТРАЦИЯ ---
+    if (subaction === 'register') {
+        try {
+            // Пытаемся создать пользователя
+            await env.DB.prepare(
+                "INSERT INTO users (username, password_hash) VALUES (?, ?)"
+            ).bind(username, hashed).run();
+
+            // Сразу создаем сессию для нового юзера, чтобы не заставлять его логиниться
+            const token = crypto.randomUUID();
+            await env.DB.prepare(
+                "INSERT INTO sessions (token, username, expires_at) VALUES (?, ?, ?)"
+            ).bind(token, username, expiresAt).run();
+
+            return new Response(JSON.stringify({ ok: true, token, username }), { headers });
+
+        } catch (e) {
+            // Если username UNIQUE в БД, вылетит ошибка при совпадении
+            return new Response(JSON.stringify({ error: 'User already exists' }), { status: 400, headers });
+        }
+    }
+    
+    // --- ЛОГИН ---
+    // Ищем пользователя с таким именем и хешем
+    const user = await env.DB.prepare(
+        "SELECT * FROM users WHERE username = ? AND password_hash = ?"
+    ).bind(username, hashed).first();
+    
+    if (!user) {
+        return new Response(JSON.stringify({ error: 'Invalid login or password' }), { status: 401, headers });
+    }
+
+    // Создаем новую сессию
+    const token = crypto.randomUUID();
     try {
-        // Роут авторизации (login / register)
-        if (action === 'auth' && request.method === 'POST') {
-            return await handleAuth(request, env, headers);
-        }
+        await env.DB.prepare(
+            "INSERT INTO sessions (token, username, expires_at) VALUES (?, ?, ?)"
+        ).bind(token, username, expiresAt).run();
 
-        if (action === 'posts') return await handleGetPosts(env, headers);
-        if (action === 'post' || action === 'comments') return await handleGetSinglePost(url, env, headers, action);
-        
-        if (action === 'create' && request.method === 'POST') {
-            return await handleCreatePost(request, env, headers);
-        }
-        
-        return new Response(JSON.stringify({ error: "Action not found" }), { status: 404, headers });
+        return new Response(JSON.stringify({ ok: true, token, username }), { headers });
     } catch (e) {
-        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers });
+        return new Response(JSON.stringify({ error: 'Failed to create session' }), { status: 500, headers });
     }
 }
