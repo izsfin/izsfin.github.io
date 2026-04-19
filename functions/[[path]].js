@@ -40,7 +40,7 @@ export async function onRequest(context) {
     // 3. Блок страниц
     const pages = {
         "": "site/main.html",
-        "forum": "site/forum/home.html",
+        "forum/": "site/forum/home.html",
         "forum/post": "site/forum/post.html",
         "auth": "site/auth.html",
         "catalog": "site/catalog/catalog.html"
