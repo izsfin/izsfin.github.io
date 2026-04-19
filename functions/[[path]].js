@@ -6,18 +6,19 @@ function githubDecode(base64) {
     return new TextDecoder().decode(bytes);
 }
 
-
-if (url.pathname !== '/' && url.pathname.endsWith('/')) {
-   return Response.redirect(url.origin + url.pathname.slice(0, -1) + url.search, 301);
-}
-
 export async function onRequest(context) {
     const { request, env } = context;
     const url = new URL(request.url);
+
+    // ← редирект ЗДЕСЬ, внутри функции
+    if (url.pathname !== '/' && url.pathname.endsWith('/')) {
+        return Response.redirect(url.origin + url.pathname.slice(0, -1) + url.search, 301);
+    }
+
     const octokit = new Octokit({ auth: env.GITHUB_TOKEN });
     const action = url.searchParams.get('action');
-
     let rawPath = url.pathname.replace(/^\/+|\/+$/g, "");
+
 
     const OWNER = "odesseu";
     const REPO = "hosting";
