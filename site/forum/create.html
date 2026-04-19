@@ -230,24 +230,33 @@ async function doPublish() {
   const name = document.getElementById('field-name').value.trim();
   const desc = document.getElementById('field-desc').value.trim();
   const text = document.getElementById('field-text').value.trim();
-  if (!name) { setMsg('Enter post title', 'err'); return; }
-  if (!desc) { setMsg('Enter description', 'err'); return; }
-  if (!text) { setMsg('Enter post text', 'err'); return; }
+  if (!name || !desc || !text) {  setMsg('Please fill in all fields', 'err');  return;  }
   if (!currentUser) { window.location.href='/auth'; return; }
   const btn = document.getElementById('publishBtn');
   btn.disabled = true;
   setMsg('Publishing...', '');
+
   try {
-    const r = await fetch('/api/docs/universal?action=create', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({username: currentUser.username, token: currentUser.token||'', name, desc, text, img: imgBase64||null})
+    const r = await fetch('/forum?action=create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: currentUser.username,
+        token: currentUser.token || '',
+        name,
+        desc,
+        text,
+        img: imgBase64 || null
+      })
     });
     const d = await r.json();
     if (d.ok) {
       setMsg('Published!', 'ok');
-      setTimeout(() => { window.location.href=`/post/${encodeURIComponent(d.id)}`; }, 800);
+      setTimeout(() => { 
+        window.location.href = `/forum/post?id=${encodeURIComponent(d.id)}`; 
+      }, 800);
     } else {
-      setMsg(d.error||'Error', 'err');
+      setMsg(d.error || 'Error', 'err');
       btn.disabled = false;
     }
   } catch(e) {
