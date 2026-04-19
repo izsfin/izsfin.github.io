@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title> Makito Forum</title>
-<link rel="icon" type="image/png" href="/v3/ss/favicon.png">
+<link rel="icon" type="image/png" href="/site/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root { --primary: #ff0073; --bg: #050204; --card: rgba(12,8,11,0.85); --border: rgba(255,255,255,0.06); }
@@ -16,8 +16,6 @@ body {
   animation: fadeIn 0.35s ease forwards;
 }
 @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-
-/* ── BG: grid of squares + svg overlay ── */
 .bg-grid {
   position: fixed; inset: 0; z-index: -3;
   background-color: #050204;
@@ -28,7 +26,7 @@ body {
 }
 .bg-svg {
   position: fixed; inset: 0; z-index: -2;
-  background-image: url("/v3/ss/tools/bg.svg");
+  background-image: url("/site/tools/bg.svg");
   background-size: cover; background-position: center;
   opacity: 0.55;
 }
@@ -277,6 +275,7 @@ try { currentUser = JSON.parse(localStorage.getItem('nq-docs-user') || 'null'); 
 
 function updateUI() {
   if (currentUser) {
+    document.getElementById('amp-sep').style.display = 'none';
     document.getElementById('btn-login').style.display = 'none';
     document.getElementById('btn-register').style.display = 'none';
     document.getElementById('btn-create').style.display = '';
@@ -299,7 +298,9 @@ function doLogout() {
 // ── MODAL ──
 function openAuth(tab) { document.getElementById('authPanel').style.display='flex'; switchTab(tab||'login'); }
 function closeAuth() { document.getElementById('authPanel').style.display='none'; }
+let currentTab = 'login';
 function switchTab(tab) {
+  currentTab = tab; // И это
   document.getElementById('form-login').style.display = tab==='login' ? '' : 'none';
   document.getElementById('form-register').style.display = tab==='register' ? '' : 'none';
   document.getElementById('tab-login').classList.toggle('active', tab==='login');
@@ -358,18 +359,22 @@ function goCreate() { window.location.href = '/create'; }
 // ── POSTS ──
 let allPosts = [];
 
+// Исправленная загрузка постов
 async function loadPosts() {
   try {
     const r = await fetch('/forum?action=posts');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
-    allPosts = Array.isArray(d.posts) ? d.posts : [];
+    // Проверка: если d — это массив, или объект с полем posts
+    allPosts = Array.isArray(d) ? d : (d.posts || []); 
     renderPosts(allPosts);
   } catch(e) {
-    document.getElementById('threadList').innerHTML = '<div class="state-row err">Could not connect to server</div>';
+    console.error(e);
+    document.getElementById('threadList').innerHTML = `<div class="state-row err">Connection error: ${e.message}</div>`;
   }
 }
 
+// Исправленный рендер ссылок
 function renderPosts(posts) {
   document.getElementById('postCount').textContent = posts.length + ' post' + (posts.length !== 1 ? 's' : '');
   if (!posts.length) {
@@ -377,7 +382,7 @@ function renderPosts(posts) {
     return;
   }
   document.getElementById('threadList').innerHTML = posts.map((p, i) => `
-    <a class="thread-row${p.pinned?' pinned':''}" href="/post/${encodeURIComponent(p.id)}" style="animation-delay:${i*0.03}s">
+    <a class="thread-row${p.pinned?' pinned':''}" href="/forum/post?id=${encodeURIComponent(p.id)}" style="animation-delay:${i*0.03}s">
       <div class="thread-icon"><div class="thread-dot"></div></div>
       <div class="thread-body">
         <div class="thread-top">
