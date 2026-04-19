@@ -269,7 +269,6 @@ body {
 </div>
 
 <script>
-// ── SESSION ──
 let currentUser = null;
 try { currentUser = JSON.parse(localStorage.getItem('nq-docs-user') || 'null'); } catch(e) {}
 
@@ -289,18 +288,12 @@ function updateUI() {
 }
 updateUI();
 
-function doLogout() {
-  localStorage.removeItem('nq-docs-user');
-  currentUser = null;
-  location.reload();
-}
-
-// ── MODAL ──
+function doLogout() { localStorage.removeItem('nq-docs-user'); location.reload(); }
 function openAuth(tab) { document.getElementById('authPanel').style.display='flex'; switchTab(tab||'login'); }
 function closeAuth() { document.getElementById('authPanel').style.display='none'; }
 let currentTab = 'login';
 function switchTab(tab) {
-  currentTab = tab; // И это
+  currentTab = tab;
   document.getElementById('form-login').style.display = tab==='login' ? '' : 'none';
   document.getElementById('form-register').style.display = tab==='register' ? '' : 'none';
   document.getElementById('tab-login').classList.toggle('active', tab==='login');
@@ -308,7 +301,6 @@ function switchTab(tab) {
 }
 document.getElementById('authPanel').addEventListener('click', e => { if(e.target===e.currentTarget) closeAuth(); });
 
-// ── AUTH ──
 async function doLogin() {
   const u = document.getElementById('login-user').value.trim();
   const p = document.getElementById('login-pass').value;
@@ -316,11 +308,7 @@ async function doLogin() {
   if (!u || !p) { msg.textContent='Fill all fields'; msg.className='modal-msg err'; return; }
   msg.textContent='wait...'; msg.className='modal-msg';
   try {
-    const r = await fetch('/forum?action=auth', {
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subaction: currentTab, username: u, password: p })
-    });
+    const r = await fetch('/forum?action=auth', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({subaction:'login', username:u, password:p}) });
     const d = await r.json();
     if (d.ok) {
       currentUser = {username: d.username||u, token: d.token||''};
@@ -339,11 +327,7 @@ async function doRegister() {
   if (p.length < 8) { msg.textContent='Password min 8 chars'; msg.className='modal-msg err'; return; }
   msg.textContent='wait...'; msg.className='modal-msg';
   try {
-    const r = await fetch('/forum?action=auth', {
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subaction: currentTab, username: u, password: p })
-    });
+    const r = await fetch('/forum?action=auth', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({subaction:'register', username:u, password:p}) });
     const d = await r.json();
     if (d.ok) {
       currentUser = {username: d.username||u, token: d.token||''};
@@ -355,44 +339,37 @@ async function doRegister() {
 }
 
 function goCreate() { window.location.href = '/create'; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function setLang(l) { document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent===l)); }
 
-// ── POSTS ──
 let allPosts = [];
 
-// Исправленная загрузка постов
 async function loadPosts() {
   try {
     const r = await fetch('/forum?action=posts');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
-    // Проверка: если d — это массив, или объект с полем posts
-    allPosts = Array.isArray(d) ? d : (d.posts || []); 
+    allPosts = d.posts || [];
     renderPosts(allPosts);
   } catch(e) {
-    console.error(e);
-    document.getElementById('threadList').innerHTML = `<div class="state-row err">Connection error: ${e.message}</div>`;
+    document.getElementById('threadList').innerHTML = `<div class="state-row err">Error: ${e.message}</div>`;
   }
 }
 
-// Исправленный рендер ссылок
 function renderPosts(posts) {
   document.getElementById('postCount').textContent = posts.length + ' post' + (posts.length !== 1 ? 's' : '');
-  if (!posts.length) {
-    document.getElementById('threadList').innerHTML = '<div class="state-row">No posts yet</div>';
-    return;
-  }
+  if (!posts.length) { document.getElementById('threadList').innerHTML = '<div class="state-row">No posts yet</div>'; return; }
   document.getElementById('threadList').innerHTML = posts.map((p, i) => `
-    <a class="thread-row${p.pinned?' pinned':''}" href="/forum/post?id=${encodeURIComponent(p.id)}" style="animation-delay:${i*0.03}s">
+    <a class="thread-row" href="/forum/post?id=${encodeURIComponent(p.id)}" style="animation-delay:${i*0.03}s">
       <div class="thread-icon"><div class="thread-dot"></div></div>
       <div class="thread-body">
         <div class="thread-top">
-          <span class="thread-name">${esc(p.name)}</span>
-          ${p.pinned ? '<span class="thread-badge">Pinned</span>' : ''}
+          <span class="thread-name">${esc(p.title)}</span>
         </div>
-        <div class="thread-desc">${esc(p.desc)}</div>
+        <div class="thread-desc">${esc(p.description)}</div>
         <div class="thread-foot">
           <span class="thread-author">${esc(p.author)}</span>
-          <span class="thread-date">${p.date||''}</span>
+          <span class="thread-date">${(p.created_at||'').slice(0,10)}</span>
         </div>
       </div>
       <div class="thread-stats">
@@ -400,32 +377,20 @@ function renderPosts(posts) {
           <span class="stat-num">${p.views||0}</span>
           <span class="stat-lbl">Views</span>
         </div>
-        <div class="stat-col">
-          <span class="stat-num">${p.comments||0}</span>
-          <span class="stat-lbl">Replies</span>
-        </div>
       </div>
     </a>
   `).join('');
 }
 
-// ── SEARCH ──
 function handleSearch() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   if (!q) { renderPosts(allPosts); return; }
-  if (q.startsWith('@')) {
-    renderPosts(allPosts.filter(p => p.author.toLowerCase().includes(q.slice(1))));
-  } else {
-    renderPosts(allPosts.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.desc.toLowerCase().includes(q) ||
-      (p.text||'').toLowerCase().includes(q)
-    ));
-  }
+  renderPosts(allPosts.filter(p =>
+    (p.title||'').toLowerCase().includes(q) ||
+    (p.description||'').toLowerCase().includes(q) ||
+    (p.author||'').toLowerCase().includes(q)
+  ));
 }
-
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function setLang(l) { document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent===l)); }
 
 loadPosts();
 </script>

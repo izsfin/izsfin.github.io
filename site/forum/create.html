@@ -165,7 +165,6 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
   </div>
 
 </div>
-
 <script>
 // ── SESSION ──
 let currentUser = null;
@@ -227,42 +226,26 @@ function setMsg(text, type) {
 }
 
 async function doPublish() {
-  const name = document.getElementById('field-name').value.trim();
-  const desc = document.getElementById('field-desc').value.trim();
-  const text = document.getElementById('field-text').value.trim();
-  if (!name || !desc || !text) {  setMsg('Please fill in all fields', 'err');  return;  }
+  const title = document.getElementById('field-name').value.trim();
+  const description = document.getElementById('field-desc').value.trim();
+  const content = document.getElementById('field-text').value.trim();
+  if (!title || !description || !content) { setMsg('Please fill in all fields', 'err'); return; }
   if (!currentUser) { window.location.href='/auth'; return; }
   const btn = document.getElementById('publishBtn');
   btn.disabled = true;
   setMsg('Publishing...', '');
-
   try {
     const r = await fetch('/forum?action=create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: currentUser.username,
-        token: currentUser.token || '',
-        name,
-        desc,
-        text,
-        img: imgBase64 || null
-      })
+      body: JSON.stringify({ token: currentUser.token, title, description, content, img: imgBase64||null })
     });
     const d = await r.json();
     if (d.ok) {
       setMsg('Published!', 'ok');
-      setTimeout(() => { 
-        window.location.href = `/forum/post?id=${encodeURIComponent(d.id)}`; 
-      }, 800);
-    } else {
-      setMsg(d.error || 'Error', 'err');
-      btn.disabled = false;
-    }
-  } catch(e) {
-    setMsg('Network error', 'err');
-    btn.disabled = false;
-  }
+      setTimeout(() => { window.location.href = `/forum/post?id=${encodeURIComponent(d.id)}`; }, 800);
+    } else { setMsg(d.error||'Error', 'err'); btn.disabled=false; }
+  } catch(e) { setMsg('Network error', 'err'); btn.disabled=false; }
 }
 </script>
 </body>

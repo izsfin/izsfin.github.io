@@ -212,7 +212,6 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
   </div>
 </nav>
 <div class="bottom-credit">© 2026 Vellote. All rights reserved.</div>
-
 <script>
 let currentUser = null;
 try { currentUser = JSON.parse(localStorage.getItem('nq-docs-user')||'null'); } catch(e) {}
@@ -223,20 +222,14 @@ if (currentUser) {
 }
 
 function getPostId() {
-  const m = window.location.pathname.match(/\/post\/(.+)/);
-  if (m) return decodeURIComponent(m[1]);
   return new URLSearchParams(window.location.search).get('id');
 }
-
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function parseText(raw) {
   if (!raw) return '';
   let s = String(raw);
-  s = s.replace(/\|\|(.+?)\|\|/gs, (_,t) => {
-    const id = 'sp'+Math.random().toString(36).slice(2);
-    return `<div class="spoiler-wrap"><button class="spoiler-toggle" onclick="toggleSpoiler('${id}')">▶ Spoiler</button><div class="spoiler-content" id="${id}">${t.trim()}</div></div>`;
-  });
+  s = s.replace(/\|\|(.+?)\|\|/gs, (_,t) => { const id='sp'+Math.random().toString(36).slice(2); return `<div class="spoiler-wrap"><button class="spoiler-toggle" onclick="toggleSpoiler('${id}')">▶ Spoiler</button><div class="spoiler-content" id="${id}">${t.trim()}</div></div>`; });
   s = s.replace(/```([\s\S]*?)```/g, (_,c) => `<pre><code>${esc(c.trim())}</code></pre>`);
   s = s.replace(/`([^`]+)`/g, (_,c) => `<code>${esc(c)}</code>`);
   s = s.replace(/^###([^\n]+)/gm, (_,t) => `<h3>${t.trim()}</h3>`);
@@ -255,37 +248,33 @@ function parseText(raw) {
   return `<p>${s}</p>`.replace(/<p>\s*<\/p>/g,'');
 }
 
-function toggleSpoiler(id) {
-  document.getElementById(id).classList.toggle('open');
-}
+function toggleSpoiler(id) { document.getElementById(id).classList.toggle('open'); }
 
 async function loadPost() {
   const postId = getPostId();
-  if (!postId) {
-    document.getElementById('postArea').innerHTML = '<div class="post-wrap"><div class="post-loading">No post ID</div></div>';
-    return;
-  }
+  if (!postId) { document.getElementById('postArea').innerHTML = '<div class="post-wrap"><div class="post-loading">No post ID</div></div>'; return; }
   try {
     const r = await fetch(`/forum?action=post&id=${encodeURIComponent(postId)}`);
     const d = await r.json();
-    const p = d.post || d;
+    const p = d.post;
+    if (!p) throw new Error(d.error || 'Not found');
 
-    document.title = (p.name || 'Post') + ' | Forum';
-    document.getElementById('topbar-postname').textContent = p.name || 'Post';
-    document.getElementById('bc-title').textContent = p.name || 'Post';
+    document.title = (p.title||'Post') + ' | Forum';
+    document.getElementById('topbar-postname').textContent = p.title || 'Post';
+    document.getElementById('bc-title').textContent = p.title || 'Post';
 
     document.getElementById('postArea').innerHTML = `
       <div class="post-wrap">
         <div class="post-header">
           <div class="post-meta">
             <span class="post-author-badge">${esc(p.author)}</span>
-            <span class="post-date">${p.date||''}</span>
+            <span class="post-date">${(p.created_at||'').slice(0,10)}</span>
           </div>
-          <div class="post-title">${esc(p.name)}</div>
-          ${p.desc ? `<div class="post-desc">${esc(p.desc)}</div>` : ''}
+          <div class="post-title">${esc(p.title)}</div>
+          ${p.description ? `<div class="post-desc">${esc(p.description)}</div>` : ''}
         </div>
         <div class="post-body">
-          <div class="post-text-col">${parseText(p.text || p.content || '')}</div>
+          <div class="post-text-col">${parseText(p.content||'')}</div>
           <div class="post-img-col">
             <div class="post-img-box">
               ${p.img ? `<img src="${p.img}" alt="">` : `<span class="no-img">No image</span>`}
@@ -298,7 +287,7 @@ async function loadPost() {
     document.getElementById('divComments').style.display = '';
     document.getElementById('commentsSection').style.display = '';
     await loadComments(postId);
-    await loadOtherPosts(p.author, postId);
+    await loadOtherPosts(postId);
   } catch(e) {
     document.getElementById('postArea').innerHTML = `<div class="post-wrap"><div class="post-loading">Error: ${esc(e.message)}</div></div>`;
   }
@@ -312,13 +301,13 @@ async function loadComments(postId) {
     document.getElementById('commentsCount').textContent = comments.length + ' repl' + (comments.length===1?'y':'ies');
     const list = document.getElementById('commentList');
     if (!comments.length) { list.innerHTML = '<div class="no-comments">No replies yet</div>'; return; }
-    list.innerHTML = comments.map((c, i) => `
+    list.innerHTML = comments.map((c,i) => `
       <div class="comment-item">
         <div class="comment-num">#${i+1}</div>
         <div class="comment-body">
           <div class="comment-top">
             <span class="comment-author">${esc(c.author)}</span>
-            <span class="comment-date">${c.date||''}</span>
+            <span class="comment-date">${(c.created_at||'').slice(0,10)}</span>
           </div>
           <div class="comment-text">${esc(c.text)}</div>
         </div>
@@ -335,34 +324,30 @@ async function sendComment() {
   msg.textContent='Sending...'; msg.className='reply-msg';
   const postId = getPostId();
   try {
-    const r = await fetch('/forum?action=comment', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({postId, text, username: currentUser.username, token: currentUser.token||''})
-    });
+    const r = await fetch('/forum?action=comment', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({postId, text, token: currentUser.token}) });
     const d = await r.json();
     if (d.ok) {
       document.getElementById('commentText').value='';
-      msg.textContent='Reply sent!'; msg.className='reply-msg';
+      msg.textContent='Sent!'; msg.className='reply-msg';
       await loadComments(postId);
-      setTimeout(() => { msg.textContent=''; }, 2000);
+      setTimeout(()=>{msg.textContent='';},2000);
     } else { msg.textContent=d.error||'Error'; msg.className='reply-msg err'; }
   } catch(e) { msg.textContent='Network error'; msg.className='reply-msg err'; }
 }
 
-async function loadOtherPosts(author, currentId) {
+async function loadOtherPosts(currentId) {
   try {
     const r = await fetch('/forum?action=posts');
     const d = await r.json();
-    const all = Array.isArray(d) ? d : (d.posts || []);
-    const posts = all.filter(p => p.id !== currentId).slice(0, 6);
+    const posts = (d.posts||[]).filter(p=>p.id!==currentId).slice(0,6);
     if (!posts.length) return;
-    document.getElementById('divOther').style.display = '';
-    document.getElementById('otherSection').style.display = '';
-    document.getElementById('otherScroll').innerHTML = posts.map(p => `
+    document.getElementById('divOther').style.display='';
+    document.getElementById('otherSection').style.display='';
+    document.getElementById('otherScroll').innerHTML = posts.map(p=>`
       <a class="mini-row" href="/forum/post?id=${encodeURIComponent(p.id)}">
-        <div class="mini-thumb">${p.img ? `<img src="${p.img}" alt="">` : `<span class="mini-np">No img</span>`}</div>
+        <div class="mini-thumb"><span class="mini-np">No img</span></div>
         <div class="mini-info">
-          <div class="mini-title">${esc(p.name)}</div>
+          <div class="mini-title">${esc(p.title)}</div>
           <div class="mini-author">${esc(p.author)}</div>
         </div>
       </a>
