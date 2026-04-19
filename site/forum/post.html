@@ -257,45 +257,28 @@ function toggleSpoiler(id) {
   document.getElementById(id).classList.toggle('open');
 }
 
-async function loadPost() {
-  const id = getPostId();
-  if (!id) { document.getElementById('postArea').innerHTML='<div class="post-wrap"><div class="post-loading">Post not found</div></div>'; return; }
+async function loadComments(postId) {
   try {
-    const r = await fetch(`https://misslua.pages.dev/functions/docs/universal.js?action=post&id=${encodeURIComponent(id)}`);
-    if (!r.ok) throw new Error('HTTP '+r.status);
+    // ЗАМЕНЕНО: теперь запрос идет на твой API
+    const r = await fetch(`/forum/?action=comments&id=${encodeURIComponent(postId)}`);
     const d = await r.json();
-    if (!d.ok || !d.post) { document.getElementById('postArea').innerHTML='<div class="post-wrap"><div class="post-loading">Post not found</div></div>'; return; }
-    const p = d.post;
-    document.title = `${p.PostName} — Vellote Forum`;
-    document.getElementById('topbar-postname').textContent = p.PostName;
-    document.getElementById('bc-title').textContent = p.PostName;
-    document.getElementById('postArea').innerHTML = `
-      <div class="post-wrap">
-        <div class="post-header">
-          <div class="post-meta">
-            <span class="post-author-badge">${esc(p.Author)}</span>
-            <span class="post-date">${p.Date||''}</span>
+    const comments = d.comments || [];
+    document.getElementById('commentsCount').textContent = comments.length + ' repl' + (comments.length===1?'y':'ies');
+    const list = document.getElementById('commentList');
+    if (!comments.length) { list.innerHTML = '<div class="no-comments">No replies yet</div>'; return; }
+    list.innerHTML = comments.map((c, i) => `
+      <div class="comment-item">
+        <div class="comment-num">#${i+1}</div>
+        <div class="comment-body">
+          <div class="comment-top">
+            <span class="comment-author">${esc(c.author)}</span>
+            <span class="comment-date">${c.date||''}</span>
           </div>
-          <div class="post-title">${esc(p.PostName)}</div>
-          <div class="post-desc">${esc(p.PostDesc)}</div>
-        </div>
-        <div class="post-body">
-          <div class="post-text-col">${parseText(p.PostText)}</div>
-          <div class="post-img-col">
-            <div class="post-img-box">
-              ${p.PostImg ? `<img src="${p.PostImg}" alt="">` : `<span class="no-img">No preview</span>`}
-            </div>
-          </div>
+          <div class="comment-text">${esc(c.text)}</div>
         </div>
       </div>
-    `;
-    document.getElementById('divComments').style.display = '';
-    document.getElementById('commentsSection').style.display = '';
-    loadComments(id);
-    loadOtherPosts(p.Author, id);
-  } catch(e) {
-    document.getElementById('postArea').innerHTML = '<div class="post-wrap"><div class="post-loading">Failed to load post</div></div>';
-  }
+    `).join('');
+  } catch(e) {}
 }
 
 async function loadComments(postId) {
@@ -329,7 +312,8 @@ async function sendComment() {
   msg.textContent='Sending...'; msg.className='reply-msg';
   const postId = getPostId();
   try {
-    const r = await fetch('https://misslua.pages.dev/functions/docs/universal.js?action=comment', {
+    // ЗАМЕНЕНО: теперь POST запрос идет на /forum/
+    const r = await fetch('/forum/?action=comment', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({postId, text, username: currentUser.username, token: currentUser.token||''})
     });
@@ -345,7 +329,7 @@ async function sendComment() {
 
 async function loadOtherPosts(author, currentId) {
   try {
-    const r = await fetch('https://misslua.pages.dev/functions/docs/universal.js?action=posts&fresh=1');
+    const r = await fetch('/forum/?action=posts&fresh=1');
     const d = await r.json();
     const posts = (d.posts||[]).filter(p => p.id !== currentId).slice(0, 6);
     if (!posts.length) return;

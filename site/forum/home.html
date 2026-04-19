@@ -315,9 +315,10 @@ async function doLogin() {
   if (!u || !p) { msg.textContent='Fill all fields'; msg.className='modal-msg err'; return; }
   msg.textContent='wait...'; msg.className='modal-msg';
   try {
-    const r = await fetch('/docs/universal?action=auth', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({subaction:'login', username:u, password:p})
+    const r = await fetch('/forum?action=auth', {
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subaction: currentTab, username: u, password: p })
     });
     const d = await r.json();
     if (d.ok) {
@@ -337,9 +338,10 @@ async function doRegister() {
   if (p.length < 8) { msg.textContent='Password min 8 chars'; msg.className='modal-msg err'; return; }
   msg.textContent='wait...'; msg.className='modal-msg';
   try {
-    const r = await fetch('/docs/universal?action=auth', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({subaction:'register', username:u, password:p})
+    const r = await fetch('/forum?action=auth', {
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subaction: currentTab, username: u, password: p })
     });
     const d = await r.json();
     if (d.ok) {
@@ -358,7 +360,7 @@ let allPosts = [];
 
 async function loadPosts() {
   try {
-    const r = await fetch('/docs/universal?action=posts');
+    const r = await fetch('/forum?action=posts');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     allPosts = Array.isArray(d.posts) ? d.posts : [];
