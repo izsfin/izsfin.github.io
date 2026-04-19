@@ -224,8 +224,10 @@ if (currentUser) {
 
 function getPostId() {
   const m = window.location.pathname.match(/\/post\/(.+)/);
-  return m ? decodeURIComponent(m[1]) : null;
+  if (m) return decodeURIComponent(m[1]);
+  return new URLSearchParams(window.location.search).get('id');
 }
+
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function parseText(raw) {
@@ -238,13 +240,13 @@ function parseText(raw) {
   s = s.replace(/```([\s\S]*?)```/g, (_,c) => `<pre><code>${esc(c.trim())}</code></pre>`);
   s = s.replace(/`([^`]+)`/g, (_,c) => `<code>${esc(c)}</code>`);
   s = s.replace(/^###([^\n]+)/gm, (_,t) => `<h3>${t.trim()}</h3>`);
-  s = s.replace(/^##([^\n]+)/gm, (_,t) => `<h2>${t.trim()}</h2>`);
-  s = s.replace(/^#-([^\n]+)/gm, (_,t) => `<h4>${t.trim()}</h4>`);
-  s = s.replace(/^#([^\n]+)/gm, (_,t) => `<h1>${t.trim()}</h1>`);
+  s = s.replace(/^##([^\n]+)/gm,  (_,t) => `<h2>${t.trim()}</h2>`);
+  s = s.replace(/^#-([^\n]+)/gm,  (_,t) => `<h4>${t.trim()}</h4>`);
+  s = s.replace(/^#([^\n]+)/gm,   (_,t) => `<h1>${t.trim()}</h1>`);
   s = s.replace(/^>{1,3}([^\n]+)/gm, (_,t) => `<blockquote>${t.trim()}</blockquote>`);
   s = s.replace(/\*\*(.+?)\*\*/g, (_,t) => `<strong>${t}</strong>`);
-  s = s.replace(/\*(.+?)\*/g, (_,t) => `<em>${t}</em>`);
-  s = s.replace(/__(.+?)__/g, (_,t) => `<u>${t}</u>`);
+  s = s.replace(/\*(.+?)\*/g,     (_,t) => `<em>${t}</em>`);
+  s = s.replace(/__(.+?)__/g,     (_,t) => `<u>${t}</u>`);
   s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_,t,u) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`);
   s = s.replace(/^(\s*)[*\-] (.+)/gm, (_,ind,item) => `<li style="margin-left:${ind.length*12}px">${item}</li>`);
   s = s.replace(/(<li[\s\S]*?<\/li>)+/g, m => `<ul>${m}</ul>`);
@@ -257,33 +259,54 @@ function toggleSpoiler(id) {
   document.getElementById(id).classList.toggle('open');
 }
 
-async function loadComments(postId) {
+async function loadPost() {
+  const postId = getPostId();
+  if (!postId) {
+    document.getElementById('postArea').innerHTML = '<div class="post-wrap"><div class="post-loading">No post ID</div></div>';
+    return;
+  }
   try {
-    // ЗАМЕНЕНО: теперь запрос идет на твой API
-    const r = await fetch(`/forum/?action=comments&id=${encodeURIComponent(postId)}`);
+    const r = await fetch(`/forum?action=post&id=${encodeURIComponent(postId)}`);
     const d = await r.json();
-    const comments = d.comments || [];
-    document.getElementById('commentsCount').textContent = comments.length + ' repl' + (comments.length===1?'y':'ies');
-    const list = document.getElementById('commentList');
-    if (!comments.length) { list.innerHTML = '<div class="no-comments">No replies yet</div>'; return; }
-    list.innerHTML = comments.map((c, i) => `
-      <div class="comment-item">
-        <div class="comment-num">#${i+1}</div>
-        <div class="comment-body">
-          <div class="comment-top">
-            <span class="comment-author">${esc(c.author)}</span>
-            <span class="comment-date">${c.date||''}</span>
+    const p = d.post || d;
+
+    document.title = (p.name || 'Post') + ' | Forum';
+    document.getElementById('topbar-postname').textContent = p.name || 'Post';
+    document.getElementById('bc-title').textContent = p.name || 'Post';
+
+    document.getElementById('postArea').innerHTML = `
+      <div class="post-wrap">
+        <div class="post-header">
+          <div class="post-meta">
+            <span class="post-author-badge">${esc(p.author)}</span>
+            <span class="post-date">${p.date||''}</span>
           </div>
-          <div class="comment-text">${esc(c.text)}</div>
+          <div class="post-title">${esc(p.name)}</div>
+          ${p.desc ? `<div class="post-desc">${esc(p.desc)}</div>` : ''}
+        </div>
+        <div class="post-body">
+          <div class="post-text-col">${parseText(p.text || p.content || '')}</div>
+          <div class="post-img-col">
+            <div class="post-img-box">
+              ${p.img ? `<img src="${p.img}" alt="">` : `<span class="no-img">No image</span>`}
+            </div>
+          </div>
         </div>
       </div>
-    `).join('');
-  } catch(e) {}
+    `;
+
+    document.getElementById('divComments').style.display = '';
+    document.getElementById('commentsSection').style.display = '';
+    await loadComments(postId);
+    await loadOtherPosts(p.author, postId);
+  } catch(e) {
+    document.getElementById('postArea').innerHTML = `<div class="post-wrap"><div class="post-loading">Error: ${esc(e.message)}</div></div>`;
+  }
 }
 
 async function loadComments(postId) {
   try {
-    const r = await fetch(`https://misslua.pages.dev/functions/docs/universal.js?action=comments&id=${encodeURIComponent(postId)}`);
+    const r = await fetch(`/forum?action=comments&id=${encodeURIComponent(postId)}`);
     const d = await r.json();
     const comments = d.comments || [];
     document.getElementById('commentsCount').textContent = comments.length + ' repl' + (comments.length===1?'y':'ies');
@@ -312,15 +335,14 @@ async function sendComment() {
   msg.textContent='Sending...'; msg.className='reply-msg';
   const postId = getPostId();
   try {
-    // ЗАМЕНЕНО: теперь POST запрос идет на /forum/
-    const r = await fetch('/forum/?action=comment', {
+    const r = await fetch('/forum?action=comment', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({postId, text, username: currentUser.username, token: currentUser.token||''})
     });
     const d = await r.json();
     if (d.ok) {
       document.getElementById('commentText').value='';
-      msg.textContent='Reply sent!'; msg.className='reply-msg ok';
+      msg.textContent='Reply sent!'; msg.className='reply-msg';
       await loadComments(postId);
       setTimeout(() => { msg.textContent=''; }, 2000);
     } else { msg.textContent=d.error||'Error'; msg.className='reply-msg err'; }
@@ -329,14 +351,15 @@ async function sendComment() {
 
 async function loadOtherPosts(author, currentId) {
   try {
-    const r = await fetch('/forum/?action=posts&fresh=1');
+    const r = await fetch('/forum?action=posts');
     const d = await r.json();
-    const posts = (d.posts||[]).filter(p => p.id !== currentId).slice(0, 6);
+    const all = Array.isArray(d) ? d : (d.posts || []);
+    const posts = all.filter(p => p.id !== currentId).slice(0, 6);
     if (!posts.length) return;
     document.getElementById('divOther').style.display = '';
     document.getElementById('otherSection').style.display = '';
     document.getElementById('otherScroll').innerHTML = posts.map(p => `
-      <a class="mini-row" href="/post/${encodeURIComponent(p.id)}">
+      <a class="mini-row" href="/forum/post?id=${encodeURIComponent(p.id)}">
         <div class="mini-thumb">${p.img ? `<img src="${p.img}" alt="">` : `<span class="mini-np">No img</span>`}</div>
         <div class="mini-info">
           <div class="mini-title">${esc(p.name)}</div>

@@ -11,19 +11,16 @@ export async function onRequest(context) {
     const url = new URL(request.url);
     const octokit = new Octokit({ auth: env.GITHUB_TOKEN });
     const action = url.searchParams.get('action');
-    
-    // Очистка пути: убираем все лишние слэши в начале и конце
+
     let rawPath = url.pathname.replace(/^\/+|\/+$/g, "");
 
     const OWNER = "odesseu";
     const REPO = "hosting";
 
-    // 1. Фикс статики (SVG, PNG, CSS)
     if (rawPath.startsWith("site/")) {
-        return context.next(); 
+        return context.next();
     }
 
-    // 2. Блок API (action)
     if (action) {
         const headersJSON = { "Content-Type": "application/json; charset=UTF-8", "Access-Control-Allow-Origin": "*" };
         try {
@@ -31,32 +28,40 @@ export async function onRequest(context) {
                 const { data } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: 'docs/index.json' });
                 return new Response(githubDecode(data.content), { headers: headersJSON });
             }
-            // Добавь сюда остальные action (auth, comments)
         } catch (e) {
             return new Response(JSON.stringify({ error: "GitHub API Error", details: e.message }), { status: 404, headers: headersJSON });
         }
     }
 
-    // 3. Блок страниц
     const pages = {
         "": "site/main.html",
-        "forum/": "site/forum/home.html",
+        "forum": "site/forum/home.html",      // ← исправлена опечатка
         "forum/post": "site/forum/post.html",
         "auth": "site/auth.html",
         "catalog": "site/catalog/catalog.html"
     };
 
-    if (rawPath in pages) {
-        try {
-            const { data } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: pages[rawPath] });
-            return new Response(githubDecode(data.content), { 
-                headers: { "Content-Type": "text/html; charset=UTF-8" } 
-            });
-        } catch (e) {
-            return new Response(`Error: File "${pages[rawPath]}" not found in repo.`, { status: 404 });
+    // Матчим точно или по префиксу (для /forum/post/some-id)
+    let pageKey = rawPath in pages ? rawPath : null;
+    if (!pageKey) {
+        for (const key of Object.keys(pages)) {
+            if (key && rawPath.startsWith(key + "/")) {
+                pageKey = key;
+                break;
+            }
         }
     }
 
-    // 4. Финальный отлов (если ничего не подошло)
+    if (pageKey !== null) {
+        try {
+            const { data } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: pages[pageKey] });
+            return new Response(githubDecode(data.content), {
+                headers: { "Content-Type": "text/html; charset=UTF-8" }
+            });
+        } catch (e) {
+            return new Response(`Error: File "${pages[pageKey]}" not found in repo.`, { status: 404 });
+        }
+    }
+
     return new Response(`404: Route "${rawPath}" not recognized.`, { status: 404 });
 }
