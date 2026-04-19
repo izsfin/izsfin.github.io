@@ -171,7 +171,7 @@ let imgBase64 = null;
 function handleImg(input) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 3*1024*1024) { setMsg('Image too large (max 3MB)', 'err'); return; }
+  if (file.size > 15*2048*2048) { setMsg('Image too large (max 15MB)', 'err'); return; }
   const reader = new FileReader();
   reader.onload = e => {
     imgBase64 = e.target.result;
@@ -223,7 +223,7 @@ async function doPublish() {
   btn.disabled = true;
   setMsg('Publishing...', '');
   try {
-    const r = await fetch('/forum?action=create', {
+    const r = await fetch('/forum/CreatePost.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: currentUser.token, title, description, content, img: imgBase64||null })
