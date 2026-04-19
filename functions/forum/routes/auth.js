@@ -1,21 +1,32 @@
-import { hashPassword } from '../lib/shared.js';
-export async function handleAuth(req, env) {
-  const { subaction, username, password } = await req.json();
-  const hashed = await hashPassword(password, env); 
-  if (subaction === 'register') {
+import { handleGetPosts, handleGetSinglePost } from './routes/posts.js';
+import { handleCreatePost } from './routes/create.js';
+import { handleAuth } from './routes/auth.js';
+
+export async function onRequest(context) {
+    const { request, env } = context;
+    const url = new URL(request.url);
+    const action = url.searchParams.get('action');
+
+    const headers = { 
+        "Content-Type": "application/json; charset=UTF-8", 
+        "Access-Control-Allow-Origin": "*" 
+    };
+
     try {
-      await env.DB.prepare( "INSERT INTO users (username, password_hash) VALUES (?, ?)" ).bind(username, hashed).run();
-      const token = crypto.randomUUID();
-      await env.KV.put(`session:${token}`, username, { expirationTtl: 86400 });
-      return Response.json({ ok: true, token, username }); } 
-      catch (e) {
-      return Response.json({ error: 'User already exists' }, { status: 400 });
+        // Роут авторизации (login / register)
+        if (action === 'auth' && request.method === 'POST') {
+            return await handleAuth(request, env, headers);
+        }
+
+        if (action === 'posts') return await handleGetPosts(env, headers);
+        if (action === 'post' || action === 'comments') return await handleGetSinglePost(url, env, headers, action);
+        
+        if (action === 'create' && request.method === 'POST') {
+            return await handleCreatePost(request, env, headers);
+        }
+        
+        return new Response(JSON.stringify({ error: "Action not found" }), { status: 404, headers });
+    } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers });
     }
-  }
-  
-  const user = await env.DB.prepare( "SELECT * FROM users WHERE username = ? AND password_hash = ?" ).bind(username, hashed).first();
-  if (!user) return Response.json({ error: 'Invalid login' }, { status: 401 });
-  const token = crypto.randomUUID();
-  const expiresAt = Math.floor(Date.now() / 1000) + 86400; // 24 часа в секундах
-  await env.DB.prepare( "INSERT INTO sessions (token, username, expires_at) VALUES (?, ?, ?)" ).bind(token, username, expiresAt).run();
-  return Response.json({ ok: true, token, username }); }
+}

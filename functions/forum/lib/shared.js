@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest';
 export const getOctokit = (env) => new Octokit({ auth: env.GITHUB_TOKEN });
-export const OWNER = 'misterlerp';
-export const REPO  = 'ML';
+export const OWNER = 'odesseu';
+export const REPO  = 'hosting';
 export const BRANCH = 'main';
 export async function hashPassword(pass, env) {
   const salt = env.DOCS_SALT || 'nekoq-docs-2025';
