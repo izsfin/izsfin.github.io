@@ -348,13 +348,13 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         return r
     end
 
-    local Security = loadMod("https://official.makito.workers.dev/static/cmd/stable/md/security") or {
+    local Security = loadMod("https://official.makito.workers.dev/static/cmd/stable/md/security.lua") or {
         IsVerified=function()return false end, ValidateModule=function()end,
         RegisterCallsyntax=function()return true end, UnregisterCallsyntax=function()end,
         CheckVersion=function()return true end, CreateSandbox=function()return{}end,
         RegisterModule=function()end, UnregisterModule=function()end,
     }
-    local Helpers = loadMod("https://official.makito.workers.dev/static/cmd/stable/md/helpers") or {}
+    local Helpers = loadMod("https://official.makito.workers.dev/static/cmd/stable/md/helpers.lua") or {}
     local activeAutoRespawns = {}
     local ActiveAnimations   = {}
     local LoadedModules      = {}
@@ -380,7 +380,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
             Apply=function(...) Logic.Apply(...) end,
             MODULES_PATH="MStudio/CMX/modules/", DB_PATH="MStudio/CMX/db/",
         })
-        local modList = loadMod("https://official.makito.workers.dev/static/cmd/stable/md/modules")
+        local modList = loadMod("https://official.makito.workers.dev/static/cmd/stable/md/modules.lua")
         if modList then
             for _, url in ipairs(modList) do task.spawn(function() ModuleSystem.Load(url) end) end
         end
