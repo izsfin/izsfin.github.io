@@ -9,9 +9,6 @@ function Helpers.Inject(sandbox, DoClearFn)
     local function getChar()
         return lp.Character
     end
-
-    -- [ changeoutfit ]
-    -- changeoutfit({ shirt = "rbxassetid://123", pants = "rbxassetid://456" })
     sandbox.changeoutfit = function(data)
         if not data then return end
         local char = getChar()

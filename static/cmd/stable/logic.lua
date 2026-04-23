@@ -1,19 +1,14 @@
--- xCMD | Logic Module
--- Returns: Apply, DoClear, BuildCMD
 local HttpService = game:GetService("HttpService")
 local Players     = game:GetService("Players")
 local lp          = Players.LocalPlayer
-
 local Logic = {}
-
 local _Library        = {}
 local _ActiveAnims    = {}
 local _ActiveRespawns = {}
 local _CurrentMode    = "once"
 local _LoadedModules  = {}
-local _ConfigPath     = "xELO LLC/xCMD/Configs"
+local _ConfigPath     = "MStudio/CMX/Configs"
 local _RecordApply    = nil
-
 function Logic.Init(ctx)
     _Library        = ctx.Library        or {}
     _ActiveAnims    = ctx.ActiveAnims    or {}
@@ -41,10 +36,6 @@ local function IsPlaceAllowed(item)
     if not item.ReqPlaceID or item.ReqPlaceID == 0 or item.ReqPlaceID == "" then return true end
     return tonumber(item.ReqPlaceID) == game.PlaceId
 end
-
--- ============================================================
--- DOCLEAR
--- ============================================================
 function Logic.DoClear(target)
     local char = lp.Character
     if not char then return end
@@ -124,9 +115,6 @@ function Logic.DoClear(target)
     end
 end
 
--- ============================================================
--- APPLY
--- ============================================================
 function Logic.Apply(data, sandbox)
     local char = lp.Character
     if not char or not char:FindFirstChild("Humanoid") then return end
@@ -342,9 +330,7 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
     return table.concat(lines, "\n")
 end
 
--- ============================================================
--- START (called from loader)
--- ============================================================
+
 function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     local function req(url)
         local ok, r = pcall(function()
@@ -362,16 +348,13 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         return r
     end
 
-    -- Security + Helpers
-    local Security = loadMod(BASE .. "static/cmd/md/security") or {
+    local Security = loadMod("https://official.makito.workers.dev/static/cmd/stable/md/security") or {
         IsVerified=function()return false end, ValidateModule=function()end,
         RegisterCallsyntax=function()return true end, UnregisterCallsyntax=function()end,
         CheckVersion=function()return true end, CreateSandbox=function()return{}end,
         RegisterModule=function()end, UnregisterModule=function()end,
     }
-    local Helpers = loadMod(BASE .. "static/cmd/md/helpers") or {}
-
-    -- Shared state
+    local Helpers = loadMod("https://official.makito.workers.dev/static/cmd/stable/md/helpers") or {}
     local activeAutoRespawns = {}
     local ActiveAnimations   = {}
     local LoadedModules      = {}
@@ -385,7 +368,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         ActiveRespawns = activeAutoRespawns,
         CurrentMode    = DAMode,
         LoadedModules  = LoadedModules,
-        ConfigPath     = "hux9z/JS/x³²/xSave/",
+        ConfigPath     = "MStudio/CMX/Configs/",
         RecordApply    = getgenv().xCMD_RecordApply or nil,
     })
 
@@ -395,15 +378,13 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
             DoClear=function(...) Logic.DoClear(...) end,
             GetVersion=function() return miXconf.project_vers end,
             Apply=function(...) Logic.Apply(...) end,
-            MODULES_PATH="hux9z/JS/32/modules/", DB_PATH="hux9z/JS/32/db/",
+            MODULES_PATH="MStudio/CMX/modules/", DB_PATH="MStudio/CMX/db/",
         })
-        local modList = loadMod(BASE .. "hux9z/jsx32/modules")
+        local modList = loadMod("https://official.makito.workers.dev/static/cmd/stable/md/modules")
         if modList then
             for _, url in ipairs(modList) do task.spawn(function() ModuleSystem.Load(url) end) end
         end
     end
-
-    -- DAMode
     local function SetDAMode(val)
         local v = val:lower():gsub("%s+","")
         if v=="1" or v=="once" then DAMode="once"; print("xCMD || DAMode = once")
