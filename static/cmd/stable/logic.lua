@@ -369,7 +369,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         CurrentMode    = DAMode,
         LoadedModules  = LoadedModules,
         ConfigPath     = "MStudio/CMX/Configs/",
-        RecordApply    = getgenv().xCMD_RecordApply or nil,
+        RecordApply    = getgenv().cx_RecordApply or nil,
     })
 
     if ModuleSystem and ModuleSystem.Init then
@@ -472,7 +472,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     end)
 
     -- Expose
-    getgenv().xc = function(...) return MainHandler(...) end
+    getgenv().cx = function(...) return MainHandler(...) end
     setmetatable(_G, { __call = function(_, ...) return MainHandler(...) end })
 end
 
