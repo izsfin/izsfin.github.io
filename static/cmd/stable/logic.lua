@@ -174,7 +174,7 @@ function Logic.Apply(data, sandbox)
     
        if not weldTarget then
            weldTarget = char:FindFirstChild("Torso") or char:FindFirstChild("Head")
-           warn("xCMD || Target " .. weldName .. " not found, defaulting to " .. (weldTarget and weldTarget.Name or "None"))
+           warn("CMX || Target " .. weldName .. " not found, defaulting to " .. (weldTarget and weldTarget.Name or "None"))
        end
        
       if weldTarget then
@@ -195,7 +195,7 @@ function Logic.Apply(data, sandbox)
         end
         
         local w = Instance.new("Weld")
-        w.Name  = "xCMD_Weld"
+        w.Name  = "CMX_Weld"
         w.Part0 = weldTarget
         w.Part1 = part
 
@@ -204,7 +204,7 @@ function Logic.Apply(data, sandbox)
         w.Parent = part
         part.Parent = char
     else    
-        warn("xCMD || Critical: No weld target found for " .. data.Name)
+        warn("CMX || Critical: No weld target found for " .. data.Name)
     end
 
     elseif data.Class == "Face" then
@@ -249,7 +249,7 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
         for _, item in pairs(items) do
             table.insert(lines, indent .. item.Name ..
                 string.rep(" ", math.max(1, 22 - #item.Name)) ..
-                '|   xc("' .. item.Name .. '")')
+                '|   cx("' .. item.Name .. '")')
         end
     end
 
@@ -316,9 +316,9 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
     table.insert(lines, "")
     table.insert(lines, "    " .. name .. " Commands")
     table.insert(lines, "")
-    table.insert(lines, '    xc("name")          - apply item')
-    table.insert(lines, '    xc("name", "clear") - clear item')
-    table.insert(lines, '    xc("all",  "clear") - clear all')
+    table.insert(lines, '    cx("name")          - apply item')
+    table.insert(lines, '    cx("name", "clear") - clear item')
+    table.insert(lines, '    cx("all",  "clear") - clear all')
     table.insert(lines, "")
     if catalog then
         table.insert(lines, "    If you need to see all items with photos check our catalog")
@@ -343,8 +343,8 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     local function loadMod(url)
         local body = req(url); if not body then return nil end
         local fn, err = loadstring(body)
-        if not fn then warn("xCMD || "..tostring(err)); return nil end
-        local ok, r = pcall(fn); if not ok then warn("xCMD || "..tostring(r)); return nil end
+        if not fn then warn("CMX || "..tostring(err)); return nil end
+        local ok, r = pcall(fn); if not ok then warn("CMX || "..tostring(r)); return nil end
         return r
     end
 
@@ -387,14 +387,14 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     end
     local function SetDAMode(val)
         local v = val:lower():gsub("%s+","")
-        if v=="1" or v=="once" then DAMode="once"; print("xCMD || DAMode = once")
-        elseif v=="2" or v=="true" then DAMode="true"; print("xCMD || DAMode = true")
-        elseif v=="reset" or v=="off" then DAMode="once"; print("xCMD || DAMode = off")
-        else warn("xCMD || Unknown DAMode: "..val) end
+        if v=="1" or v=="once" then DAMode="once"; print("CMX || DAMode = once")
+        elseif v=="2" or v=="true" then DAMode="true"; print("CMX || DAMode = true")
+        elseif v=="reset" or v=="off" then DAMode="once"; print("CMX || DAMode = off")
+        else warn("CMX || Unknown DAMode: "..val) end
     end
 
     -- Aliases + Groups
-    local function SetAlias(s,t) Aliases[s:lower()]=t:lower(); print("xCMD || Alias: '"..s.."' → '"..t.."'") end
+    local function SetAlias(s,t) Aliases[s:lower()]=t:lower(); print("CMX || Alias: '"..s.."' → '"..t.."'") end
     local function ResolveAlias(n) return Aliases[n:lower()] or n end
     local function SetGroup(g,i) Groups[g:lower()]=i end
     local function ResolveGroup(n) return Groups[n:lower()] or nil end
@@ -430,7 +430,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
             local modLines = ModuleSystem and ModuleSystem.BuildCMDLines(Security.IsVerified) or {}
             local builtIn  = Logic.BuildCMD(function() return miXconf.project_vers end, miXconf.project_catalog, miXconf.project_discord, miXconf.project_name)
             setclipboard(table.concat(modLines,"\n") .. "\n" .. builtIn)
-            print("xCMD || CMD copied"); return
+            print("CMX || CMD copied"); return
         end
 
         if m == "clear" then Logic.DoClear(n); return end
@@ -438,7 +438,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         for _, d in pairs(Library) do
             if d.Name:lower() == n then
                 if d.ReqPlaceID and d.ReqPlaceID ~= 0 and tonumber(d.ReqPlaceID) ~= game.PlaceId then
-                    warn("xCMD || Item '"..d.Name.."' not available"); return
+                    warn("CMX || Item '"..d.Name.."' not available"); return
                 end
                 if key and key ~= "" then
                     game:GetService("UserInputService").InputBegan:Connect(function(i,gp)
@@ -460,7 +460,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
             end
         end
 
-        warn("xCMD || Item '"..name.."' not found")
+        warn("CMX || Item '"..name.."' not found")
     end
 
     -- Respawn
