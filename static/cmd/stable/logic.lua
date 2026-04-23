@@ -249,7 +249,7 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
         for _, item in pairs(items) do
             table.insert(lines, indent .. item.Name ..
                 string.rep(" ", math.max(1, 22 - #item.Name)) ..
-                '|   js("' .. item.Name .. '")')
+                '|   xc("' .. item.Name .. '")')
         end
     end
 
@@ -316,9 +316,9 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
     table.insert(lines, "")
     table.insert(lines, "    " .. name .. " Commands")
     table.insert(lines, "")
-    table.insert(lines, '    js("name")          - apply item')
-    table.insert(lines, '    js("name", "clear") - clear item')
-    table.insert(lines, '    js("all",  "clear") - clear all')
+    table.insert(lines, '    xc("name")          - apply item')
+    table.insert(lines, '    xc("name", "clear") - clear item')
+    table.insert(lines, '    xc("all",  "clear") - clear all')
     table.insert(lines, "")
     if catalog then
         table.insert(lines, "    If you need to see all items with photos check our catalog")
