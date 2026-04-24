@@ -20,7 +20,7 @@ Run.DexByIY = function() exec("https://raw.githubusercontent.com/infyiff/backup/
 
 
 -- Games
-Run.VDTexRBLX = function() exec("https://raw.makito.workers.dev/scripts/games/violence-district/TexRBLX-script.lua") end
+Run.VDTexRBLX = function() exec("https://raw.makito.workers.dev/scripts/games/loadviolence-district/TexRBLX-script.lua") end
 Run.VDTexRBLXRewrite = function() exec("https://raw.makito.workers.dev/scripts/games/violence-district/TexRBLX-Rewrite.lua") end
 Run.DisableStopEmote = function() exec("https://raw.makito.workers.dev/scripts/games/violence-district/DisableStopEmote.lua") end
 Run.MoonWalk = function() exec("https://raw.makito.workers.dev/scripts/games/violence-district/MoonWalk.lua") end
