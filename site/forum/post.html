@@ -144,12 +144,6 @@ body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-s
 /* ── LOADING ── */
 .post-loading { padding: 70px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
 
-/* ── BOTTOM NAV ── */
-.bottom-nav { position: fixed; bottom: 22px; left: 22px; background: rgba(5,2,4,0.75); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 12px; padding: 9px 18px; display: flex; gap: 22px; z-index: 10; align-items: center; }
-.nav-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; }
-.nav-link:hover { color: white; }
-.nav-divider { width: 1px; height: 13px; background: var(--border); }
-.bottom-credit { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); font-size: 9px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.08); text-transform: uppercase; z-index: 10; white-space: nowrap; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -215,19 +209,6 @@ body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-s
     </div>
   </aside>
 </div>
-
-<nav class="bottom-nav">
-  <a href="/" class="nav-link">Home</a>
-  <a href="/catalog" class="nav-link">Catalog</a>
-  <a href="/obfuscator" class="nav-link">Tools</a>
-  <a href="/getkey" class="nav-link">Auth</a>
-  <a href="/status" class="nav-link">Status</a>
-  <a href="https://discord.gg/TRPZg4Xfkq" class="nav-link" target="_blank">Discord</a>
-  <div class="nav-divider"></div>
-  <a href="/forum" class="nav-link">Forum</a>
-</nav>
-<div class="bottom-credit">© 2026 Makito. All rights reserved.</div>
-
 <script>
 // ── Session ──
 let currentUser = null;
