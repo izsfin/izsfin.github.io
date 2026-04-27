@@ -1,10 +1,9 @@
 import { Octokit } from "@octokit/rest";
-import { authToAcc }                    from './functions/forum/AuthToAcc.js';
+import { discordAuthRedirect, discordAuthCallback, discordLogout } from './functions/forum/AuthToAcc.js';
 import { createPost }                   from './functions/forum/CreatePost.js';
 import { loadPosts, loadPost, loadComments, addComment } from './functions/forum/PostLoad.js';
 const OWNER = "odesseu";
 const REPO  = "hosting";
-
 function githubDecode(base64) {
     const binString = atob(base64.replace(/\s/g, ""));
     const bytes = Uint8Array.from(binString, m => m.codePointAt(0));
@@ -31,10 +30,10 @@ export async function onRequest(context) {
         }});
     }
 
-    // Статика
     if (rawPath.startsWith("site/")) return context.next();
-
-    // ── API ──
+    if (rawPath === "auth/discord")          return discordAuthRedirect(env);
+    if (rawPath === "auth/discord/callback") return discordAuthCallback(request, env, H);
+    if (rawPath === "auth/logout")           return discordLogout(request, env, H);
     if (action) {
         try {
             const octokit = new Octokit({ auth: env.GITHUB_TOKEN });
@@ -42,7 +41,6 @@ export async function onRequest(context) {
             if (action === "posts") {
                 const res  = await loadPosts(env, H);
                 const data = await res.json();
-                // Добавляем verified к каждому посту
                 data.posts = await attachVerified(data.posts, 'author', octokit, OWNER, REPO);
                 return new Response(JSON.stringify(data), { headers: H });
             }
@@ -66,10 +64,8 @@ export async function onRequest(context) {
                 return new Response(JSON.stringify(data), { headers: H });
             }
 
-            if (action === "comment"  && request.method === "POST") return addComment(request, env, H);
-            if (action === "create"   && request.method === "POST") return createPost(request, env, H);
-            if (action === "auth"     && request.method === "POST") return authToAcc(request, env, H);
-
+            if (action === "comment" && request.method === "POST") return addComment(request, env, H);
+            if (action === "create"  && request.method === "POST") return createPost(request, env, H);
             return new Response(JSON.stringify({ error: "Action not found" }), { status: 404, headers: H });
 
         } catch (e) {
