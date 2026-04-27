@@ -4,27 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Makito Forum | New Post</title>
-<link rel="icon" type="image/png" href="/site/html/favicon.png">
+<link rel="icon" type="image/png" href="/site/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root { --primary: #ff0073; --bg: #050204; --border: rgba(255,255,255,0.06); }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans-serif; height: 100vh; overflow: hidden; animation: fadeIn 0.35s ease forwards; display: flex; flex-direction: column; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-
 .bg-grid { position: fixed; inset: 0; z-index: -3; background-color: #050204; background-image: linear-gradient(rgba(209,209,209,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(209,209,209,0.04) 1px, transparent 1px); background-size: 40px 40px; }
-.bg-svg { position: fixed; inset: 0; z-index: -2; background-image: url("/site/html/tools/bg.svg"); background-size: cover; background-position: center; opacity: 0.55; }
+.bg-svg { position: fixed; inset: 0; z-index: -2; background-image: url("/site/tools/bg.svg"); background-size: cover; background-position: center; opacity: 0.55; }
 .bg-fade { position: fixed; inset: 0; z-index: -1; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(5,2,4,0) 0%, rgba(5,2,4,0.85) 100%); }
-
-/* ── TOPBAR ── */
 .topbar { flex-shrink: 0; height: 52px; background: rgba(5,2,4,0.75); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 8px; position: relative; z-index: 10; }
 .topbar-logo { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; text-decoration: none; margin-right: 24px; }
-.topbar-nav { display: flex; align-items: center; gap: 2px; flex: 1; justify-content: center; }
-.topbar-link { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.35); padding: 6px 12px; border-radius: 8px; transition: color 0.2s; cursor: pointer; border: none; background: none; font-family: 'Poppins',sans-serif; }
-.topbar-link:hover { color: white; }
-.topbar-link.active-nav { color: rgba(255,145,207,0.8); }
-.topbar-sep { color: rgba(255,255,255,0.15); font-size: 12px; margin: 0 2px; }
-.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: 24px; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .btn-go { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 7px 18px; border-radius: 8px; border: 1px solid rgba(255,0,115,0.35); background: rgba(255,0,115,0.08); color: var(--primary); cursor: pointer; transition: all 0.2s; text-decoration: none; }
 .btn-go:hover { background: var(--primary); color: white; }
 .user-chip { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: rgba(255,145,207,0.8); text-transform: uppercase; }
@@ -71,27 +63,16 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
 <div class="bg-grid"></div>
 <div class="bg-svg"></div>
 <div class="bg-fade"></div>
-
-<!-- TOPBAR -->
 <nav class="topbar">
-  <a href="/docs" class="topbar-logo">Vellote</a>
-  <div class="topbar-nav">
-    <button class="topbar-link" onclick="window.location.href='/auth'">Login</button>
-    <span class="topbar-sep">\</span>
-    <button class="topbar-link" onclick="window.location.href='/auth'">Register</button>
-    <span style="color:rgba(255,255,255,0.1);font-size:11px;margin:0 4px">&amp;</span>
-    <button class="topbar-link active-nav">New Post</button>
-    <span class="user-chip" id="user-chip" style="display:none"></span>
+  <a href="/" class="topbar-logo">MissLua</a>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center">
+    <span class="user-chip" id="user-chip"></span>
   </div>
   <div class="topbar-right">
-    <a href="/docs" class="btn-go">← Forum</a>
+    <a href="/" class="btn-go">← Forum</a>
   </div>
 </nav>
-
-<!-- EDITOR LAYOUT -->
 <div class="editor-layout">
-
-  <!-- LEFT -->
   <div class="col-left">
     <div class="col-left-head">Post Preview</div>
     <div class="preview-card">
@@ -106,7 +87,7 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
         </div>
       </div>
       <input type="file" id="imgInput" accept="image/*" onchange="handleImg(this)">
-      <input type="text" class="field-name" id="field-name" placeholder="Post title..." oninput="">
+      <input type="text" class="field-name" id="field-name" placeholder="Post title...">
       <textarea class="field-desc" id="field-desc" placeholder="Short description..." rows="2"></textarea>
     </div>
     <div class="publish-area">
@@ -114,8 +95,6 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
       <div class="publish-msg" id="publishMsg"></div>
     </div>
   </div>
-
-  <!-- CENTER -->
   <div class="col-editor">
     <div class="editor-toolbar">
       <button class="tb-btn" onclick="wrap('**','**')"><b>B</b></button>
@@ -134,10 +113,8 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
       <button class="tb-btn" onclick="wrap('||','||')">spoiler</button>
       <button class="tb-btn" onclick="insertLink()">[link]</button>
     </div>
-    <textarea class="editor-textarea" id="field-text" placeholder="Write your post here...&#10;&#10;Supported markdown:&#10;**bold**  *italic*  __underline__&#10;# H1  ## H2  ### H3&#10;> quote&#10;\`inline code\`  \`\`\`code block\`\`\`&#10;* list item&#10;||spoiler||&#10;[text](url)"></textarea>
+    <textarea class="editor-textarea" id="field-text" placeholder="Write your post here..."></textarea>
   </div>
-
-  <!-- RIGHT -->
   <div class="col-right">
     <div class="col-right-head">Formatting</div>
     <div class="help-item"><div class="help-syntax">**text**</div><div class="help-desc">Bold</div></div>
@@ -151,27 +128,29 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
     <div class="help-item"><div class="help-syntax">||spoiler||</div><div class="help-desc">Spoiler</div></div>
     <div class="help-item"><div class="help-syntax">[text](url)</div><div class="help-desc">Link</div></div>
   </div>
-
 </div>
 <script>
-// ── SESSION ──
 let currentUser = null;
-try { currentUser = JSON.parse(localStorage.getItem('nq-docs-user') || 'null'); } catch(e) {}
+let imgBase64 = null;
 
-if (!currentUser) {
-  window.location.href = '/auth';
-} else {
+async function initSession() {
+  try {
+    const r = await fetch('/forum?action=me');
+    const d = await r.json();
+    currentUser = d.user || null;
+  } catch(e) {}
+  if (!currentUser) {
+    window.location.href = '/auth';
+    return;
+  }
   document.getElementById('previewAuthor').textContent = currentUser.username;
-  document.getElementById('user-chip').style.display = '';
   document.getElementById('user-chip').textContent = currentUser.username;
 }
 
-// ── IMAGE ──
-let imgBase64 = null;
 function handleImg(input) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 15*2048*2048) { setMsg('Image too large (max 15MB)', 'err'); return; }
+  if (file.size > 3*1024*1024) { setMsg('Image too large (max 3MB)', 'err'); return; }
   const reader = new FileReader();
   reader.onload = e => {
     imgBase64 = e.target.result;
@@ -183,15 +162,12 @@ function handleImg(input) {
   reader.readAsDataURL(file);
 }
 
-// ── TOOLBAR ──
 function getTA() { return document.getElementById('field-text'); }
 function wrap(before, after) {
   const ta = getTA(), s = ta.selectionStart, e = ta.selectionEnd;
   const sel = ta.value.slice(s,e);
-  const rep = before+(sel||'text')+after;
-  ta.setRangeText(rep, s, e, 'end');
+  ta.setRangeText(before+(sel||'text')+after, s, e, 'end');
   ta.focus();
-  if (!sel) { ta.selectionStart=s+before.length; ta.selectionEnd=s+before.length+4; }
 }
 function insertLine(prefix) {
   const ta = getTA(), s = ta.selectionStart;
@@ -206,7 +182,6 @@ function insertLink() {
   ta.focus();
 }
 
-// ── PUBLISH ──
 function setMsg(text, type) {
   const el = document.getElementById('publishMsg');
   el.textContent = text;
@@ -217,16 +192,15 @@ async function doPublish() {
   const title = document.getElementById('field-name').value.trim();
   const description = document.getElementById('field-desc').value.trim();
   const content = document.getElementById('field-text').value.trim();
-  if (!title || !description || !content) { setMsg('Please fill in all fields', 'err'); return; }
-  if (!currentUser) { window.location.href='/auth'; return; }
+  if (!title || !content) { setMsg('Fill in title and content', 'err'); return; }
   const btn = document.getElementById('publishBtn');
   btn.disabled = true;
   setMsg('Publishing...', '');
   try {
-    const r = await fetch('/forum/CreatePost.js', {
+    const r = await fetch('/forum?action=create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: currentUser.token, title, description, content, img: imgBase64||null })
+      body: JSON.stringify({ title, description, content, img: imgBase64||null })
     });
     const d = await r.json();
     if (d.ok) {
@@ -235,6 +209,8 @@ async function doPublish() {
     } else { setMsg(d.error||'Error', 'err'); btn.disabled=false; }
   } catch(e) { setMsg('Network error', 'err'); btn.disabled=false; }
 }
+
+initSession();
 </script>
 </body>
 </html>

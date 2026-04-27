@@ -1,9 +1,11 @@
 import { Octokit } from "@octokit/rest";
-import { discordAuthRedirect, discordAuthCallback, discordLogout } from './forum/AuthToAcc.js';
+import { discordAuthRedirect, discordAuthCallback, discordLogout, getSession } from './forum/AuthToAcc.js';
 import { createPost }                   from './forum/CreatePost.js';
 import { loadPosts, loadPost, loadComments, addComment } from './forum/PostLoad.js';
+
 const OWNER = "odesseu";
 const REPO  = "hosting";
+
 function githubDecode(base64) {
     const binString = atob(base64.replace(/\s/g, ""));
     const bytes = Uint8Array.from(binString, m => m.codePointAt(0));
@@ -21,7 +23,6 @@ export async function onRequest(context) {
         "Access-Control-Allow-Origin": "*"
     };
 
-    // CORS preflight
     if (request.method === "OPTIONS") {
         return new Response(null, { headers: {
             "Access-Control-Allow-Origin": "*",
@@ -31,9 +32,13 @@ export async function onRequest(context) {
     }
 
     if (rawPath.startsWith("site/")) return context.next();
+
+    // Discord OAuth2
     if (rawPath === "auth/discord")          return discordAuthRedirect(env);
     if (rawPath === "auth/discord/callback") return discordAuthCallback(request, env, H);
     if (rawPath === "auth/logout")           return discordLogout(request, env, H);
+
+    // API
     if (action) {
         try {
             const octokit = new Octokit({ auth: env.GITHUB_TOKEN });
@@ -41,31 +46,29 @@ export async function onRequest(context) {
             if (action === "posts") {
                 const res  = await loadPosts(env, H);
                 const data = await res.json();
-                data.posts = await attachVerified(data.posts, 'author', octokit, OWNER, REPO);
                 return new Response(JSON.stringify(data), { headers: H });
             }
 
             if (action === "post") {
                 const res  = await loadPost(url, env, H, request);
                 const data = await res.json();
-                if (data.post) {
-                    const [withV] = await attachVerified([data.post], 'author', octokit, OWNER, REPO);
-                    data.post = withV;
-                }
                 return new Response(JSON.stringify(data), { headers: H });
             }
 
-            if (action === "comments") {
-                const res  = await loadComments(url, env, H);
-                const data = await res.json();
-                if (data.comments) {
-                    data.comments = await attachVerified(data.comments, 'author', octokit, OWNER, REPO);
-                }
-                return new Response(JSON.stringify(data), { headers: H });
-            }
+            if (action === "comments") return loadComments(url, env, H);
 
             if (action === "comment" && request.method === "POST") return addComment(request, env, H);
             if (action === "create"  && request.method === "POST") return createPost(request, env, H);
+
+            if (action === "me") {
+                const session = await getSession(request, env);
+                if (!session) return new Response(JSON.stringify({ user: null }), { headers: H });
+                const user = await env.DB.prepare(
+                    "SELECT discord_id, username, avatar FROM users WHERE discord_id = ?"
+                ).bind(session.discord_id).first();
+                return new Response(JSON.stringify({ user: user || null }), { headers: H });
+            }
+
             return new Response(JSON.stringify({ error: "Action not found" }), { status: 404, headers: H });
 
         } catch (e) {
@@ -73,7 +76,7 @@ export async function onRequest(context) {
         }
     }
 
-    // ── HTML страницы ──
+    // HTML страницы
     const pages = {
         "":             "site/forum/home.html",
         "forum":        "site/forum/home.html",

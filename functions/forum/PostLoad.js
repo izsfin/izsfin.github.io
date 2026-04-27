@@ -61,9 +61,9 @@ export async function loadComments(url, env, headers) {
 
 // Добавить комментарий
 export async function addComment(request, env, headers) {
-    const { postId, text, token } = await request.json();
+    const { postId, text } = await request.json();
 
-    if (!postId || !text || !token) {
+    if (!postId || !text) {
         return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400, headers });
     }
 
@@ -71,9 +71,8 @@ export async function addComment(request, env, headers) {
         return new Response(JSON.stringify({ error: 'Comment too long (max 2000)' }), { status: 400, headers });
     }
 
-    const session = await env.DB.prepare(
-        "SELECT username FROM sessions WHERE token = ? AND expires_at > ?"
-    ).bind(token, Math.floor(Date.now() / 1000)).first();
+    const { getSession } = await import('./AuthToAcc.js');
+    const session = await getSession(request, env);
 
     if (!session) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers });
