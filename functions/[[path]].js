@@ -1,7 +1,7 @@
 import { Octokit } from "@octokit/rest";
-import { discordAuthRedirect, discordAuthCallback, discordLogout } from './functions/forum/AuthToAcc.js';
-import { createPost }                   from './functions/forum/CreatePost.js';
-import { loadPosts, loadPost, loadComments, addComment } from './functions/forum/PostLoad.js';
+import { discordAuthRedirect, discordAuthCallback, discordLogout } from './forum/AuthToAcc.js';
+import { createPost }                   from './forum/CreatePost.js';
+import { loadPosts, loadPost, loadComments, addComment } from './forum/PostLoad.js';
 const OWNER = "odesseu";
 const REPO  = "hosting";
 function githubDecode(base64) {
