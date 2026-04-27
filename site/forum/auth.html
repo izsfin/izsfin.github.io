@@ -44,7 +44,7 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
 <div class="bg-svg"></div>
 <div class="bg-fade"></div>
 <nav class="topbar">
-  <a href="/" class="topbar-logo">MissLua</a>
+  <a href="/" class="topbar-logo">Makito</a>
   <div class="topbar-right">
     <a href="/" class="btn-go">← Forum</a>
   </div>
@@ -52,7 +52,7 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
 <div class="page-center">
   <div class="auth-wrap">
     <div class="auth-brand">
-      <div class="auth-brand-name">MissLua</div>
+      <div class="auth-brand-name">Makito</div>
       <div class="auth-brand-sub">Forum / Sign In</div>
     </div>
     <div class="auth-card">
@@ -75,9 +75,8 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
   <a href="/status" class="nav-link">Status</a>
   <a href="https://discord.gg/TRPZg4Xfkq" class="nav-link" target="_blank">Discord</a>
 </nav>
-<div class="bottom-credit">© 2026 MissLua. All rights reserved.</div>
+<div class="bottom-credit">© 2026 Makito. All rights reserved.</div>
 <script>
-// Если уже залогинен — редиректим на главную
 fetch('/forum?action=me').then(r=>r.json()).then(d=>{
   if (d.user) window.location.href = '/';
 });
