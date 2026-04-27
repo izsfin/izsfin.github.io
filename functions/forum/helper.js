@@ -59,18 +59,7 @@ export function formatViews(n) {
     return String(n);
 }
 
-
-// ─────────────────────────────────────────
-//  ViewsCounter
-//  incrementView(env, postId) → new views count
-//
-//  Защита: один IP/сессия не может накрутить
-//  Хранит ключ  `view:{postId}:{ip}`  в D1
-//  с TTL cooldown (по умолчанию 1 час)
-// ─────────────────────────────────────────
-
-const VIEW_COOLDOWN_SEC = 3600; // 1 час
-
+const VIEW_COOLDOWN_SEC = 3600;
 export async function incrementView(env, postId, request) {
     // Получаем идентификатор посетителя (IP + User-Agent хэш)
     const ip = request.headers.get('CF-Connecting-IP')
