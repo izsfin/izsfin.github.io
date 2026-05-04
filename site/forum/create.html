@@ -107,16 +107,16 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
 <div class="bg-svg"></div>
 <div class="bg-fade"></div>
 <nav class="topbar">
-  <a href="/forum" class="topbar-logo">Makito</a>
+  <a href="/forum/" class="topbar-logo">Makito</a>
   <div style="flex:1;display:flex;align-items:center;justify-content:center">
     <span class="user-chip" id="user-chip"></span>
   </div>
   <div class="topbar-right">
-    <a href="/forum" class="btn-go">← Forum</a>
+    <a href="/forum/" class="btn-go">← Forum</a>
   </div>
 </nav>
+
 <div class="editor-layout">
-  <!-- LEFT -->
   <div class="col-left">
     <div class="col-head">Post Info</div>
     <div class="preview-card">
@@ -140,7 +140,6 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
     </div>
   </div>
 
-  <!-- CENTER -->
   <div class="col-editor">
     <div class="editor-tabs">
       <button class="editor-tab active" id="tab-write" onclick="switchTab('write')">Write</button>
@@ -170,7 +169,6 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
     <div id="previewPane"></div>
   </div>
 
-  <!-- RIGHT -->
   <div class="col-right">
     <div class="col-right-head">Formatting</div>
     <div class="help-item"><div class="help-syntax">**text**</div><div class="help-desc">Bold</div></div>
@@ -194,9 +192,9 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
   </div>
 </div>
 <script>
+
 let currentUser = null;
 let imgBase64 = null;
-
 async function initSession() {
   try {
     const r = await fetch('/forum?action=me');
@@ -253,7 +251,6 @@ function insertCodeBlock() {
   ta.focus();
 }
 
-// ── Tab switching ──
 function switchTab(tab) {
   if (tab==='preview') {
     document.getElementById('writePane').style.display='none';

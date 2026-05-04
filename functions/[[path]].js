@@ -63,7 +63,7 @@ export async function onRequest(context) {
 
     let htmlFile = null;
     if (rawPath === "" || rawPath === "forum") {
-        htmlFile = "site/forum/home.html";
+        htmlFile = "site/forum/index.html";
     } else if (rawPath === "auth") {
         htmlFile = "site/forum/auth.html";
     } else if (rawPath === "catalog") {

@@ -82,8 +82,8 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
       <input class="search-input" placeholder="Search posts..." id="searchInput" oninput="handleSearch()">
       <span style="color:rgba(255,255,255,0.2);font-size:15px">⌕</span>
     </div>
-    <a href="/forum/create" class="btn-action" id="btn-create" style="display:none">+ New Post</a>
-    <a href="/auth" class="btn-action" id="btn-login" style="display:none">Login</a>
+    <a href="/forum/create/" class="btn-action" id="btn-create" style="display:none">+ New Post</a>
+    <a href="/auth/" class="btn-action" id="btn-login" style="display:none">Login</a>
   </div>
 </nav>
 <main class="main">
@@ -101,7 +101,7 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
       <div class="side-head">Account</div>
       <div style="padding:14px 14px 12px">
         <div id="side-logged-out" style="display:none">
-          <a href="/auth" class="btn-action" style="display:block;text-align:center;margin-bottom:8px">Login with Discord</a>
+          <a href="/auth/" class="btn-action" style="display:block;text-align:center;margin-bottom:8px">Login with Discord</a>
         </div>
         <div id="side-logged-in" style="display:none">
           <div class="side-user" style="padding:0 0 10px">
@@ -110,7 +110,7 @@ body { background-color: var(--bg); color: #d1d1d1; font-family: 'Poppins', sans
             </div>
             <div><div class="side-uname" id="side-uname">—</div><div class="side-urole">Member</div></div>
           </div>
-          <a href="/forum/create" class="btn-action" style="display:block;text-align:center;margin-bottom:8px">+ New Post</a>
+          <a href="/forum/create/" class="btn-action" style="display:block;text-align:center;margin-bottom:8px">+ New Post</a>
           <button onclick="doLogout()" style="width:100%;padding:8px;background:none;border:1px solid var(--border);border-radius:8px;font-family:Poppins,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;transition:all 0.2s" onmouseover="this.style.color='rgba(248,113,113,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">Log out</button>
         </div>
       </div>
