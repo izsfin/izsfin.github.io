@@ -6,151 +6,119 @@
 <title>Makito Forum | Post</title>
 <link rel="icon" type="image/png" href="/site/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
-:root {
-  --primary: #ff0073;
-  --bg: #050204;
-  --card: rgba(12,8,11,0.9);
-  --border: rgba(255,255,255,0.06);
-  --text: #c8c8c8;
-  --text-dim: rgba(255,255,255,0.35);
-}
+:root { --primary: #ff0073; --bg: #050204; --card: rgba(12,8,11,0.9); --border: rgba(255,255,255,0.06); --text: #c8c8c8; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; min-height: 100vh; overflow-x: hidden; animation: fadeIn 0.3s ease forwards; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
-
-.bg-grid { position: fixed; inset: 0; z-index: -3; background: #050204 url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='rgba(255,255,255,0.03)' stroke-width='1'/%3E%3C/svg%3E") repeat; }
+.bg-grid { position: fixed; inset: 0; z-index: -3; background-color: #050204; background-image: linear-gradient(rgba(209,209,209,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(209,209,209,0.04) 1px,transparent 1px); background-size: 40px 40px; }
 .bg-svg { position: fixed; inset: 0; z-index: -2; background: url("/site/tools/bg.svg") center/cover; opacity: 0.4; }
 .bg-fade { position: fixed; inset: 0; z-index: -1; background: radial-gradient(ellipse 90% 55% at 50% 0%, transparent 0%, rgba(5,2,4,0.9) 100%); }
 
-/* ── TOPBAR ── */
-.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 50px; background: rgba(5,2,4,0.8); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 12px; }
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 50px; background: rgba(5,2,4,0.85); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 12px; }
 .topbar-logo { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; }
 .topbar-sep { width: 1px; height: 14px; background: var(--border); margin: 0 4px; }
 .topbar-crumb { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .user-chip { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: rgba(255,145,207,0.8); text-transform: uppercase; }
-.btn-back { font-size: 10px; font-weight: 700; padding: 6px 14px; border-radius: 7px; border: 1px solid var(--border); background: none; color: rgba(255,255,255,0.3); text-decoration: none; transition: 0.2s; letter-spacing: 0.5px; }
+.btn-back { font-size: 10px; font-weight: 700; padding: 6px 14px; border-radius: 7px; border: 1px solid var(--border); background: none; color: rgba(255,255,255,0.3); text-decoration: none; transition: 0.2s; }
 .btn-back:hover { color: white; border-color: rgba(255,255,255,0.2); }
 
-/* ── LAYOUT ── */
-.main { padding: 62px 20px 100px; max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: 1fr 240px; gap: 16px; position: relative; z-index: 2; }
-@media(max-width:760px) { .main { grid-template-columns: 1fr; } .sidebar { display: none; } }
+.main { padding: 62px 20px 100px; max-width: 760px; margin: 0 auto; position: relative; z-index: 2; }
 
-/* ── LEFT COLUMN ── */
-.col-main { min-width: 0; }
+/* POST CARD */
+.post-card { border: 1px solid var(--border); border-radius: 12px; background: var(--card); overflow: hidden; margin-top: 16px; }
+.post-card-header { display: grid; grid-template-columns: 120px 1fr; border-bottom: 1px solid var(--border); }
+.post-thumb { width: 120px; height: 120px; background: rgba(255,255,255,0.03); border-right: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.post-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.post-thumb-ph { font-size: 32px; opacity: 0.08; }
+.post-card-meta { padding: 14px 18px; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+.post-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.post-title { font-size: 17px; font-weight: 800; color: white; line-height: 1.3; flex: 1; min-width: 0; }
+.post-views { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.22); white-space: nowrap; flex-shrink: 0; }
+.post-author-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.post-author { font-size: 11px; font-weight: 700; color: rgba(255,145,207,0.8); }
+.post-desc { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 5px; line-height: 1.55; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.post-date { font-size: 10px; color: rgba(255,255,255,0.16); text-align: right; }
 
-/* ── POST ── */
-.post-wrap { border: 1px solid var(--border); border-radius: 10px; background: var(--card); overflow: hidden; margin-top: 14px; }
-
-.post-header { padding: 22px 26px 18px; border-bottom: 1px solid var(--border); }
-
-.post-meta-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-.post-author-wrap { display: flex; align-items: center; gap: 6px; }
-.post-avatar { width: 26px; height: 26px; border-radius: 6px; background: rgba(255,0,115,0.1); border: 1px solid rgba(255,0,115,0.18); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: var(--primary); text-transform: uppercase; flex-shrink: 0; }
-.post-author { font-size: 11px; font-weight: 700; color: rgba(255,145,207,0.85); }
-.post-verified { color: #4db8ff; font-size: 11px; line-height: 1; }
-.post-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.15); }
-.post-date { font-size: 10px; color: rgba(255,255,255,0.2); }
-.post-views { font-size: 10px; color: rgba(255,255,255,0.18); margin-left: auto; }
-
-.post-title { font-size: 22px; font-weight: 800; color: white; line-height: 1.3; margin-bottom: 8px; }
-.post-description { font-size: 12px; color: rgba(255,255,255,0.38); line-height: 1.65; }
-
-/* ── POST CONTENT ── */
+/* CONTENT */
 .post-content { padding: 24px 26px; font-size: 13px; line-height: 2; color: rgba(255,255,255,0.72); }
 .post-content p { margin-bottom: 14px; }
 .post-content p:last-child { margin-bottom: 0; }
-.post-content h1 { font-size: 20px; font-weight: 800; color: white; margin: 24px 0 12px; line-height: 1.3; }
+.post-content h1 { font-size: 20px; font-weight: 800; color: white; margin: 24px 0 12px; }
 .post-content h2 { font-size: 16px; font-weight: 700; color: rgba(255,255,255,0.92); margin: 20px 0 10px; }
 .post-content h3 { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.8); margin: 16px 0 8px; }
 .post-content h4 { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.35); margin: 14px 0 6px; }
 .post-content strong { color: rgba(255,255,255,0.92); font-weight: 700; }
-.post-content em { color: rgba(255,255,255,0.72); font-style: italic; }
+.post-content em { font-style: italic; }
 .post-content u { text-decoration: underline; text-decoration-color: rgba(255,0,115,0.45); }
 .post-content s { color: rgba(255,255,255,0.3); }
 .post-content a { color: var(--primary); text-decoration: none; }
 .post-content a:hover { text-decoration: underline; }
 .post-content hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 .post-content blockquote { border-left: 2px solid rgba(255,0,115,0.35); padding: 2px 0 2px 16px; margin: 14px 0; color: rgba(255,255,255,0.42); font-style: italic; }
-.post-content code { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.09); border-radius: 4px; padding: 1px 7px; font-size: 11px; font-family: 'Courier New', monospace; color: rgba(255,145,207,0.85); }
-.post-content pre { background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 16px 18px; margin: 14px 0; overflow-x: auto; }
-.post-content pre code { background: none; border: none; padding: 0; font-size: 12px; color: rgba(255,255,255,0.65); }
-.post-content ul, .post-content ol { padding-left: 20px; margin-bottom: 14px; }
+.post-content code { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.09); border-radius: 4px; padding: 1px 7px; font-size: 11px; font-family: 'Courier New',monospace; color: rgba(255,145,207,0.85); }
+.post-content pre { background: rgba(0,0,0,0.5) !important; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 16px 18px; margin: 14px 0; overflow-x: auto; }
+.post-content pre code { background: none !important; border: none !important; padding: 0 !important; font-size: 12px !important; font-family: 'Courier New',monospace; color: rgba(255,255,255,0.65); }
+.post-content pre code.hljs { background: none !important; padding: 0 !important; }
+.post-content ul,.post-content ol { padding-left: 20px; margin-bottom: 14px; }
 .post-content li { margin-bottom: 6px; line-height: 1.8; }
 .post-content .spoiler-wrap { margin: 12px 0; }
 .post-content .spoiler-toggle { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-family: 'Poppins',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.2s; }
 .post-content .spoiler-toggle:hover { color: white; border-color: rgba(255,255,255,0.18); }
 .post-content .spoiler-content { display: none; margin-top: 8px; padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 6px; }
 .post-content .spoiler-content.open { display: block; }
+/* Images in content */
+.post-content .img-block { margin: 16px 0; }
+.post-content .img-block img { width: 100%; max-height: 440px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); display: block; }
+.post-content .img-side { display: flex; gap: 16px; align-items: flex-start; margin: 16px 0; }
+.post-content .img-side img { width: 220px; min-width: 220px; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; }
+.post-content .img-side .img-text { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.75; }
 
-/* Post image — под контентом, если есть */
-.post-img-wrap { border-top: 1px solid var(--border); padding: 16px 26px; }
-.post-img-wrap img { width: 100%; max-height: 480px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
-
-/* ── DIVIDER ── */
+/* DIVIDER */
 .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0 0; }
 .divider-line { flex: 1; height: 1px; background: var(--border); }
 .divider-label { font-size: 9px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.12); }
 
-/* ── COMMENTS ── */
-.comments-wrap { border: 1px solid var(--border); border-radius: 10px; background: var(--card); overflow: hidden; margin-top: 4px; }
+/* COMMENTS */
+.comments-wrap { border: 1px solid var(--border); border-radius: 12px; background: var(--card); overflow: hidden; margin-top: 4px; }
 .comments-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--border); }
 .comments-label { font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.18); }
 .comments-count { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.2); }
-
-.comment-row { display: grid; grid-template-columns: 40px 1fr; border-bottom: 1px solid rgba(255,255,255,0.035); }
-.comment-row:last-child { border-bottom: none; }
-.comment-idx { display: flex; align-items: flex-start; justify-content: center; border-right: 1px solid rgba(255,255,255,0.035); padding-top: 16px; font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.1); padding-bottom: 16px; }
+.comment-row { display: grid; grid-template-columns: 48px 1fr; border-bottom: 1px solid rgba(255,255,255,0.035); }
+.comment-row:last-of-type { border-bottom: none; }
+.comment-left { border-right: 1px solid rgba(255,255,255,0.035); display: flex; flex-direction: column; align-items: center; padding: 13px 0 10px; gap: 5px; }
+.comment-av { width: 28px; height: 28px; border-radius: 7px; overflow: hidden; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 800; color: rgba(255,255,255,0.3); text-transform: uppercase; flex-shrink: 0; }
+.comment-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.comment-idx { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.1); }
 .comment-inner { padding: 13px 16px; }
-.comment-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.comment-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .comment-author { font-size: 10px; font-weight: 700; color: rgba(255,145,207,0.75); }
-.comment-verified { color: #4db8ff; font-size: 10px; }
 .comment-date { font-size: 9px; color: rgba(255,255,255,0.15); }
 .comment-text { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.75; }
 .no-comments { padding: 30px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
-
-/* ── REPLY ── */
-.reply-wrap { border-top: 1px solid var(--border); padding: 14px 16px; background: rgba(255,255,255,0.01); display: grid; grid-template-columns: 32px 1fr; gap: 10px; align-items: start; }
-.reply-av { width: 32px; height: 32px; border-radius: 7px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.2); text-transform: uppercase; }
+.reply-wrap { border-top: 1px solid var(--border); padding: 14px 16px; display: grid; grid-template-columns: 32px 1fr; gap: 10px; align-items: start; }
+.reply-av { width: 32px; height: 32px; border-radius: 7px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.2); text-transform: uppercase; }
+.reply-av img { width: 100%; height: 100%; object-fit: cover; }
 .reply-right { display: flex; flex-direction: column; gap: 6px; }
 .reply-input-row { display: flex; gap: 8px; align-items: flex-end; }
-.reply-ta { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 9px 13px; font-family: 'Poppins', sans-serif; font-size: 11px; color: white; outline: none; resize: none; transition: border-color 0.2s; min-height: 38px; line-height: 1.6; }
+.reply-ta { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 9px 13px; font-family: 'Poppins',sans-serif; font-size: 11px; color: white; outline: none; resize: none; transition: border-color 0.2s; min-height: 38px; line-height: 1.6; }
 .reply-ta:focus { border-color: rgba(255,0,115,0.3); }
 .reply-ta::placeholder { color: rgba(255,255,255,0.15); }
 .reply-btn { padding: 9px 16px; border-radius: 8px; border: 1px solid rgba(255,0,115,0.3); background: rgba(255,0,115,0.07); color: var(--primary); font-family: 'Poppins',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
 .reply-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
 .reply-msg { font-size: 9px; font-weight: 700; color: rgba(255,145,207,0.7); min-height: 12px; }
 .reply-msg.err { color: rgba(248,113,113,0.7); }
-
-/* ── SIDEBAR ── */
-.sidebar { padding-top: 14px; display: flex; flex-direction: column; gap: 12px; }
-.side-card { border: 1px solid var(--border); border-radius: 10px; background: var(--card); overflow: hidden; }
-.side-head { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.18); }
-.side-post { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); text-decoration: none; color: inherit; transition: background 0.15s; }
-.side-post:last-child { border-bottom: none; }
-.side-post:hover { background: rgba(255,255,255,0.02); }
-.side-post-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.1); flex-shrink: 0; transition: background 0.15s; }
-.side-post:hover .side-post-dot { background: var(--primary); }
-.side-post-info { min-width: 0; }
-.side-post-title { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.side-post-author { font-size: 9px; color: rgba(255,145,207,0.5); margin-top: 2px; }
-.side-post-views { font-size: 9px; color: rgba(255,255,255,0.15); margin-left: auto; flex-shrink: 0; }
-
-.side-info-row { padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.35); }
-.side-info-row:last-child { border-bottom: none; }
-.side-info-val { color: rgba(255,255,255,0.6); font-weight: 600; }
-
-/* ── LOADING ── */
 .post-loading { padding: 70px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.1); }
-
+.bottom-credit { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.08); text-transform: uppercase; z-index: 10; white-space: nowrap; }
 </style>
 </head>
 <body>
 <div class="bg-grid"></div>
 <div class="bg-svg"></div>
 <div class="bg-fade"></div>
-
 <nav class="topbar">
   <a href="/forum" class="topbar-logo">Makito</a>
   <div class="topbar-sep"></div>
@@ -160,239 +128,219 @@ body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-s
     <a href="/forum" class="btn-back">← Forum</a>
   </div>
 </nav>
-
 <div class="main">
-  <!-- LEFT: post + comments -->
-  <div class="col-main">
-
-    <div id="postArea">
-      <div class="post-wrap"><div class="post-loading">Loading...</div></div>
-    </div>
-
-    <div class="divider" id="divComments" style="display:none">
-      <div class="divider-line"></div>
-      <div class="divider-label">Replies</div>
-      <div class="divider-line"></div>
-    </div>
-
-    <div class="comments-wrap" id="commentsWrap" style="display:none">
-      <div class="comments-head">
-        <span class="comments-label">Comments</span>
-        <span class="comments-count" id="commentsCount"></span>
-      </div>
-      <div id="commentList"></div>
-      <div class="reply-wrap">
-        <div class="reply-av" id="reply-av">?</div>
-        <div class="reply-right">
-          <div class="reply-input-row">
-            <textarea class="reply-ta" id="commentText" placeholder="Write a reply..." rows="1"></textarea>
-            <button class="reply-btn" onclick="sendComment()">Reply</button>
-          </div>
-          <div class="reply-msg" id="commentMsg"></div>
-        </div>
-      </div>
-    </div>
-
+  <div id="postArea"><div class="post-card"><div class="post-loading">Loading...</div></div></div>
+  <div class="divider" id="divComments" style="display:none">
+    <div class="divider-line"></div><div class="divider-label">Replies</div><div class="divider-line"></div>
   </div>
-
-  <!-- RIGHT: sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="side-card" id="postInfoCard" style="display:none">
-      <div class="side-head">Post Info</div>
-      <div class="side-info-row">Views <span class="side-info-val" id="si-views">—</span></div>
-      <div class="side-info-row">Author <span class="side-info-val" id="si-author">—</span></div>
-      <div class="side-info-row">Posted <span class="side-info-val" id="si-date">—</span></div>
+  <div class="comments-wrap" id="commentsWrap" style="display:none">
+    <div class="comments-head">
+      <span class="comments-label">Comments</span>
+      <span class="comments-count" id="commentsCount"></span>
     </div>
-    <div class="side-card" id="otherCard" style="display:none">
-      <div class="side-head">Other Posts</div>
-      <div id="otherList"></div>
+    <div id="commentList"></div>
+    <div class="reply-wrap">
+      <div class="reply-av" id="reply-av-wrap"><span id="reply-av-text">?</span></div>
+      <div class="reply-right">
+        <div class="reply-input-row">
+          <textarea class="reply-ta" id="commentText" placeholder="Write a reply..." rows="1"></textarea>
+          <button class="reply-btn" onclick="sendComment()">Reply</button>
+        </div>
+        <div class="reply-msg" id="commentMsg"></div>
+      </div>
     </div>
-  </aside>
+  </div>
 </div>
+<div class="bottom-credit">© 2026 Makito. All rights reserved.</div>
 <script>
-// ── Session ──
 let currentUser = null;
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(ts) {
+  if (!ts) return '';
+  const d = new Date(typeof ts==='number'?ts*1000:ts);
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtViews(n) {
+  n=Number(n)||0;
+  if(n>=1e6) return(n/1e6).toFixed(n%1e6===0?0:1).replace(/\.0$/,'')+'M';
+  if(n>=1e3) return(n/1e3).toFixed(n%1e3===0?0:1).replace(/\.0$/,'')+'k';
+  return String(n);
+}
+
+function getPostId() {
+  const param = new URLSearchParams(location.search).get('id');
+  if (param) return param;
+  const parts = location.pathname.replace(/^\/+|\/+$/g,'').split('/');
+  if (parts.length>=2 && parts[0]==='forum' && parts[1] && parts[1]!=='create') return decodeURIComponent(parts[1]);
+  return null;
+}
+
+function parseText(raw) {
+  if (!raw) return '';
+  let s = String(raw);
+  s = s.replace(/\|\|(.+?)\|\|/gs, (_,t) =>
+    `<div class="spoiler-wrap"><button class="spoiler-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Spoiler</button><div class="spoiler-content">${t.trim()}</div></div>`
+  );
+  s = s.replace(/```(\w+)?\n?([\s\S]*?)```/g, (_,lang,c) => {
+    const cls = lang?` class="language-${lang}"`:'';
+    return `<pre><code${cls} data-lang="${lang||''}">${esc(c.trim())}</code></pre>`;
+  });
+  // !![alt](url) — full width block image
+  s = s.replace(/!!\[([^\]]*)\]\(([^)]+)\)/g, (_,alt,url) =>
+    `<div class="img-block"><img src="${url}" alt="${esc(alt)}" loading="lazy"></div>`
+  );
+  // ![alt](url) text — side by side
+  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\) (.+)/g, (_,alt,url,txt) =>
+    `<div class="img-side"><img src="${url}" alt="${esc(alt)}" loading="lazy"><div class="img-text">${txt}</div></div>`
+  );
+  // ![alt](url) alone — block
+  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_,alt,url) =>
+    `<div class="img-block"><img src="${url}" alt="${esc(alt)}" loading="lazy"></div>`
+  );
+  s = s.replace(/`([^`]+)`/g,       (_,c) => `<code>${esc(c)}</code>`);
+  s = s.replace(/^#### (.+)/gm,     (_,t) => `<h4>${t.trim()}</h4>`);
+  s = s.replace(/^### (.+)/gm,      (_,t) => `<h3>${t.trim()}</h3>`);
+  s = s.replace(/^## (.+)/gm,       (_,t) => `<h2>${t.trim()}</h2>`);
+  s = s.replace(/^# (.+)/gm,        (_,t) => `<h1>${t.trim()}</h1>`);
+  s = s.replace(/^> (.+)/gm,        (_,t) => `<blockquote>${t.trim()}</blockquote>`);
+  s = s.replace(/^---$/gm, '<hr>');
+  s = s.replace(/\*\*(.+?)\*\*/g,   (_,t) => `<strong>${t}</strong>`);
+  s = s.replace(/\*(.+?)\*/g,       (_,t) => `<em>${t}</em>`);
+  s = s.replace(/__(.+?)__/g,       (_,t) => `<u>${t}</u>`);
+  s = s.replace(/~~(.+?)~~/g,       (_,t) => `<s>${t}</s>`);
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_,t,u) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`);
+  s = s.replace(/^(\s*)[*\-] (.+)/gm, (_,ind,item) => `<li style="margin-left:${ind.length*12}px">${item}</li>`);
+  s = s.replace(/(<li[\s\S]*?<\/li>\n?)+/g, m => `<ul>${m}</ul>`);
+  s = s.replace(/\n{2,}/g,'</p><p>');
+  s = s.replace(/\n/g,'<br>');
+  return `<p>${s}</p>`.replace(/<p>\s*<\/p>/g,'');
+}
+
 async function initSession() {
   try {
     const r = await fetch('/forum?action=me');
     const d = await r.json();
-    currentUser = d.user || null;
+    currentUser = d.user||null;
   } catch(e) {}
   if (currentUser) {
-    document.getElementById('user-chip').style.display = '';
-    document.getElementById('user-chip').textContent = currentUser.username;
-    document.getElementById('reply-av').textContent = currentUser.username.slice(0,2).toUpperCase();
+    document.getElementById('user-chip').style.display='';
+    document.getElementById('user-chip').textContent=currentUser.username;
+    const wrap = document.getElementById('reply-av-wrap');
+    if (currentUser.avatar) {
+      wrap.innerHTML=`<img src="${esc(currentUser.avatar)}" alt="">`;
+    } else {
+      wrap.textContent=currentUser.username.slice(0,2).toUpperCase();
+    }
   }
 }
 
-function getPostId() { return new URLSearchParams(location.search).get('id'); }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function fmtDate(ts) {
-  if (!ts) return '';
-  const d = new Date(typeof ts === 'number' ? ts * 1000 : ts);
-  return d.toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
-}
-function fmtViews(n) {
-  n = Number(n)||0;
-  if (n >= 1e6) return (n/1e6).toFixed(n%1e6===0?0:1).replace(/\.0$/,'')+'M';
-  if (n >= 1e3) return (n/1e3).toFixed(n%1e3===0?0:1).replace(/\.0$/,'')+'k';
-  return String(n);
-}
-
-// ── RichText ──
-function parseText(raw) {
-  if (!raw) return '';
-  let s = String(raw);
-  s = s.replace(/\|\|(.+?)\|\|/gs, (_,t) => {
-    const id = 'sp'+Math.random().toString(36).slice(2);
-    return `<div class="spoiler-wrap"><button class="spoiler-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Spoiler</button><div class="spoiler-content">${t.trim()}</div></div>`;
-  });
-  s = s.replace(/```([\s\S]*?)```/g, (_,c) => `<pre><code>${esc(c.trim())}</code></pre>`);
-  s = s.replace(/`([^`]+)`/g,       (_,c) => `<code>${esc(c)}</code>`);
-  s = s.replace(/^#### (.+)/gm, (_,t) => `<h4>${t.trim()}</h4>`);
-  s = s.replace(/^### (.+)/gm,  (_,t) => `<h3>${t.trim()}</h3>`);
-  s = s.replace(/^## (.+)/gm,   (_,t) => `<h2>${t.trim()}</h2>`);
-  s = s.replace(/^# (.+)/gm,    (_,t) => `<h1>${t.trim()}</h1>`);
-  s = s.replace(/^> (.+)/gm,    (_,t) => `<blockquote>${t.trim()}</blockquote>`);
-  s = s.replace(/^---$/gm, '<hr>');
-  s = s.replace(/\*\*(.+?)\*\*/g, (_,t) => `<strong>${t}</strong>`);
-  s = s.replace(/\*(.+?)\*/g,     (_,t) => `<em>${t}</em>`);
-  s = s.replace(/__(.+?)__/g,     (_,t) => `<u>${t}</u>`);
-  s = s.replace(/~~(.+?)~~/g,     (_,t) => `<s>${t}</s>`);
-  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_,t,u) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`);
-  s = s.replace(/^(\s*)[*\-] (.+)/gm, (_,ind,item) => `<li style="margin-left:${ind.length*12}px">${item}</li>`);
-  s = s.replace(/(<li[\s\S]*?<\/li>\n?)+/g, m => `<ul>${m}</ul>`);
-  s = s.replace(/\n{2,}/g, '</p><p>');
-  s = s.replace(/\n/g, '<br>');
-  return `<p>${s}</p>`.replace(/<p>\s*<\/p>/g,'');
-}
-
-function verifiedBadge(verified) {
-  return verified ? '<span class="post-verified" title="Verified">✓</span>' : '';
-}
-
-// ── Load post ──
 async function loadPost() {
   const postId = getPostId();
   if (!postId) {
-    document.getElementById('postArea').innerHTML = '<div class="post-wrap"><div class="post-loading">No post ID</div></div>';
+    document.getElementById('postArea').innerHTML='<div class="post-card"><div class="post-loading">No post ID</div></div>';
     return;
   }
   try {
     const r = await fetch(`/forum?action=post&id=${encodeURIComponent(postId)}`);
     const d = await r.json();
     const p = d.post;
-    if (!p) throw new Error(d.error || 'Not found');
+    if (!p) throw new Error(d.error||'Not found');
 
-    document.title = (p.title||'Post') + ' | Makito';
-    document.getElementById('topbar-crumb').textContent = p.title || 'Post';
+    document.title=(p.title||'Post')+' | Makito';
+    document.getElementById('topbar-crumb').textContent=p.title||'Post';
 
-    // Sidebar info
-    document.getElementById('postInfoCard').style.display = '';
-    document.getElementById('si-views').textContent = fmtViews(p.views);
-    document.getElementById('si-author').textContent = p.author || '—';
-    document.getElementById('si-date').textContent = fmtDate(p.created_at);
+    const thumbHtml = p.img
+      ? `<img src="${esc(p.img)}" alt="">`
+      : `<span class="post-thumb-ph">◻</span>`;
 
-    document.getElementById('postArea').innerHTML = `
-      <div class="post-wrap">
-        <div class="post-header">
-          <div class="post-meta-row">
-            <div class="post-author-wrap">
-              <div class="post-avatar">${esc((p.author||'?').slice(0,2))}</div>
-              <span class="post-author">${esc(p.author)}</span>
-              ${verifiedBadge(p.verified)}
+    document.getElementById('postArea').innerHTML=`
+      <div class="post-card">
+        <div class="post-card-header">
+          <div class="post-thumb">${thumbHtml}</div>
+          <div class="post-card-meta">
+            <div>
+              <div class="post-title-row">
+                <div class="post-title">${esc(p.title)}</div>
+                <div class="post-views">👁 ${fmtViews(p.views)}</div>
+              </div>
+              <div class="post-author-row">
+                <span class="post-author">${esc(p.author)}</span>
+              </div>
+              ${p.description?`<div class="post-desc">${esc(p.description)}</div>`:''}
             </div>
-            <div class="post-dot"></div>
-            <span class="post-date">${fmtDate(p.created_at)}</span>
-            <span class="post-views">👁 ${fmtViews(p.views)}</span>
+            <div class="post-date">${fmtDate(p.created_at)}</div>
           </div>
-          <div class="post-title">${esc(p.title)}</div>
-          ${p.description ? `<div class="post-description">${esc(p.description)}</div>` : ''}
         </div>
         <div class="post-content">${parseText(p.content||'')}</div>
-        ${p.img ? `<div class="post-img-wrap"><img src="${p.img}" alt=""></div>` : ''}
-      </div>
-    `;
+      </div>`;
 
-    document.getElementById('divComments').style.display = '';
-    document.getElementById('commentsWrap').style.display = '';
+    // Syntax highlight
+    document.querySelectorAll('pre code[data-lang]').forEach(block => {
+      const lang = block.getAttribute('data-lang');
+      if (lang && hljs.getLanguage(lang)) {
+        block.innerHTML=hljs.highlight(block.textContent,{language:lang}).value;
+        block.classList.add('hljs');
+      }
+    });
+
+    document.getElementById('divComments').style.display='';
+    document.getElementById('commentsWrap').style.display='';
     await loadComments(postId);
-    await loadOtherPosts(postId);
-
   } catch(e) {
-    document.getElementById('postArea').innerHTML = `<div class="post-wrap"><div class="post-loading">Error: ${esc(e.message)}</div></div>`;
+    document.getElementById('postArea').innerHTML=`<div class="post-card"><div class="post-loading">Error: ${esc(e.message)}</div></div>`;
   }
 }
 
-// ── Comments ──
 async function loadComments(postId) {
   try {
     const r = await fetch(`/forum?action=comments&id=${encodeURIComponent(postId)}`);
     const d = await r.json();
-    const comments = d.comments || [];
-    document.getElementById('commentsCount').textContent = comments.length + ' repl' + (comments.length===1?'y':'ies');
+    const comments = d.comments||[];
+    document.getElementById('commentsCount').textContent=comments.length+' repl'+(comments.length===1?'y':'ies');
     const list = document.getElementById('commentList');
-    if (!comments.length) { list.innerHTML = '<div class="no-comments">No replies yet</div>'; return; }
-    list.innerHTML = comments.map((c,i) => `
-      <div class="comment-row">
-        <div class="comment-idx">#${i+1}</div>
+    if (!comments.length) { list.innerHTML='<div class="no-comments">No replies yet</div>'; return; }
+    list.innerHTML=comments.map((c,i)=>{
+      const avHtml = c.avatar
+        ? `<img src="${esc(c.avatar)}" alt="">`
+        : `<img src="/site/forum/profile.png" alt="" onerror="this.outerHTML='<span>${esc((c.author||'?').slice(0,2))}</span>'">`;
+      return `<div class="comment-row">
+        <div class="comment-left">
+          <div class="comment-av">${avHtml}</div>
+          <div class="comment-idx">#${i+1}</div>
+        </div>
         <div class="comment-inner">
           <div class="comment-meta">
             <span class="comment-author">${esc(c.author)}</span>
-            ${c.verified ? '<span class="comment-verified" title="Verified">✓</span>' : ''}
             <span class="comment-date">${fmtDate(c.created_at)}</span>
           </div>
           <div class="comment-text">${esc(c.text)}</div>
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   } catch(e) {}
 }
 
 async function sendComment() {
-  const text = document.getElementById('commentText').value.trim();
-  const msg  = document.getElementById('commentMsg');
-  if (!text) { msg.textContent='Write something'; msg.className='reply-msg err'; return; }
-  if (!currentUser) { msg.textContent='Login to reply'; msg.className='reply-msg err'; return; }
-  msg.textContent='Sending...'; msg.className='reply-msg';
-  const postId = getPostId();
+  const text=document.getElementById('commentText').value.trim();
+  const msg=document.getElementById('commentMsg');
+  if (!text){msg.textContent='Write something';msg.className='reply-msg err';return;}
+  if (!currentUser){msg.textContent='Login to reply';msg.className='reply-msg err';return;}
+  msg.textContent='Sending...';msg.className='reply-msg';
+  const postId=getPostId();
   try {
-    const r = await fetch('/forum?action=comment', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({postId, text, token: ''})
-    });
-    const d = await r.json();
-    if (d.ok) {
+    const r=await fetch('/forum?action=comment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({postId,text})});
+    const d=await r.json();
+    if(d.ok){
       document.getElementById('commentText').value='';
-      msg.textContent='Sent!'; msg.className='reply-msg';
+      msg.textContent='Sent!';msg.className='reply-msg';
       await loadComments(postId);
       setTimeout(()=>{msg.textContent='';},2000);
-    } else { msg.textContent=d.error||'Error'; msg.className='reply-msg err'; }
-  } catch(e) { msg.textContent='Network error'; msg.className='reply-msg err'; }
+    } else {msg.textContent=d.error||'Error';msg.className='reply-msg err';}
+  } catch(e){msg.textContent='Network error';msg.className='reply-msg err';}
 }
 
-// ── Other posts (sidebar) ──
-async function loadOtherPosts(currentId) {
-  try {
-    const r = await fetch('/forum?action=posts');
-    const d = await r.json();
-    const posts = (d.posts||[]).filter(p=>p.id!==currentId).slice(0,8);
-    if (!posts.length) return;
-    document.getElementById('otherCard').style.display = '';
-    document.getElementById('otherList').innerHTML = posts.map(p=>`
-      <a class="side-post" href="/forum/post?id=${encodeURIComponent(p.id)}">
-        <div class="side-post-dot"></div>
-        <div class="side-post-info">
-          <div class="side-post-title">${esc(p.title)}</div>
-          <div class="side-post-author">${esc(p.author)}</div>
-        </div>
-        <span class="side-post-views">${fmtViews(p.views)}</span>
-      </a>
-    `).join('');
-  } catch(e) {}
-}
-
-initSession().then(() => loadPost());
+initSession().then(()=>loadPost());
 </script>
 </body>
 </html>

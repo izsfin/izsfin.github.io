@@ -2,10 +2,8 @@ import { Octokit } from "@octokit/rest";
 import { discordAuthRedirect, discordAuthCallback, discordLogout, getSession } from './forum/AuthToAcc.js';
 import { createPost }                   from './forum/CreatePost.js';
 import { loadPosts, loadPost, loadComments, addComment } from './forum/PostLoad.js';
-
 const OWNER = "odesseu";
 const REPO  = "hosting";
-
 function githubDecode(base64) {
     const binString = atob(base64.replace(/\s/g, ""));
     const bytes = Uint8Array.from(binString, m => m.codePointAt(0));
@@ -17,7 +15,6 @@ export async function onRequest(context) {
     const url    = new URL(request.url);
     const action = url.searchParams.get("action");
     let rawPath  = url.pathname.replace(/^\/+|\/+$/g, "");
-
     const H = {
         "Content-Type": "application/json; charset=UTF-8",
         "Access-Control-Allow-Origin": "*"
@@ -32,34 +29,24 @@ export async function onRequest(context) {
     }
 
     if (rawPath.startsWith("site/")) return context.next();
-
-    // Discord OAuth2
     if (rawPath === "auth/discord")          return discordAuthRedirect(env);
     if (rawPath === "auth/discord/callback") return discordAuthCallback(request, env, H);
     if (rawPath === "auth/logout")           return discordLogout(request, env, H);
-
-    // API
     if (action) {
         try {
-            const octokit = new Octokit({ auth: env.GITHUB_TOKEN });
-
             if (action === "posts") {
                 const res  = await loadPosts(env, H);
                 const data = await res.json();
                 return new Response(JSON.stringify(data), { headers: H });
             }
-
             if (action === "post") {
                 const res  = await loadPost(url, env, H, request);
                 const data = await res.json();
                 return new Response(JSON.stringify(data), { headers: H });
             }
-
             if (action === "comments") return loadComments(url, env, H);
-
             if (action === "comment" && request.method === "POST") return addComment(request, env, H);
             if (action === "create"  && request.method === "POST") return createPost(request, env, H);
-
             if (action === "me") {
                 const session = await getSession(request, env);
                 if (!session) return new Response(JSON.stringify({ user: null }), { headers: H });
@@ -68,40 +55,33 @@ export async function onRequest(context) {
                 ).bind(session.discord_id).first();
                 return new Response(JSON.stringify({ user: user || null }), { headers: H });
             }
-
             return new Response(JSON.stringify({ error: "Action not found" }), { status: 404, headers: H });
-
         } catch (e) {
             return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: H });
         }
     }
 
-    // HTML страницы
-    const pages = {
-        "":             "site/forum/home.html",
-        "forum":        "site/forum/home.html",
-        "forum/post":   "site/forum/post.html",
-        "forum/create": "site/forum/create.html",
-        "auth":         "site/forum/auth.html",
-        "catalog":      "site/catalog/catalog.html"
-    };
-
-    let pageKey = rawPath in pages ? rawPath : null;
-    if (!pageKey) {
-        for (const key of Object.keys(pages)) {
-            if (key && rawPath.startsWith(key + "/")) { pageKey = key; break; }
-        }
+    let htmlFile = null;
+    if (rawPath === "" || rawPath === "forum") {
+        htmlFile = "site/forum/home.html";
+    } else if (rawPath === "auth") {
+        htmlFile = "site/forum/auth.html";
+    } else if (rawPath === "catalog") {
+        htmlFile = "site/catalog/catalog.html";
+    } else if (rawPath === "forum/create") {
+        htmlFile = "site/forum/create.html";
+    } else if (rawPath.startsWith("forum/")) {
+        htmlFile = "site/forum/post.html";
     }
-
-    if (pageKey !== null) {
+    if (htmlFile) {
         try {
             const octokit = new Octokit({ auth: env.GITHUB_TOKEN });
-            const { data } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: pages[pageKey] });
+            const { data } = await octokit.repos.getContent({ owner: OWNER, repo: REPO, path: htmlFile });
             return new Response(githubDecode(data.content), {
                 headers: { "Content-Type": "text/html; charset=UTF-8" }
             });
         } catch (e) {
-            return new Response(`File not found: ${pages[pageKey]}`, { status: 404 });
+            return new Response(`File not found: ${htmlFile}`, { status: 404 });
         }
     }
 
