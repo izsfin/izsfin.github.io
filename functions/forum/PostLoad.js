@@ -10,7 +10,6 @@ export async function loadPosts(env, headers) {
         "SELECT id, author, title, description, views, created_at FROM posts ORDER BY created_at DESC"
     ).all();
 
-    // Форматируем views для каждого поста
     const posts = results.map(p => ({
         ...p,
         viewsFormatted: formatViews(p.views)
@@ -26,14 +25,13 @@ export async function loadPost(url, env, headers, request) {
     }
 
     const post = await env.DB.prepare(
-        "SELECT * FROM posts WHERE id = ?"
+        "SELECT p.*, u.avatar as author_avatar, u.discord_id FROM posts p LEFT JOIN users u ON p.author = u.username WHERE p.id = ?"
     ).bind(id).first();
 
     if (!post) {
         return new Response(JSON.stringify({ error: 'Post not found' }), { status: 404, headers });
     }
 
-    // Инкремент просмотров с защитой
     const views = await incrementView(env, id, request);
 
     return new Response(JSON.stringify({
@@ -52,9 +50,13 @@ export async function loadComments(url, env, headers) {
         return new Response(JSON.stringify({ error: 'No id' }), { status: 400, headers });
     }
 
-    const { results } = await env.DB.prepare(
-        "SELECT * FROM comments WHERE post_id = ? ORDER BY created_at ASC"
-    ).bind(id).all();
+    const { results } = await env.DB.prepare(`
+        SELECT c.*, u.avatar, u.discord_id
+        FROM comments c
+        LEFT JOIN users u ON c.author = u.username
+        WHERE c.post_id = ?
+        ORDER BY c.created_at ASC
+    `).bind(id).all();
 
     return new Response(JSON.stringify({ comments: results }), { headers });
 }

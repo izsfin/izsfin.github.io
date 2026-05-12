@@ -26,11 +26,7 @@ export function parseText(raw) {
         </div>`;
     });
 
-    s = s.replace(/```(\w+)?\n?([\s\S]*?)```/g, (_, lang, c) => {
-        const code = c.trim();
-        const cls  = lang ? ` class="language-${lang}"` : '';
-        return `<pre><code${cls} data-lang="${lang||''}">${esc(code)}</code></pre>`;
-    });
+    s = s.replace(/```([\s\S]*?)```/g, (_, c) => `<pre><code>${esc(c.trim())}</code></pre>`);
     s = s.replace(/`([^`]+)`/g, (_, c) => `<code>${esc(c)}</code>`);
     s = s.replace(/^#### (.+)/gm, (_, t) => `<h4>${t.trim()}</h4>`);
     s = s.replace(/^### (.+)/gm,  (_, t) => `<h3>${t.trim()}</h3>`);

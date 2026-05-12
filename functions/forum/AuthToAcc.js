@@ -129,4 +129,4 @@ export async function discordLogout(request, env, headers) {
             'Set-Cookie': 'session=; Path=/; Max-Age=0',
         },
     });
-} 
+}
