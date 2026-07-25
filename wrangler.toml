@@ -1,0 +1,9 @@
+name = "dbwsender"
+type = "javascript"
+main = "src/index.js"
+
+[build]
+command = ""
+
+[env.production]
+route = "ref.izsme.workers.dev/*"
