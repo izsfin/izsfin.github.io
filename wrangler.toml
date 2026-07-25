@@ -1,4 +1,4 @@
-name = "dbwsender"
+name = "ref"
 type = "javascript"
 main = "src/index.js"
 
