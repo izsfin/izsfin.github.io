@@ -338,6 +338,9 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
     table.insert(lines, '    cx("name")          - apply item')
     table.insert(lines, '    cx("name", "clear") - clear item')
     table.insert(lines, '    cx("all",  "clear") - clear all')
+    table.insert(lines, '    cx("name", "true"/"2")  - reapply item after respawn')
+    table.insert(lines, '    cx("name", "false"/"1") - apply once and disable reapply')
+    table.insert(lines, '    cx("name", "reset"/"off") - disable reapply for item')
     table.insert(lines, "")
     if catalog then
         table.insert(lines, "    If you need to see all items with photos check our catalog")
@@ -401,9 +404,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
             for _, url in ipairs(modList) do task.spawn(function() ModuleSystem.Load(url) end) end
         end
     end
-    -- DA mode belongs to the item being applied, not to a global switch.
-    -- true/2 enables re-application after respawn; false/1/once and
-    -- reset/off disable it for that item.
+
     local function SetItemDAMode(itemName, mode, data, sandbox)
         local v = tostring(mode or "once"):lower():gsub("%s+", "")
         if v == "true" or v == "2" or v == "loop" or v == "spawn" then
@@ -452,7 +453,15 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
             print("CMX || CMD copied"); return
         end
 
-        if m == "clear" then Logic.DoClear(n); return end
+        if m == "clear" then
+            if n == "all" then
+                for itemName in pairs(activeAutoRespawns) do activeAutoRespawns[itemName] = nil end
+            else
+                activeAutoRespawns[n] = nil
+            end
+            Logic.DoClear(n)
+            return
+        end
 
         for _, d in pairs(Library) do
             if d.Name:lower() == n then
