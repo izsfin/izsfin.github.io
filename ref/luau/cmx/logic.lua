@@ -407,9 +407,9 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
 
     local function SetItemDAMode(itemName, mode, data, sandbox)
         local v = tostring(mode or "once"):lower():gsub("%s+", "")
-        if v == "true" or v == "2" or v == "loop" or v == "spawn" then
+        if v == "true" or v == "2" or v == "true/2" or v == "loop" or v == "spawn" then
             activeAutoRespawns[itemName] = { data = data, sandbox = sandbox }
-        elseif v == "false" or v == "1" or v == "once" or v == "reset" or v == "off" then
+        elseif v == "false" or v == "1" or v == "false/1" or v == "once" or v == "reset" or v == "off" or v == "reset/off" then
             activeAutoRespawns[itemName] = nil
         else
             warn("CMX || Unknown DAMode for '" .. itemName .. "': " .. tostring(mode))
