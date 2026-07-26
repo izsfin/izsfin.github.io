@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Expert | Catalog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff0073;
+            --bg: #050204;
+            --card: rgba(255,255,255,0.03);
+            --card-hover: rgba(255,255,255,0.06);
+            --border: rgba(255,255,255,0.07);
+            --border-hover: rgba(255,0,115,0.5);
+            --text: #d1d1d1;
+            --text-dim: rgba(255,255,255,0.25);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            animation: pageFadeIn 0.4s ease forwards;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── ANIMATED GRADIENT BG ── */
+        .bg-gradient {
+            position: fixed; inset: 0; z-index: -4;
+            background: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(255,0,115,0.12) 0%, transparent 60%),
+                        radial-gradient(ellipse 60% 80% at 80% 80%, rgba(120,0,255,0.08) 0%, transparent 60%),
+                        #050204;
+            animation: bgShift 18s ease-in-out infinite alternate;
+        }
+        @keyframes bgShift {
+            0%   { background: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(255,0,115,0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 80% 80%, rgba(120,0,255,0.08) 0%, transparent 60%), #050204; }
+            50%  { background: radial-gradient(ellipse 70% 70% at 70% 10%, rgba(255,0,115,0.10) 0%, transparent 60%), radial-gradient(ellipse 80% 60% at 20% 90%, rgba(80,0,255,0.10) 0%, transparent 60%), #050204; }
+            100% { background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(255,0,80,0.08) 0%, transparent 60%), radial-gradient(ellipse 70% 50% at 90% 30%, rgba(150,0,255,0.08) 0%, transparent 60%), #050204; }
+        }
+
+        .bg-grid {
+            position: fixed; inset: 0; z-index: -3;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+        }
+
+        .bg-glow {
+            position: fixed; inset: 0; z-index: -2;
+            background: radial-gradient(circle 140px at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.04) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        /* ── MAIN ── */
+        .main {
+            position: relative; z-index: 2;
+            padding: 36px 36px 120px;
+            max-width: 1400px; margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            margin-bottom: 36px;
+        }
+
+        .page-title {
+            font-size: 30px; font-weight: 800; color: white;
+            background: linear-gradient(to bottom, #fff 40%, #888);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .filter-btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px; font-weight: 700;
+            padding: 10px 22px; border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            backdrop-filter: blur(16px);
+            color: white; cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* ── SECTIONS ── */
+        .section-block { margin-bottom: 44px; }
+
+        .section-header {
+            display: flex; align-items: center;
+            gap: 14px; margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 10px; font-weight: 700;
+            color: var(--text-dim);
+            letter-spacing: 2.5px; text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .section-line { flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
+
+        .subsection-header {
+            display: flex; align-items: center;
+            gap: 12px; margin: 18px 0 10px;
+        }
+        .subsection-title {
+            font-size: 9px; font-weight: 700;
+            color: rgba(255,255,255,0.15);
+            letter-spacing: 2px; text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* ── CARDS ── */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+            gap: 14px;
+        }
+
+        .item-card {
+            background: var(--card);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1),
+                        box-shadow 0.28s ease,
+                        border-color 0.28s ease,
+                        background 0.28s ease;
+            display: flex; flex-direction: column;
+            opacity: 0; transform: translateY(16px);
+            animation: cardIn 0.4s ease forwards;
+        }
+
+        @keyframes cardIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .item-card:hover {
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px -12px rgba(255,0,115,0.25),
+                        0 0 0 1px rgba(255,0,115,0.08);
+        }
+
+        .item-preview {
+            width: 100%; aspect-ratio: 1;
+            background: rgba(255,255,255,0.02);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative;
+        }
+        .item-preview img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .item-card:hover .item-preview img { transform: scale(1.06); }
+        .no-preview {
+            font-size: 10px; font-weight: 600;
+            color: rgba(255,255,255,0.15); letter-spacing: 0.5px;
+        }
+
+        .item-info { padding: 11px 13px 13px; }
+        .item-name {
+            font-size: 11px; font-weight: 700; color: white;
+            margin-bottom: 9px; line-height: 1.35;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .item-btn {
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            font-size: 10px; font-weight: 700;
+            padding: 7px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.6);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .item-btn:hover {
+            background: rgba(255,0,115,0.12);
+            border-color: var(--primary); color: white;
+        }
+
+        .state-msg {
+            text-align: center; padding: 80px 0;
+            font-size: 13px; color: var(--text-dim); font-weight: 600;
+        }
+
+        /* ── FILTER MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 60;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.22s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+        .modal {
+            background: rgba(8,5,7,0.97);
+            backdrop-filter: blur(32px);
+            border: 1px solid rgba(255,0,115,0.15);
+            border-radius: 18px; padding: 32px;
+            width: 500px; max-width: 92vw;
+            transform: translateY(20px) scale(0.97);
+            transition: transform 0.22s cubic-bezier(0.4,0,0.2,1);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+        .modal-title {
+            font-size: 15px; font-weight: 800; color: white;
+            text-align: center; margin-bottom: 24px;
+        }
+        .modal-label {
+            font-size: 10px; font-weight: 700;
+            color: var(--text-dim);
+            letter-spacing: 1.5px; text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .modal-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 20px 0; }
+
+        .toggle-row { display: flex; gap: 8px; }
+        .toggle-btn {
+            flex: 1; font-family: 'Poppins', sans-serif;
+            font-size: 11px; font-weight: 700; padding: 10px;
+            border-radius: 9px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.35); cursor: pointer; transition: all 0.2s;
+        }
+        .toggle-btn.active { border-color: var(--primary); background: rgba(255,0,115,0.1); color: white; }
+
+        .cat-row { display: flex; gap: 7px; flex-wrap: wrap; }
+        .cat-btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px; font-weight: 700;
+            padding: 7px 15px; border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.35); cursor: pointer; transition: all 0.2s;
+        }
+        .cat-btn.active { border-color: var(--primary); background: rgba(255,0,115,0.1); color: white; }
+
+        .script-search-input {
+            width: 100%; font-family: 'Poppins', sans-serif;
+            font-size: 12px; font-weight: 600;
+            padding: 11px 16px; border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: white; outline: none;
+            transition: border-color 0.2s;
+        }
+        .script-search-input::placeholder { color: rgba(255,255,255,0.18); }
+        .script-search-input:focus { border-color: rgba(255,0,115,0.4); }
+
+        .modal-apply-btn {
+            width: 100%; margin-top: 22px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px; font-weight: 700; padding: 13px;
+            border-radius: 10px; border: 1px solid var(--primary);
+            background: rgba(255,0,115,0.1); color: white;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .modal-apply-btn:hover { background: var(--primary); }
+
+        /* ── ITEM MODAL ── */
+        .item-modal-overlay {
+            position: fixed; inset: 0; z-index: 70;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s ease;
+            padding: 20px;
+        }
+        .item-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+        .item-modal {
+            background: rgba(8,5,7,0.98);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            width: 820px; max-width: 95vw;
+            max-height: 90vh; overflow-y: auto;
+            transform: translateY(24px) scale(0.96);
+            transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+            overflow: hidden;
+        }
+        .item-modal-overlay.open .item-modal { transform: translateY(0) scale(1); }
+
+        .item-modal-left {
+            background: rgba(255,255,255,0.02);
+            border-right: 1px solid rgba(255,255,255,0.06);
+            display: flex; flex-direction: column;
+        }
+
+        .item-modal-preview {
+            width: 100%; aspect-ratio: 1;
+            background: rgba(255,255,255,0.02);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative;
+        }
+        .item-modal-preview img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .item-modal-author {
+            position: absolute; top: 12px; left: 12px;
+            background: rgba(5,2,4,0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px; padding: 4px 10px;
+            font-size: 10px; font-weight: 700;
+            color: rgba(255,255,255,0.5);
+        }
+        .item-modal-author.verified {
+            border-color: rgba(255,0,115,0.4);
+            color: rgba(255,100,160,0.9);
+        }
+        .vdot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--primary); margin-right: 5px; box-shadow: 0 0 6px rgba(255,0,115,0.7); }
+
+        .item-modal-right { padding: 28px 28px 28px; display: flex; flex-direction: column; }
+        .item-modal-name { font-size: 18px; font-weight: 800; color: white; margin-bottom: 8px; line-height: 1.3; }
+        .item-modal-meta { font-size: 10px; font-weight: 700; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; }
+
+        .item-modal-label { font-size: 10px; font-weight: 700; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+        .item-modal-cmd {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px; padding: 12px 14px;
+            font-size: 12px; font-weight: 600;
+            color: rgba(255,100,160,0.9);
+            word-break: break-all; line-height: 1.6;
+            margin-bottom: 14px; font-family: monospace;
+        }
+        .item-modal-copy {
+            width: 100%; font-family: 'Poppins', sans-serif;
+            font-size: 13px; font-weight: 700; padding: 12px;
+            border-radius: 11px; border: 1px solid rgba(255,0,115,0.35);
+            background: rgba(255,0,115,0.08); color: white;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 24px;
+        }
+        .item-modal-copy:hover { background: rgba(255,0,115,0.18); border-color: rgba(255,0,115,0.7); }
+        .item-modal-copy.copied { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.5); color: #86efac; }
+
+        .related-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .related-label { font-size: 10px; font-weight: 700; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+        .related-grid-sm {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .rel-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 10px; overflow: hidden; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .rel-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+        .rel-preview { width: 100%; aspect-ratio: 1; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .rel-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .rel-info { padding: 7px 8px 9px; }
+        .rel-name { font-size: 10px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .item-modal-close {
+            position: absolute; top: 16px; right: 16px;
+            width: 30px; height: 30px; border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.5);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s; font-size: 14px;
+        }
+        .item-modal-close:hover { background: rgba(255,0,115,0.15); border-color: var(--border-hover); color: white; }
+
+        @media (max-width: 700px) {
+            .item-modal { grid-template-columns: 1fr; }
+            .item-modal-left { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+            .item-modal-preview { aspect-ratio: 16/9; }
+            .related-grid-sm { grid-template-columns: repeat(3, 1fr); }
+            .main { padding: 20px 16px 100px; }
+        }
+
+        /* ── BOTTOM NAV ── */
+        .bottom-nav {
+            position: fixed; bottom: 22px; left: 50%;
+            transform: translateX(-50%); z-index: 50;
+            background: rgba(8,5,7,0.75);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px; padding: 10px 22px;
+            display: flex; gap: 24px; align-items: center;
+        }
+        .nav-link {
+            font-size: 10px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px;
+            color: rgba(255,255,255,0.35);
+            transition: color 0.2s; cursor: pointer;
+            text-decoration: none;
+        }
+        .nav-link:hover { color: white; }
+        .nav-link.active { color: var(--primary); }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px; z-index: 200;
+            background: rgba(255,0,115,0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,0,115,0.4);
+            color: white; font-size: 12px; font-weight: 600;
+            padding: 10px 20px; border-radius: 10px;
+            transform: translateY(12px); opacity: 0;
+            transition: all 0.22s ease; pointer-events: none;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        /* ── CONTEXT MENU ── */
+        .ctx-menu {
+            position: fixed; z-index: 100;
+            background: rgba(8,5,7,0.97);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,0,115,0.18);
+            border-radius: 11px; padding: 6px; min-width: 158px;
+        }
+        .ctx-item {
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px; font-weight: 700;
+            padding: 9px 13px; border-radius: 7px;
+            cursor: pointer; color: rgba(255,255,255,0.55);
+            transition: all 0.15s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .ctx-item:hover { background: rgba(255,0,115,0.14); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="bg-gradient"></div>
+<div class="bg-grid"></div>
+<div class="bg-glow" id="bgGlow"></div>
+
+<div class="main">
+    <div class="page-header">
+        <div class="page-title">Catalog</div>
+        <button class="filter-btn" onclick="openFilter()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Filter
+        </button>
+    </div>
+    <div id="catalogContent"></div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal-overlay" id="filterOverlay" onclick="closeFilterOutside(event)">
+    <div class="modal">
+        <div class="modal-title">Filter</div>
+        <div class="modal-label">Verification</div>
+        <div class="toggle-row">
+            <button class="toggle-btn active" id="toggleVerified" onclick="setVerified(true)">Verified &amp; Official</button>
+            <button class="toggle-btn" id="toggleUnverified" onclick="setVerified(false)">Not Verified</button>
+        </div>
+        <hr class="modal-divider">
+        <div class="modal-label">Category</div>
+        <div class="cat-row">
+            <button class="cat-btn active" data-cat="" onclick="setCat(this,'')">All</button>
+            <button class="cat-btn" data-cat="Accessories" onclick="setCat(this,'Accessories')">Accessories</button>
+            <button class="cat-btn" data-cat="Outfits" onclick="setCat(this,'Outfits')">Outfits</button>
+            <button class="cat-btn" data-cat="Characters" onclick="setCat(this,'Characters')">Character's</button>
+            <button class="cat-btn" data-cat="Scripts" onclick="setCat(this,'Scripts')">Scripts</button>
+        </div>
+        <div id="typeSection" style="display:none">
+            <hr class="modal-divider">
+            <div class="modal-label" id="typeLabel">Type</div>
+            <div class="cat-row" id="typeRow"></div>
+        </div>
+        <div id="scriptSearchSection" style="display:none">
+            <hr class="modal-divider">
+            <div class="modal-label">Search</div>
+            <input class="script-search-input" id="scriptSearchInput" type="text" placeholder="e.g. Fav, Roleplay...">
+        </div>
+        <button class="modal-apply-btn" onclick="applyFilter()">Apply</button>
+    </div>
+</div>
+
+<!-- Item Modal -->
+<div class="item-modal-overlay" id="itemOverlay" onclick="closeItemOutside(event)">
+    <div class="item-modal" id="itemModal" style="position:relative">
+        <div class="item-modal-close" onclick="closeItem()">✕</div>
+        <div class="item-modal-left" id="itemLeft"></div>
+        <div class="item-modal-right" id="itemRight"></div>
+    </div>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctxMenu" style="display:none">
+    <div class="ctx-item" onclick="ctxCopy()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Command
+    </div>
+    <div class="ctx-item" onclick="ctxCopyLink()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Copy Link
+    </div>
+    <div class="ctx-item" onclick="ctxOpen()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Open Page
+    </div>
+</div>
+    
+<div class="toast" id="toast"></div>
+
+<script>
+    // ── CONFIG ──
+    const INFO_URL = './info.json';
+    const VER_URL  = './verified.json';
+
+    const CAT_ORDER  = ['Accessories','Outfits','Characters','Scripts'];
+    const CAT_LABELS = { Accessories:'Accessories', Outfits:"Outfit's", Characters:"Character's", Scripts:'Scripts' };
+    const ACC_TYPES  = [{code:'Head',label:'Head'},{code:'Face',label:'Face'},{code:'Neck',label:'Neck'},{code:'Shoulder',label:'Shoulder'},{code:'Front',label:'Front'},{code:'Back',label:'Back'}];
+    const CHAR_TYPES = [{code:'body',label:"Body's"},{code:'face',label:"Face's"},{code:'dhead',label:'Dynamic Head'},{code:'hair',label:'Hair'}];
+
+    let allItems = [], verifiedAuthors = [];
+    let filterVerified = true, filterCat = '', filterType = '';
+    let ctxId = null, ctxCmd = null;
+    let currentItemId = null;
+
+    // ── MOUSE GLOW ──
+    window.addEventListener('mousemove', e => {
+        document.body.style.setProperty('--mx', e.clientX + 'px');
+        document.body.style.setProperty('--my', e.clientY + 'px');
+    });
+
+    // ── LOAD ──
+    async function loadData() {
+        try {
+            const [iRes, vRes] = await Promise.all([fetch(INFO_URL), fetch(VER_URL)]);
+            const iData = await iRes.json();
+            const vData = await vRes.json();
+            allItems = iData.items || [];
+            verifiedAuthors = vData.verified || [];
+            // Check URL param for direct item link
+            const urlId = new URLSearchParams(location.search).get('id');
+            if (urlId) {
+                renderContent(allItems);
+                const found = allItems.find(i => i.id === urlId);
+                if (found) openItem(urlId);
+            } else {
+                renderContent(allItems);
+            }
+        } catch(e) {
+            document.getElementById('catalogContent').innerHTML = '<div class="state-msg">Error: ' + e.message + '</div>';
+        }
+    }
+
+    // ── RENDER ──
+    function renderContent(items) {
+        const el = document.getElementById('catalogContent');
+        if (!items.length) { el.innerHTML = '<div class="state-msg">No items found</div>'; return; }
+
+        const grouped = {};
+        CAT_ORDER.forEach(c => grouped[c] = []);
+        items.forEach(i => {
+            const c = i.category || 'Other';
+            if (!grouped[c]) grouped[c] = [];
+            grouped[c].push(i);
+        });
+
+        let html = '';
+        CAT_ORDER.forEach(cat => {
+            const catItems = grouped[cat];
+            if (!catItems || !catItems.length) return;
+            html += `<div class="section-block">`;
+            html += `<div class="section-header"><div class="section-title">${CAT_LABELS[cat]||cat}</div><div class="section-line"></div></div>`;
+            if (cat === 'Accessories') html += renderTyped(catItems, ACC_TYPES);
+            else if (cat === 'Characters') html += renderTyped(catItems, CHAR_TYPES);
+            else if (cat === 'Scripts') {
+                const byType = {};
+                catItems.forEach(i => { const t = i.type||'Other'; if(!byType[t]) byType[t]=[]; byType[t].push(i); });
+                let first = true;
+                Object.keys(byType).forEach(t => {
+                    if (!byType[t].length) return;
+                    html += `<div class="subsection-header">${!first?'<div class="section-line"></div>':''}<div class="subsection-title">${t}</div><div class="section-line"></div></div>`;
+                    first = false;
+                    html += `<div class="catalog-grid" style="margin-bottom:8px">${byType[t].map(cardHtml).join('')}</div>`;
+                });
+            } else {
+                html += `<div class="catalog-grid">${catItems.map(cardHtml).join('')}</div>`;
+            }
+            html += '</div>';
+        });
+        el.innerHTML = html;
+
+        // Stagger card animations
+        el.querySelectorAll('.item-card').forEach((c, i) => {
+            c.style.animationDelay = (i * 0.03) + 's';
+        });
+    }
+
+    function renderTyped(items, typeList) {
+        const byType = {};
+        typeList.forEach(t => byType[t.code] = []);
+        items.forEach(i => { const t = i.type||''; if(!byType[t]) byType[t]=[]; byType[t].push(i); });
+        let html = '', first = true;
+        typeList.forEach(t => {
+            if (!byType[t.code]||!byType[t.code].length) return;
+            html += `<div class="subsection-header">${!first?'<div class="section-line"></div>':''}<div class="subsection-title">${t.label}</div><div class="section-line"></div></div>`;
+            first = false;
+            html += `<div class="catalog-grid" style="margin-bottom:8px">${byType[t.code].map(cardHtml).join('')}</div>`;
+        });
+        return html;
+    }
+
+    function cardHtml(item) {
+        const prev = item.preview
+            ? `<img src="/${item.preview}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<span class=no-preview>No preview</span>'">`
+            : '<span class="no-preview">No preview</span>';
+        const cmd = (item.command||'').replace(/"/g,'&quot;');
+        return `<div class="item-card" data-id="${item.id}" data-cmd="${cmd}" onclick="openItem('${item.id}')">
+            <div class="item-preview">${prev}</div>
+            <div class="item-info">
+                <div class="item-name">${item.name}</div>
+                <button class="item-btn" onclick="event.stopPropagation();openItem('${item.id}')">Get Command</button>
+            </div>
+        </div>`;
+    }
+
+    // ── ITEM MODAL ──
+    function openItem(id) {
+        const item = allItems.find(i => i.id === id);
+        if (!item) return;
+        currentItemId = id;
+
+        // Update URL without reload
+        history.replaceState(null, '', '?id=' + id);
+
+        const isVerified = verifiedAuthors.includes(item.author);
+        const authorHtml = isVerified
+            ? `<div class="item-modal-author verified"><span class="vdot"></span>${item.author||'Unknown'}</div>`
+            : `<div class="item-modal-author">${item.author||'Unknown'}</div>`;
+
+        const prevHtml = item.preview
+            ? `<img src="/${item.preview}" alt="${item.name}" onerror="this.outerHTML='<span style=\\'font-size:11px;color:rgba(255,255,255,0.15)\\'>No preview</span>'">`
+            : '<span style="font-size:11px;color:rgba(255,255,255,0.15)">No preview</span>';
+
+        const related = allItems.filter(i => i.id !== id && i.category === item.category && i.type === item.type).slice(0, 6);
+        let relHtml = '';
+        if (related.length) {
+            const cards = related.map(r => {
+                const rp = r.preview
+                    ? `<img src="/${r.preview}" alt="" loading="lazy" onerror="this.parentElement.innerHTML=''">`
+                    : '';
+                return `<div class="rel-card" onclick="openItem('${r.id}')">
+                    <div class="rel-preview">${rp}</div>
+                    <div class="rel-info"><div class="rel-name">${r.name}</div></div>
+                </div>`;
+            }).join('');
+            relHtml = `<div class="related-title-row"><div class="related-label">Similar</div><div class="section-line"></div></div>
+                       <div class="related-grid-sm">${cards}</div>`;
+        }
+
+        document.getElementById('itemLeft').innerHTML = `
+            <div class="item-modal-preview">
+                ${prevHtml}
+                ${authorHtml}
+            </div>`;
+
+        document.getElementById('itemRight').innerHTML = `
+            <div class="item-modal-name">${item.name}</div>
+            <div class="item-modal-meta">${item.category||''}${item.type ? ' · ' + item.type : ''}</div>
+            <div class="item-modal-label">Command</div>
+            <div class="item-modal-cmd" id="iCmd">${item.command||''}</div>
+            <button class="item-modal-copy" id="iCopyBtn" onclick="copyItemCmd()">Copy Command</button>
+            ${relHtml}`;
+
+        document.getElementById('itemOverlay').classList.add('open');
+    }
+
+    function closeItem() {
+        document.getElementById('itemOverlay').classList.remove('open');
+        history.replaceState(null, '', location.pathname);
+        currentItemId = null;
+    }
+
+    function closeItemOutside(e) {
+        if (e.target === document.getElementById('itemOverlay')) closeItem();
+    }
+
+    function copyItemCmd() {
+        const cmd = document.getElementById('iCmd')?.textContent;
+        if (!cmd) return;
+        navigator.clipboard.writeText(cmd).then(() => {
+            const btn = document.getElementById('iCopyBtn');
+            btn.textContent = 'Copied ✓';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.textContent = 'Copy Command'; btn.classList.remove('copied'); }, 2000);
+            showToast('Copied ✓');
+        });
+    }
+
+    // ── FILTER ──
+    function openFilter() { document.getElementById('filterOverlay').classList.add('open'); }
+    function closeFilter() { document.getElementById('filterOverlay').classList.remove('open'); }
+    function closeFilterOutside(e) { if (e.target === document.getElementById('filterOverlay')) closeFilter(); }
+
+    function setVerified(val) {
+        filterVerified = val;
+        document.getElementById('toggleVerified').classList.toggle('active', val);
+        document.getElementById('toggleUnverified').classList.toggle('active', !val);
+    }
+
+    function setCat(el, val) {
+        filterCat = val; filterType = '';
+        document.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('typeSection').style.display = 'none';
+        document.getElementById('scriptSearchSection').style.display = 'none';
+        document.getElementById('scriptSearchInput').value = '';
+        if (val === 'Accessories') { document.getElementById('typeLabel').textContent = 'Accessory Type'; buildTypeBtns(ACC_TYPES); document.getElementById('typeSection').style.display = 'block'; }
+        else if (val === 'Characters') { document.getElementById('typeLabel').textContent = 'Character Type'; buildTypeBtns(CHAR_TYPES); document.getElementById('typeSection').style.display = 'block'; }
+        else if (val === 'Scripts') { document.getElementById('scriptSearchSection').style.display = 'block'; }
+    }
+
+    function buildTypeBtns(list) {
+        document.getElementById('typeRow').innerHTML =
+            '<button class="cat-btn active" data-type="" onclick="setType(this,\'\')">All</button>' +
+            list.map(t => `<button class="cat-btn" data-type="${t.code}" onclick="setType(this,'${t.code}')">${t.label}</button>`).join('');
+    }
+
+    function setType(el, val) {
+        filterType = val;
+        document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function applyFilter() {
+        closeFilter();
+        let filtered = allItems.slice();
+        if (filterVerified) filtered = filtered.filter(i => verifiedAuthors.includes(i.author));
+        else filtered = filtered.filter(i => !verifiedAuthors.includes(i.author));
+        if (filterCat) filtered = filtered.filter(i => i.category === filterCat);
+        if (filterType) filtered = filtered.filter(i => i.type === filterType);
+        if (filterCat === 'Scripts') {
+            const q = document.getElementById('scriptSearchInput').value.trim().toLowerCase();
+            if (q) filtered = filtered.filter(i => (i.type||'').toLowerCase().includes(q) || (i.name||'').toLowerCase().includes(q));
+        }
+        renderContent(filtered);
+    }
+
+    // ── CONTEXT MENU ──
+    document.addEventListener('contextmenu', e => {
+        const card = e.target.closest('.item-card');
+        if (!card) { hideCtx(); return; }
+        e.preventDefault();
+        ctxId = card.dataset.id;
+        ctxCmd = card.dataset.cmd;
+        const menu = document.getElementById('ctxMenu');
+        menu.style.display = 'block';
+        let x = e.clientX, y = e.clientY;
+        if (x + 170 > window.innerWidth) x = window.innerWidth - 175;
+        if (y + 110 > window.innerHeight) y = window.innerHeight - 115;
+        menu.style.left = x + 'px';
+        menu.style.top  = y + 'px';
+    });
+    document.addEventListener('click', hideCtx);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideCtx(); closeItem(); } });
+
+    function hideCtx() { document.getElementById('ctxMenu').style.display = 'none'; }
+    function ctxCopy() { hideCtx(); if (!ctxCmd) return; navigator.clipboard.writeText(ctxCmd).then(() => showToast('Command copied ✓')); }
+    function ctxCopyLink() { hideCtx(); if (!ctxId) return; navigator.clipboard.writeText(location.origin + '/catalog/?id=' + ctxId).then(() => showToast('Link copied ✓')); }
+    function ctxOpen() { hideCtx(); if (ctxId) openItem(ctxId); }
+
+    // ── TOAST ──
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    loadData();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "mode": "safe",
+  "protectedPaths": [
+    "iME/CMX/config",
+    "iME/CMX/db",
+    "iME/CMX/security"
+  ],
+  "protectedGlobals": [
+    "cx",
+    "MainHandler",
+    "DoClear",
+    "Apply"
+  ],
+  "note": "Minimal placeholder used by the Luau security module."
+}
