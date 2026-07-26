@@ -171,6 +171,24 @@ local Library = {
     },
     {
         Class = "Accessory",
+        Name = "Black Fedora",
+        Weld = "Head",
+        MeshID = "rbxassetid://10550906266",
+        TextureID = "rbxassetid://10523208372",
+        CFrame = CFrame.new(0, 0.6, 0) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Accessory",
+        Name = "Ninja Mask of Shadows",
+        Weld = "Head",
+        MeshID = "http://www.roblox.com/asset/?id=1286427",
+        TextureID = "http://www.roblox.com/asset/?id=1309894",
+        CFrame = CFrame.new(1.07, 1.07, 1.07) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Accessory",
         Name = "Back Tail",
         Weld = "Torso",
         MeshID = "rbxassetid://85052393126449",
