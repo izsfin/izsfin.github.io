@@ -10,6 +10,26 @@ local _CurrentMode    = "once"
 local _LoadedModules  = {}
 local _ConfigPath     = "iME/CMX/Configs"
 local _RecordApply    = nil
+
+local function HttpGet(url)
+    if not url or url == "" then return nil end
+
+    local ok, result = pcall(function()
+        if game and typeof(game.HttpGet) == "function" then
+            return game:HttpGet(url)
+        end
+
+        local httpService = game:GetService("HttpService")
+        return httpService:GetAsync(url)
+    end)
+
+    if ok then
+        return result
+    end
+
+    return nil
+end
+
 function Logic.Init(ctx)
     _Library        = ctx.Library        or {}
     _ActiveAnims    = ctx.ActiveAnims    or {}
@@ -117,10 +137,12 @@ function Logic.DoClear(target)
 end
 
 function Logic.Apply(data, sandbox)
-    local char = lp.Character
+    local char = lp and lp.Character
     if not char or not char:FindFirstChild("Humanoid") then return end
     local lowName   = data.Name:lower()
     local textureId = data.TextureID or data.Texture or ""
+    local itemClass = data.Class or ""
+    local isHeadItem = itemClass == "Head" or itemClass == "Character"
 
     if data.Class == "Outfit" and not isfile(_ConfigPath.."PlayerOutfit.json") then
         local s, p = char:FindFirstChildOfClass("Shirt"), char:FindFirstChildOfClass("Pants")
@@ -148,13 +170,13 @@ function Logic.Apply(data, sandbox)
         local p = char:FindFirstChildOfClass("Pants") or Instance.new("Pants", char)
         p.PantsTemplate = data.PantsID
 
-    elseif data.Class == "Head" then
+    elseif isHeadItem then
         Logic.DoClear("head")
         local h = char:WaitForChild("Head", 5)
         if h then
             if h:FindFirstChild("face") then h.face.Transparency = 1 end
             local m = h:FindFirstChildOfClass("SpecialMesh") or Instance.new("SpecialMesh", h)
-            m.Name = "G_Item_"..lowName; m.MeshId = data.MeshID; m.TextureId = textureId; m.Scale = data.Scale
+            m.Name = "G_Item_"..lowName; m.MeshId = data.MeshID; m.TextureId = textureId; m.Scale = data.Scale or Vector3.new(1, 1, 1)
         end
 
     elseif data.Class == "Body" then
@@ -330,10 +352,8 @@ end
 
 function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     local function req(url)
-        local ok, r = pcall(function()
-            return http.request({ Url=url, Method="GET", Headers={["User-Agent"]=UA} })
-        end)
-        if ok and r and r.StatusCode == 200 then return r.Body end
+        local body = HttpGet(url)
+        if body and type(body) == "string" then return body end
         return nil
     end
 
