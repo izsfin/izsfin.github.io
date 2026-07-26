@@ -4,8 +4,8 @@
       "id": "kawaii-neutral-black-cat-ears",
       "name": "Kawaii Neutral Black Cat Ears",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/kNBCE/preview.png",
-      "command": "js(\"Black Cat Ears\")",
+      "preview": "resources/assets/catalog/kNBCE/preview.png",
+      "command": "cx(\"Black Cat Ears\")",
       "category": "Accessories",
       "type": "Head"
     },
@@ -13,8 +13,8 @@
       "id": "black-beanie",
       "name": "Black Beanie",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/BlackBeanie/preview.png",
-      "command": "js(\"Black Beanie\")",
+      "preview": "resources/assets/catalog/BlackBeanie/preview.png",
+      "command": "cx(\"Black Beanie\")",
       "category": "Accessories",
       "type": "Head"
     },
@@ -22,8 +22,8 @@
       "id": "black-balaclava-fisher-hat",
       "name": "Black Balaclava Fisher Hat",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/balaclava/fisher-hat/preview.png",
-      "command": "js(\"Black Balaclava Fisher Hat\")",
+      "preview": "resources/assets/catalog/balaclava/fisher-hat/preview.png",
+      "command": "cx(\"Black Balaclava Fisher Hat\")",
       "category": "Accessories",
       "type": "Head"
     },
@@ -31,8 +31,8 @@
       "id": "emo-spiked-shades",
       "name": "Emo Spiked Shades",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/EmoSpikedShades/preview.png",
-      "command": "js(\"Emo Spiked Shades\")",
+      "preview": "resources/assets/catalog/EmoSpikedShades/preview.png",
+      "command": "cx(\"Emo Spiked Shades\")",
       "category": "Accessories",
       "type": "Face"
     },
@@ -40,8 +40,8 @@
       "id": "white-polarized-sunglasses",
       "name": "White Polarized Sunglasses",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/polarizedSG/white/preview.png",
-      "command": "js(\"White Polarized Sunglasses\")",
+      "preview": "resources/assets/catalog/polarizedSG/white/preview.png",
+      "command": "cx(\"White Polarized Sunglasses\")",
       "category": "Accessories",
       "type": "Face"
     },
@@ -49,8 +49,8 @@
       "id": "pink-polarized-sunglasses",
       "name": "Pink Polarized Sunglasses",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/polarizedSG/pink/preview.png",
-      "command": "js(\"Pink Polarized Sunglasses\")",
+      "preview": "resources/assets/catalog/polarizedSG/pink/preview.png",
+      "command": "cx(\"Pink Polarized Sunglasses\")",
       "category": "Accessories",
       "type": "Face"
     },
@@ -58,8 +58,8 @@
       "id": "black-neck-mask_low",
       "name": "Black Neck Mask (Low)",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/neck-mask/black/preview.png",
-      "command": "js(\"Black Neck Mask (Low)\")",
+      "preview": "resources/assets/catalog/neck-mask/black/preview.png",
+      "command": "cx(\"Black Neck Mask (Low)\")",
       "category": "Accessories",
       "type": "Face"
     },
@@ -67,8 +67,8 @@
       "id": "white-ski-mask",
       "name": "White Ski Mask",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/neck-mask/white/preview.png",
-      "command": "js(\"White Ski Mask\")",
+      "preview": "resources/assets/catalog/neck-mask/white/preview.png",
+      "command": "cx(\"White Ski Mask\")",
       "category": "Accessories",
       "type": "Face"
     },
@@ -76,8 +76,8 @@
       "id": "guns-x-alien",
       "name": "Gunslinger & Alien",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/GxA/preview.png",
-      "command": "js(\"Guns & Alien\")",
+      "preview": "resources/assets/catalog/GxA/preview.png",
+      "command": "cx(\"Guns & Alien\")",
       "category": "Characters",
       "type": "body"
     },
@@ -85,8 +85,8 @@
       "id": "pal-face-classic",
       "name": "Pal Face",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/PalFace/preview.png",
-      "command": "js(\"Pal Face Static\")",
+      "preview": "resources/assets/catalog/PalFace/preview.png",
+      "command": "cx(\"Pal Face Static\")",
       "category": "Characters",
       "type": "face"
     },
@@ -94,8 +94,8 @@
       "id": "pal-face",
       "name": "Pal Face",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/PalFace/NSpreview.png",
-      "command": "js(\"Pal Face\")",
+      "preview": "resources/assets/catalog/PalFace/NSpreview.png",
+      "command": "cx(\"Pal Face\")",
       "category": "Characters",
       "type": "dhead"
     },
@@ -103,71 +103,71 @@
       "id": "purple-bape-v1",
       "name": "Purple Bape #1",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/bape/purple/v.1/preview.png",
-      "command": "js(\"Purple Bape\")",
+      "preview": "resources/assets/catalog/bape/purple/v.1/preview.png",
+      "command": "cx(\"Purple Bape\")",
       "category": "Outfits"
     },
     {
       "id": "purple-bape-v2",
       "name": "Purple Bape #2",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/bape/purple/v.2/preview.png",
-      "command": "js(\"Purple Bape\")",
+      "preview": "resources/assets/catalog/bape/purple/v.2/preview.png",
+      "command": "cx(\"Purple Bape\")",
       "category": "Outfits"
     },
     {
       "id": "black-bape",
       "name": "Black Bape",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/bape/black/preview.png",
-      "command": "js(\"Black Bape\")",
+      "preview": "resources/assets/catalog/bape/black/preview.png",
+      "command": "cx(\"Black Bape\")",
       "category": "Outfits"
     },
     {
       "id": "blue-bape-v1",
       "name": "Blue Bape #1",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/bape/blue/v.1/preview.png",
-      "command": "js(\"Blue Bape #1\")",
+      "preview": "resources/assets/catalog/bape/blue/v.1/preview.png",
+      "command": "cx(\"Blue Bape #1\")",
       "category": "Outfits"
     },
     {
       "id": "blue-bape-v2",
       "name": "Blue Bape #2",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/bape/blue/v.2/preview.png",
-      "command": "js(\"Blue Bape #2\")",
+      "preview": "resources/assets/catalog/bape/blue/v.2/preview.png",
+      "command": "cx(\"Blue Bape #2\")",
       "category": "Outfits"
     },
     {
       "id": "black-camo-v1",
       "name": "Black Camo #1",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/Millitary/BlackCamo/v1/preview.png",
-      "command": "js(\"Black Camo #1\")",
+      "preview": "resources/assets/catalog/Millitary/BlackCamo/v1/preview.png",
+      "command": "cx(\"Black Camo #1\")",
       "category": "Outfits"
     },
     {
       "id": "black-camo-v2",
       "name": "Black Camo #2",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/Millitary/BlackCamo/v2/preview.png",
-      "command": "js(\"Black Camo #2\")",
+      "preview": "resources/assets/catalog/Millitary/BlackCamo/v2/preview.png",
+      "command": "cx(\"Black Camo #2\")",
       "category": "Outfits"
     },
     {
       "id": "blue-camo",
       "name": "Blue Camo",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/Millitary/BlueCamo/preview.png",
-      "command": "js(\"Blue Camo\")",
+      "preview": "resources/assets/catalog/Millitary/BlueCamo/preview.png",
+      "command": "cx(\"Blue Camo\")",
       "category": "Outfits"
     },
     {
       "id": "classic-camo",
       "name": "Classic Camo",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/Millitary/ClassicCamo/preview.png",
+      "preview": "resources/assets/catalog/Millitary/ClassicCamo/preview.png",
       "command": "cmd(\"Classic Camo\")",
       "category": "Outfits"
     },
@@ -175,7 +175,7 @@
       "id": "loader",
       "name": "Loader",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/mister.lerp/assets/Loader.png",
+      "preview": "resources/assets/catalog/mister.lerp/assets/Loader.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/loader\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -184,7 +184,7 @@
       "id": "aqusu-mobile",
       "name": "Aqusu Mobile",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/mister.lerp/assets/",
+      "preview": "resources/assets/catalog/mister.lerp/assets/",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/mobile\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -193,7 +193,7 @@
       "id": "aqusu-pc.cerberus",
       "name": "Aqusu PC | Cerberus",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/mister.lerp/assets/PC.png",
+      "preview": "resources/assets/catalog/mister.lerp/assets/PC.png",
       "command": "loadstring(game:HttpGet(\"https://aqusu.pages.dev/pcU\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -202,7 +202,7 @@
       "id": "aqusu-pc.aquxui",
       "name": "Aqusu PC | OurUI",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/mister.lerp/assets/PC.png",
+      "preview": "resources/assets/catalog/mister.lerp/assets/PC.png",
       "command": "loadstring(game:HttpGet(\"https://aqusu.pages.dev/pcX\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -211,7 +211,7 @@
       "id": "aqusu-legacy",
       "name": "Aqusu  [Legacy]",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/mister.lerp/assets/Legacy.png",
+      "preview": "resources/assets/catalog/mister.lerp/assets/Legacy.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/legacy\"))()",
       "category": "Scripts",
       "type": "Official Software"
@@ -220,7 +220,7 @@
       "id": "soon",
       "name": "soon",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/mister.lerp/assets/Premium.png",
+      "preview": "resources/assets/catalog/mister.lerp/assets/Premium.png",
       "command": "soon",
       "category": "Scripts",
       "type": "Official Software"
@@ -229,7 +229,7 @@
       "id": "cmd-release",
       "name": "CMD | Release 3.2.0",
       "author": "mister.lerp",
-      "preview": "site/catalog/items/PalFace/preview.png",
+      "preview": "resources/assets/catalog/PalFace/preview.png",
       "command": "loadstring(game:HttpGet(\"https://vellote.vercel.app/js\"))()",
       "category": "Scripts",
       "type": "Official Software"
