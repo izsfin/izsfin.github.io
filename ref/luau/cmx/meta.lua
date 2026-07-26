@@ -1,8 +1,8 @@
 local canswer = "please, try later!"
 local meta = {
-    project_name    = "CMd",
+    project_name    = "CMX",
     project_devs    = "iME Team",
-    project_vers    = "v2.14.5",
+    project_vers    = "v2.14.6",
     project_svers   = "Stable",
     project_catalog = "https://izsfin.github.io/svc/catalog",
     project_discord = ".gg/TRPZg4Xfkq",
