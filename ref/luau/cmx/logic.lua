@@ -106,10 +106,21 @@ function Logic.DoClear(target)
         for _, v in pairs(char:GetChildren()) do if v:IsA("CharacterMesh") then v:Destroy() end end
         local savedBody = LoadConfig("PlayerBody")
         if savedBody then
-            for partName, meshId in pairs(savedBody) do
-                if meshId and meshId ~= "" then
-                    local m = Instance.new("CharacterMesh", char)
-                    m.BodyPart = Enum.BodyPart[partName]; m.MeshId = meshId
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if savedBody.RigType == "R15" and humanoid then
+                local ok, description = pcall(function() return humanoid:GetAppliedDescription() end)
+                if ok and description then
+                    for _, partName in ipairs({"Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}) do
+                        if savedBody[partName] then description[partName] = savedBody[partName] end
+                    end
+                    pcall(function() humanoid:ApplyDescription(description) end)
+                end
+            else
+                for partName, meshId in pairs(savedBody) do
+                    if Enum.BodyPart[partName] and meshId and meshId ~= "" then
+                        local m = Instance.new("CharacterMesh", char)
+                        m.BodyPart = Enum.BodyPart[partName]; m.MeshId = meshId
+                    end
                 end
             end
         end
@@ -139,6 +150,27 @@ end
 function Logic.Apply(data, sandbox)
     local char = lp and lp.Character
     if not char or not char:FindFirstChild("Humanoid") then return end
+    local humanoid  = char:FindFirstChildOfClass("Humanoid")
+
+    -- A Body can contain rig-specific definitions:
+    -- R6 = { Torso = "...", LeftArm = "...", ... }
+    -- R15 = { Head = "...", Torso = "...", LeftArm = "...", ... }
+    -- Keep the common fields (Name, Class, ReqPlaceID, etc.) and only replace
+    -- the body-part data with the definition for the current rig.
+    if data.Class == "Body" and (data.R6 or data.R15) then
+        local rigKey = humanoid.RigType == Enum.HumanoidRigType.R15 and "R15" or "R6"
+        local rigData = data[rigKey]
+        if type(rigData) ~= "table" then
+            warn("CMX || Body '" .. tostring(data.Name) .. "' has no " .. rigKey .. " definition")
+            return
+        end
+
+        local resolved = {}
+        for k, v in pairs(data) do resolved[k] = v end
+        for k, v in pairs(rigData) do resolved[k] = v end
+        resolved.R6, resolved.R15 = nil, nil
+        data = resolved
+    end
     local lowName   = data.Name:lower()
     local textureId = data.TextureID or data.Texture or ""
     local itemClass = data.Class or ""
@@ -157,9 +189,19 @@ function Logic.Apply(data, sandbox)
             FaceID = f and f.Texture or "rbxasset://textures/face.png"
         })
     elseif data.Class == "Body" and not isfile(_ConfigPath.."PlayerBody.json") then
-        local bodyData = { Torso="", LeftArm="", RightArm="", LeftLeg="", RightLeg="" }
-        for _, v in pairs(char:GetChildren()) do
-            if v:IsA("CharacterMesh") then bodyData[v.BodyPart.Name] = v.MeshId end
+        local bodyData
+        if humanoid.RigType == Enum.HumanoidRigType.R15 then
+            local description = humanoid:GetAppliedDescription()
+            bodyData = {
+                RigType = "R15", Head = description.Head, Torso = description.Torso,
+                LeftArm = description.LeftArm, RightArm = description.RightArm,
+                LeftLeg = description.LeftLeg, RightLeg = description.RightLeg,
+            }
+        else
+            bodyData = { Torso="", LeftArm="", RightArm="", LeftLeg="", RightLeg="" }
+            for _, v in pairs(char:GetChildren()) do
+                if v:IsA("CharacterMesh") then bodyData[v.BodyPart.Name] = v.MeshId end
+            end
         end
         SaveConfig("PlayerBody", bodyData)
     end
@@ -181,10 +223,28 @@ function Logic.Apply(data, sandbox)
 
     elseif data.Class == "Body" then
         Logic.DoClear("body")
-        for _, pN in pairs({"Torso","LeftArm","RightArm","LeftLeg","RightLeg"}) do
-            if data[pN] then
-                local m = Instance.new("CharacterMesh", char)
-                m.BodyPart = Enum.BodyPart[pN]; m.MeshId = data[pN]:match("%d+")
+        if humanoid.RigType == Enum.HumanoidRigType.R15 then
+            local ok, description = pcall(function()
+                return humanoid:GetAppliedDescription()
+            end)
+            if not ok or not description then
+                warn("CMX || Couldn't read the R15 humanoid description for '" .. data.Name .. "'")
+                return
+            end
+
+            for _, partName in ipairs({"Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}) do
+                if data[partName] then
+                    description[partName] = tostring(data[partName]):match("%d+") or "0"
+                end
+            end
+            local applied, err = pcall(function() humanoid:ApplyDescription(description) end)
+            if not applied then warn("CMX || Couldn't apply R15 body '" .. data.Name .. "': " .. tostring(err)) end
+        else
+            for _, pN in ipairs({"Torso","LeftArm","RightArm","LeftLeg","RightLeg"}) do
+                if data[pN] then
+                    local m = Instance.new("CharacterMesh", char)
+                    m.BodyPart = Enum.BodyPart[pN]; m.MeshId = data[pN]:match("%d+")
+                end
             end
         end
 
