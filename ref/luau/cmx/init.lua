@@ -1,5 +1,3 @@
-print("CMX | bootstrap start")
-
 local Library = {
     {
         Class = "Character",
@@ -192,7 +190,7 @@ local Library = {
     {
         Class = "Script",
         Name = "OldDXB",
-        URL = "https://weh-face.vercel.app/old-DXBRE",
+        URL = "",
 		ReqPlaceID = 0
     },
     {
@@ -361,29 +359,22 @@ local Library = {
 		ReqPlaceID = 0
 	}
 }
-
-local function run()
-    local meta = loadstring(game:HttpGet("https://izsfin.github.io/ref/luau/cmx/meta.lua"))()
-    if not meta then
-        warn("xCMD || Meta not answer, please try later!")
-        return
-    end
-
-    print(meta.project_name .. " | Loading | " .. meta.project_vers .. "  " .. meta.project_svers)
-
-    local Logic = loadstring(game:HttpGet("https://izsfin.github.io/ref/luau/cmx/logic.lua"))()
-    if not Logic then
-        if meta.logic_down then
-            meta:logic_down()
-        end
-        return
-    end
-
-    Logic.Start(Library, meta, ModuleSystem, UA, Base)
-    print(meta.project_name .. " | Loaded | " .. meta.project_vers .. "  " .. meta.project_svers)
+print( "loading... | 1/3" )
+local meta = loadstring(game:HttpGet("https://izsfin.github.io/ref/luau/cmx/meta.lua"))()
+ if not meta 
+  then warn("xCMD || Metanot answer, please try later!")
+ return 
 end
 
-local ok, err = pcall(run)
-if not ok then
-    warn("CMX | bootstrap failed: " .. tostring(err))
+print( meta.project_name .. " " .. meta.project_vers .. " " .. meta.project_svers .. " loaded | 2/3" )
+
+local Logic = loadstring(game:HttpGet("https://izsfin.github.io/ref/luau/cmx/logic.lua"))()
+    if not Logic then  
+        if meta.logic_down then 
+            meta:logic_down() 
+        end 
+    return  
 end
+Logic.Start(Library, meta, ModuleSystem, UA, Base)
+
+print( meta.project_name .. " " .. meta.project_vers .. " " .. meta.project_svers .. " loaded | 3/3" )
