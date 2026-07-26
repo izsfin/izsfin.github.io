@@ -1,1 +1,0 @@
-return "hux9z/software", "https://aqusu.pages.dev/~/static/cmd/stable/"
