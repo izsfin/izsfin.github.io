@@ -375,7 +375,6 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     local activeAutoRespawns = {}
     local ActiveAnimations   = {}
     local LoadedModules      = {}
-    local DAMode             = "once"
     local Aliases            = {}
     local Groups             = {}
 
@@ -383,7 +382,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         Library        = Library,
         ActiveAnims    = ActiveAnimations,
         ActiveRespawns = activeAutoRespawns,
-        CurrentMode    = DAMode,
+        CurrentMode    = "once",
         LoadedModules  = LoadedModules,
         ConfigPath     = "iME/CMX/Configs/",
         RecordApply    = getgenv().cx_RecordApply or nil,
@@ -402,12 +401,18 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
             for _, url in ipairs(modList) do task.spawn(function() ModuleSystem.Load(url) end) end
         end
     end
-    local function SetDAMode(val)
-        local v = val:lower():gsub("%s+","")
-        if v=="1" or v=="once" then DAMode="once"; print("CMX || DAMode = once")
-        elseif v=="2" or v=="true" then DAMode="true"; print("CMX || DAMode = true")
-        elseif v=="reset" or v=="off" then DAMode="once"; print("CMX || DAMode = off")
-        else warn("CMX || Unknown DAMode: "..val) end
+    -- DA mode belongs to the item being applied, not to a global switch.
+    -- true/2 enables re-application after respawn; false/1/once and
+    -- reset/off disable it for that item.
+    local function SetItemDAMode(itemName, mode, data, sandbox)
+        local v = tostring(mode or "once"):lower():gsub("%s+", "")
+        if v == "true" or v == "2" or v == "loop" or v == "spawn" then
+            activeAutoRespawns[itemName] = { data = data, sandbox = sandbox }
+        elseif v == "false" or v == "1" or v == "once" or v == "reset" or v == "off" then
+            activeAutoRespawns[itemName] = nil
+        else
+            warn("CMX || Unknown DAMode for '" .. itemName .. "': " .. tostring(mode))
+        end
     end
 
     local function SetAlias(s,t) Aliases[s:lower()]=t:lower(); print("CMX || Alias: '"..s.."' → '"..t.."'") end
@@ -419,12 +424,11 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         if not name then return end
         local raw = tostring(name)
         local n   = ResolveAlias(raw:lower())
-        local m   = tostring(mode or DAMode):lower()
+        local m   = tostring(mode or "once"):lower()
 
         local group = ResolveGroup(n)
         if group then for _, i in ipairs(group) do MainHandler(i, mode) end; return end
 
-        local daVal = raw:match("^DAMode%s*=%s*(.+)$"); if daVal then SetDAMode(daVal); return end
         local aS, aT = raw:match("^alias%s*=%s*([^,]+),%s*(.+)$")
         if aS then SetAlias(aS:match("^%s*(.-)%s*$"), aT:match("^%s*(.-)%s*$")); return end
         local gN, gI = raw:match("^group%s*=%s*([^,]+),(.+)$")
@@ -460,7 +464,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
                         if not gp and i.KeyCode == Enum.KeyCode[key:upper()] then Logic.Apply(d) end
                     end)
                 else Logic.Apply(d) end
-                if m=="loop" or m=="true" or m=="spawn" then activeAutoRespawns[n]=d end
+                SetItemDAMode(n, m, d)
                 return
             end
         end
@@ -469,7 +473,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
             for _, d in pairs(mod.library or {}) do
                 if d.Name:lower() == n then
                     Logic.Apply(d, mod.sandbox)
-                    if m=="loop" or m=="true" or m=="spawn" then activeAutoRespawns[n]=d end
+                    SetItemDAMode(n, m, d, mod.sandbox)
                     return
                 end
             end
@@ -480,8 +484,8 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
 
     game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
         task.wait(1.5)
-        if DAMode == "true" then
-            for _, d in pairs(activeAutoRespawns) do Logic.Apply(d) end
+        for _, entry in pairs(activeAutoRespawns) do
+            Logic.Apply(entry.data, entry.sandbox)
         end
     end)
 

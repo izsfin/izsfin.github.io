@@ -632,64 +632,24 @@
             ? `<img src="/${item.preview}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<span class=no-preview>No preview</span>'">`
             : '<span class="no-preview">No preview</span>';
         const cmd = (item.command||'').replace(/"/g,'&quot;');
-        return `<div class="item-card" data-id="${item.id}" data-cmd="${cmd}" onclick="openItem('${item.id}')">
+        return `<div class="item-card" data-id="${item.id}" data-cmd="${cmd}" onclick="goToItem('${item.id}')">
             <div class="item-preview">${prev}</div>
             <div class="item-info">
                 <div class="item-name">${item.name}</div>
-                <button class="item-btn" onclick="event.stopPropagation();openItem('${item.id}')">Get Command</button>
+                <button class="item-btn" onclick="event.stopPropagation();goToItem('${item.id}')">Get Command</button>
             </div>
         </div>`;
     }
 
-    // ── ITEM MODAL ──
-    function openItem(id) {
+    // ── ITEM PAGE NAVIGATION ──
+    function goToItem(id) {
         const item = allItems.find(i => i.id === id);
         if (!item) return;
-        currentItemId = id;
+        window.location.href = './item/?id=' + encodeURIComponent(id);
+    }
 
-        // Update URL without reload
-        history.replaceState(null, '', '?id=' + id);
-
-        const isVerified = verifiedAuthors.includes(item.author);
-        const authorHtml = isVerified
-            ? `<div class="item-modal-author verified"><span class="vdot"></span>${item.author||'Unknown'}</div>`
-            : `<div class="item-modal-author">${item.author||'Unknown'}</div>`;
-
-        const prevHtml = item.preview
-            ? `<img src="/${item.preview}" alt="${item.name}" onerror="this.outerHTML='<span style=\\'font-size:11px;color:rgba(255,255,255,0.15)\\'>No preview</span>'">`
-            : '<span style="font-size:11px;color:rgba(255,255,255,0.15)">No preview</span>';
-
-        const related = allItems.filter(i => i.id !== id && i.category === item.category && i.type === item.type).slice(0, 6);
-        let relHtml = '';
-        if (related.length) {
-            const cards = related.map(r => {
-                const rp = r.preview
-                    ? `<img src="/${r.preview}" alt="" loading="lazy" onerror="this.parentElement.innerHTML=''">`
-                    : '';
-                return `<div class="rel-card" onclick="openItem('${r.id}')">
-                    <div class="rel-preview">${rp}</div>
-                    <div class="rel-info"><div class="rel-name">${r.name}</div></div>
-                </div>`;
-            }).join('');
-            relHtml = `<div class="related-title-row"><div class="related-label">Similar</div><div class="section-line"></div></div>
-                       <div class="related-grid-sm">${cards}</div>`;
-        }
-
-        document.getElementById('itemLeft').innerHTML = `
-            <div class="item-modal-preview">
-                ${prevHtml}
-                ${authorHtml}
-            </div>`;
-
-        document.getElementById('itemRight').innerHTML = `
-            <div class="item-modal-name">${item.name}</div>
-            <div class="item-modal-meta">${item.category||''}${item.type ? ' · ' + item.type : ''}</div>
-            <div class="item-modal-label">Command</div>
-            <div class="item-modal-cmd" id="iCmd">${item.command||''}</div>
-            <button class="item-modal-copy" id="iCopyBtn" onclick="copyItemCmd()">Copy Command</button>
-            ${relHtml}`;
-
-        document.getElementById('itemOverlay').classList.add('open');
+    function openItem(id) {
+        goToItem(id);
     }
 
     function closeItem() {
@@ -784,7 +744,7 @@
     function hideCtx() { document.getElementById('ctxMenu').style.display = 'none'; }
     function ctxCopy() { hideCtx(); if (!ctxCmd) return; navigator.clipboard.writeText(ctxCmd).then(() => showToast('Command copied ✓')); }
     function ctxCopyLink() { hideCtx(); if (!ctxId) return; navigator.clipboard.writeText(location.origin + '/catalog/?id=' + ctxId).then(() => showToast('Link copied ✓')); }
-    function ctxOpen() { hideCtx(); if (ctxId) openItem(ctxId); }
+    function ctxOpen() { hideCtx(); if (ctxId) goToItem(ctxId); }
 
     // ── TOAST ──
     function showToast(msg) {
