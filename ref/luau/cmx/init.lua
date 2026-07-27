@@ -189,7 +189,7 @@ local Library = {
         Weld = "Head",
         MeshID = "http://www.roblox.com/asset/?id=1286427",
         TextureID = "http://www.roblox.com/asset/?id=1309894",
-        Scale = Vector3.new(1.07, 1.07, 1.07)
+        Scale = Vector3.new(1.07, 1.07, 1.07),
         CFrame = CFrame.new(0, 0, 0) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
         ReqPlaceID = 0
     },
@@ -257,7 +257,7 @@ local Library = {
         -- Left Arm
             LeftUpperArm = "http://www.roblox.com/asset/?id=1660648319",
             LeftLowerArm = "http://www.roblox.com/asset/?id=1660648303",
-            LeftHand = "http://www.roblox.com/asset/?id=1660648264"
+            LeftHand = "http://www.roblox.com/asset/?id=1660648264",
         -- Right Arm
             RightUpperArm = "http://www.roblox.com/asset/?id=1660648351",
             RightLowerArm = "http://www.roblox.com/asset/?id=1660648342",
