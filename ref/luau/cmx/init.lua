@@ -179,7 +179,7 @@ local Library = {
         Weld = "Head",
         MeshID = "rbxassetid://10550906266",
         TextureID = "rbxassetid://10523208372",
-        CFrame = CFrame.new(0, 0.6, 0) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
+        CFrame = CFrame.new(0, -0.6, 0) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
         ReqPlaceID = 0
     },
     {
@@ -249,7 +249,7 @@ local Library = {
             RightArm = "rbxassetid://27111864",
             LeftLeg = "rbxassetid://27111857",
             RightLeg = "rbxassetid://27111882",
-        },
+        },--[[
         R15 = {
         -- Torso
             UpperTorso = "http://www.roblox.com/asset/?id=1660648364",
@@ -270,7 +270,7 @@ local Library = {
             RightUpperLeg = "http://www.roblox.com/asset/?id=1660648424",
             RightLowerLeg = "http://www.roblox.com/asset/?id=1660648441",
             RightFoot = "http://www.roblox.com/asset/?id=1660648451",
-        },
+        },]]
         ReqPlaceID = 0
     },
     {
@@ -283,7 +283,7 @@ local Library = {
             RightArm = "32331968",
             LeftLeg = "32331927",
             RightLeg = "32332020",
-        },
+        },--[[
         R15 = {
         -- Torso
             UpperTorso = "http://www.roblox.com/asset/?id=546087875",
@@ -304,34 +304,20 @@ local Library = {
             RightUpperLeg = "http://www.roblox.com/asset/?id=546087898",
             RightLowerLeg = "http://www.roblox.com/asset/?id=546087895",
             RightFoot = "http://www.roblox.com/asset/?id=546087891",
-        },
+        },]]
         ReqPlaceID = 0
     },
     {
         Class = "Character",
         SubClass = "Body",
         Name = "Tentacled Alien",
-R6 = {
-    Torso = "rbxassetid://27493604",
-    LeftArm = "rbxassetid://27493648",
-    RightArm = "rbxassetid://27493629",
-    LeftLeg = "rbxassetid://27493683",
-    RightLeg = "rbxassetid://27493718",
-},
-
-R15 = {
-    -- Torso
-    UpperTorso = "rbxassetid://6925030854",
-    -- Left Arm
-    LeftUpperArm = "rbxassetid://546814821",
-    -- Right Arm
-    RightUpperArm = "rbxassetid://546814954",
-    -- Left Leg
-    LeftFoot = "rbxassetid://6925030879",
-    -- Right Leg
-    RightFoot = "rbxassetid://6925030941",
-},
-
+        R6 = {
+            Torso = "rbxassetid://27493604",
+            LeftArm = "rbxassetid://27493648",
+            RightArm = "rbxassetid://27493629",
+            LeftLeg = "rbxassetid://27493683",
+            RightLeg = "rbxassetid://27493718",
+        },
         ReqPlaceID = 0
     },
     {
@@ -344,18 +330,6 @@ R15 = {
             RightArm = "rbxassetid://27402580",
             LeftLeg = "rbxassetid://27402714",
             RightLeg = "rbxassetid://27402742",
-        },
-        R15 = {
-            -- Torso
-            UpperTorso = "rbxassetid://14487770524",
-            -- Left Arm
-            LeftUpperArm = "rbxassetid://14487770468",
-            -- Right Arm
-            RightUpperArm = "rbxassetid://14487770503",
-            -- Left Leg
-            LeftUpperLeg = "rbxassetid://545981900",
-            -- Right Leg
-            RightUpperLeg = "rbxassetid://545982042",
         },
     },
     {
