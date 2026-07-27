@@ -144,6 +144,7 @@ local Library = {
     },
     {
         Class = "Accessory",
+        Subclass = "Head",
         Name = "Cap",
         Weld = "Head",
         MeshID = "rbxassetid://92976453142475",
@@ -153,6 +154,7 @@ local Library = {
     },
     {
         Class = "Accessory",
+        Subclass = "Head",
         Name = "Black Cat Ears",
         Weld = "Head",
         MeshID = "rbxassetid://128534799696292",
@@ -163,6 +165,7 @@ local Library = {
     {
         Class = "Accessory",
         Name = "Emo Spiked Shades",
+        Subclass = "Face",
         Weld = "Head",
         MeshID = "rbxassetid://17154559796",
         TextureID = "rbxassetid://17154478293",
@@ -171,6 +174,7 @@ local Library = {
     },
     {
         Class = "Accessory",
+        Subclass = "Head",
         Name = "Black Fedora",
         Weld = "Head",
         MeshID = "rbxassetid://10550906266",
@@ -180,11 +184,13 @@ local Library = {
     },
     {
         Class = "Accessory",
+        Subclass = "Head",
         Name = "Ninja Mask of Shadows",
         Weld = "Head",
         MeshID = "http://www.roblox.com/asset/?id=1286427",
         TextureID = "http://www.roblox.com/asset/?id=1309894",
-        CFrame = CFrame.new(1.07, 1.07, 1.07) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
+        Scale = Vector3.new(1.07, 1.07, 1.07)
+        CFrame = CFrame.new(0, 0, 0) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
         ReqPlaceID = 0
     },
     {
@@ -212,7 +218,8 @@ local Library = {
 		ReqPlaceID = 0
     },
     {
-        Class = "Body",
+        Class = "Character",
+        SubClass = "Body",
         Name = "Custom",
         Torso = "rbxassetid://27493004",
         LeftArm = "rbxassetid://27400132",
@@ -222,7 +229,8 @@ local Library = {
 		ReqPlaceID = 0
     },
  {
-        Class = "Body",
+        Class = "Character",
+        SubClass = "Body",
         Name = "Guns&Alien",
         Torso = "rbxassetid://32332055",
         LeftArm = "rbxassetid://32331863",
@@ -232,17 +240,127 @@ local Library = {
         ReqPlaceID = 0
     },
     {
-        Class = "Body",
+        Class = "Character",
+        SubClass = "Body",
         Name = "Robloxian 2.0",
-        Torso = "rbxassetid://27111894",
-        LeftArm = "rbxassetid://27111419",
-        RightArm = "rbxassetid://27111864",
-        LeftLeg = "rbxassetid://27111857",
-        RightLeg = "rbxassetid://27111882",
+        R6 = {
+            Torso = "rbxassetid://27111894",
+            LeftArm = "rbxassetid://27111419",
+            RightArm = "rbxassetid://27111864",
+            LeftLeg = "rbxassetid://27111857",
+            RightLeg = "rbxassetid://27111882",
+        },
+        R15 = {
+        -- Torso
+            UpperTorso = "http://www.roblox.com/asset/?id=1660648364",
+            LowerTorso = "http://www.roblox.com/asset/?id=1660648469",
+        -- Left Arm
+            LeftUpperArm = "http://www.roblox.com/asset/?id=1660648319",
+            LeftLowerArm = "http://www.roblox.com/asset/?id=1660648303",
+            LeftHand = "http://www.roblox.com/asset/?id=1660648264"
+        -- Right Arm
+            RightUpperArm = "http://www.roblox.com/asset/?id=1660648351",
+            RightLowerArm = "http://www.roblox.com/asset/?id=1660648342",
+            RightHand = "http://www.roblox.com/asset/?id=1660648337", 
+        -- Left Leg
+            LeftUpperLeg = "http://www.roblox.com/asset/?id=1660648407",
+            LeftLowerLeg = "http://www.roblox.com/asset/?id=1660648395",
+            LeftFoot = "http://www.roblox.com/asset/?id=1660648380",
+        -- Right Leg
+            RightUpperLeg = "http://www.roblox.com/asset/?id=1660648424",
+            RightLowerLeg = "http://www.roblox.com/asset/?id=1660648441",
+            RightFoot = "http://www.roblox.com/asset/?id=1660648451",
+        },
         ReqPlaceID = 0
     },
     {
-        Class = "Body",
+        Class = "Character",
+        Subclass = "Body",
+        Name = "Gunslinger",
+        R6 = {
+            Torso = "32332055",
+            LeftArm = "32331863",
+            RightArm = "32331968",
+            LeftLeg = "32331927",
+            RightLeg = "32332020",
+        },
+        R15 = {
+        -- Torso
+            UpperTorso = "http://www.roblox.com/asset/?id=546087875",
+            LowerTorso = "http://www.roblox.com/asset/?id=546087903",
+        -- Left Arm
+            LeftUpperArm = "http://www.roblox.com/asset/?id=546087859",
+            LeftLowerArm = "http://www.roblox.com/asset/?id=546087854",
+            LeftHand = "http://www.roblox.com/asset/?id=546087850",
+        -- Right Arm
+            RightUpperArm = "http://www.roblox.com/asset/?id=546087870",
+            RightLowerArm = "http://www.roblox.com/asset/?id=546087867",
+            RightHand = "http://www.roblox.com/asset/?id=546087863",
+        -- Left Leg
+            LeftUpperLeg = "http://www.roblox.com/asset/?id=546087886",
+            LeftLowerLeg = "http://www.roblox.com/asset/?id=546087885",
+            LeftFoot = "http://www.roblox.com/asset/?id=546087878",
+        -- Right Leg
+            RightUpperLeg = "http://www.roblox.com/asset/?id=546087898",
+            RightLowerLeg = "http://www.roblox.com/asset/?id=546087895",
+            RightFoot = "http://www.roblox.com/asset/?id=546087891",
+        },
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Character",
+        SubClass = "Body",
+        Name = "Tentacled Alien",
+R6 = {
+    Torso = "rbxassetid://27493604",
+    LeftArm = "rbxassetid://27493648",
+    RightArm = "rbxassetid://27493629",
+    LeftLeg = "rbxassetid://27493683",
+    RightLeg = "rbxassetid://27493718",
+},
+
+R15 = {
+    -- Torso
+    UpperTorso = "rbxassetid://6925030854",
+    -- Left Arm
+    LeftUpperArm = "rbxassetid://546814821",
+    -- Right Arm
+    RightUpperArm = "rbxassetid://546814954",
+    -- Left Leg
+    LeftFoot = "rbxassetid://6925030879",
+    -- Right Leg
+    RightFoot = "rbxassetid://6925030941",
+},
+
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Character",
+        Subclass = "Body",
+        Name = "Action Figure",
+        R6 = {
+            Torso = "rbxassetid://27402546",
+            LeftArm = "rbxassetid://27402641",
+            RightArm = "rbxassetid://27402580",
+            LeftLeg = "rbxassetid://27402714",
+            RightLeg = "rbxassetid://27402742",
+        },
+        R15 = {
+            -- Torso
+            UpperTorso = "rbxassetid://14487770524",
+            -- Left Arm
+            LeftUpperArm = "rbxassetid://14487770468",
+            -- Right Arm
+            RightUpperArm = "rbxassetid://14487770503",
+            -- Left Leg
+            LeftUpperLeg = "rbxassetid://545981900",
+            -- Right Leg
+            RightUpperLeg = "rbxassetid://545982042",
+        },
+    }
+    {
+        Class = "Character",
+        SubClass = "Body",
         Name = "Superhero",
         Torso = "rbxassetid://32328670",
         LeftArm = "rbxassetid://32328397",

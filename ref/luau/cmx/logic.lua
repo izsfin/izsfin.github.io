@@ -1,4 +1,4 @@
--- [ luau/cmx/logic.lua ]
+-- [ ref/luau/cmx/logic.lua ]
 local HttpService = game:GetService("HttpService")
 local Players     = game:GetService("Players")
 local lp          = Players.LocalPlayer
@@ -57,6 +57,73 @@ local function IsPlaceAllowed(item)
     if not item.ReqPlaceID or item.ReqPlaceID == 0 or item.ReqPlaceID == "" then return true end
     return tonumber(item.ReqPlaceID) == game.PlaceId
 end
+
+local function GetEffectiveClass(item)
+    local class = item.Class or ""
+    local subClass = tostring(item.SubClass or ""):match("^%s*(.-)%s*$")
+
+    if class == "Character" and subClass == "Body" then
+        return "Body"
+    end
+
+    return class
+end
+
+
+local R15PartNames = {
+    "Head",
+    "UpperTorso", "LowerTorso",
+    "LeftUpperArm", "LeftLowerArm", "LeftHand",
+    "RightUpperArm", "RightLowerArm", "RightHand",
+    "LeftUpperLeg", "LeftLowerLeg", "LeftFoot",
+    "RightUpperLeg", "RightLowerLeg", "RightFoot",
+}
+
+local function IsIndividualR15Definition(definition)
+    if type(definition) ~= "table" then return false end
+    for _, partName in ipairs(R15PartNames) do
+        if definition[partName] then return true end
+    end
+    return false
+end
+
+local function ToAssetId(value)
+    local id = tostring(value or "")
+    if id == "" then return "" end
+    if id:find("rbxassetid://", 1, true) then return id end
+    local number = id:match("%d+")
+    return number and "rbxassetid://" .. number or id
+end
+
+local function ApplyIndividualR15Parts(char, definition)
+    for _, partName in ipairs(R15PartNames) do
+        local entry = definition[partName]
+        local meshId = type(entry) == "table" and (entry.MeshID or entry.ID) or entry
+        local target = char:FindFirstChild(partName)
+
+        if target and meshId and tostring(meshId) ~= "" then
+            for _, child in ipairs(target:GetChildren()) do
+                if child:IsA("SpecialMesh") and child:GetAttribute("CMXR15Body") then
+                    child:Destroy()
+                end
+            end
+
+            local mesh = Instance.new("SpecialMesh")
+            mesh.Name = partName
+            mesh:SetAttribute("CMXR15Body", true)
+            mesh:SetAttribute("CMXItemName", itemName)
+            mesh.MeshId = ToAssetId(meshId)
+            if type(entry) == "table" then
+                mesh.TextureId = ToAssetId(entry.TextureID or entry.Texture)
+                mesh.Scale = entry.Scale or Vector3.new(1, 1, 1)
+            end
+            mesh.Parent = target
+        elseif entry then
+            warn("CMX || R15 part '" .. partName .. "' was not found")
+        end
+    end
+end
+
 function Logic.DoClear(target)
     local char = lp.Character
     if not char then return end
@@ -104,6 +171,10 @@ function Logic.DoClear(target)
 
     if n == "all" or n == "body" then
         for _, v in pairs(char:GetChildren()) do if v:IsA("CharacterMesh") then v:Destroy() end end
+        for _, v in pairs(char:GetDescendants()) do
+            if v:IsA("SpecialMesh") and (v:GetAttribute("CMXR15Body") or v.Name == "R15Mesh" or v.Name == "CMX_R15Mesh") then
+                v:Destroy()
+        end
         local savedBody = LoadConfig("PlayerBody")
         if savedBody then
             local humanoid = char:FindFirstChildOfClass("Humanoid")
@@ -143,7 +214,12 @@ function Logic.DoClear(target)
     end
 
     for _, v in pairs(char:GetDescendants()) do
-        if v.Name:lower() == "g_item_"..n or (n == "all" and v.Name:find("G_Item_")) then v:Destroy() end
+        local isCMXItem = v:GetAttribute("CMXItemName") ~= nil
+        if (isCMXItem and (n == "all" or v:GetAttribute("CMXItemName") == n))
+            or v.Name:lower() == "g_item_"..n
+            or (n == "all" and v.Name:find("G_Item_")) then
+            v:Destroy()
+        end
     end
 end
 
@@ -151,13 +227,12 @@ function Logic.Apply(data, sandbox)
     local char = lp and lp.Character
     if not char or not char:FindFirstChild("Humanoid") then return end
     local humanoid  = char:FindFirstChildOfClass("Humanoid")
+    local itemClass = GetEffectiveClass(data)
+    local useIndividualR15Parts = itemClass == "Body"
+        and humanoid.RigType == Enum.HumanoidRigType.R15
+        and IsIndividualR15Definition(data.R15)
 
-    -- A Body can contain rig-specific definitions:
-    -- R6 = { Torso = "...", LeftArm = "...", ... }
-    -- R15 = { Head = "...", Torso = "...", LeftArm = "...", ... }
-    -- Keep the common fields (Name, Class, ReqPlaceID, etc.) and only replace
-    -- the body-part data with the definition for the current rig.
-    if data.Class == "Body" and (data.R6 or data.R15) then
+    if itemClass == "Body" and (data.R6 or data.R15) then
         local rigKey = humanoid.RigType == Enum.HumanoidRigType.R15 and "R15" or "R6"
         local rigData = data[rigKey]
         if type(rigData) ~= "table" then
@@ -173,13 +248,12 @@ function Logic.Apply(data, sandbox)
     end
     local lowName   = data.Name:lower()
     local textureId = data.TextureID or data.Texture or ""
-    local itemClass = data.Class or ""
     local isHeadItem = itemClass == "Head" or itemClass == "Character"
 
-    if data.Class == "Outfit" and not isfile(_ConfigPath.."PlayerOutfit.json") then
+    if itemClass == "Outfit" and not isfile(_ConfigPath.."PlayerOutfit.json") then
         local s, p = char:FindFirstChildOfClass("Shirt"), char:FindFirstChildOfClass("Pants")
         SaveConfig("PlayerOutfit", { Shirt = s and s.ShirtTemplate or "", Pants = p and p.PantsTemplate or "" })
-    elseif data.Class == "Head" and not isfile(_ConfigPath.."PlayerHead.json") then
+    elseif itemClass == "Head" and not isfile(_ConfigPath.."PlayerHead.json") then
         local h = char:FindFirstChild("Head")
         local m = h and h:FindFirstChildOfClass("SpecialMesh")
         local f = h and h:FindFirstChild("face")
@@ -188,7 +262,7 @@ function Logic.Apply(data, sandbox)
             ScaleX = m and m.Scale.X or 1.25, ScaleY = m and m.Scale.Y or 1.25, ScaleZ = m and m.Scale.Z or 1.25,
             FaceID = f and f.Texture or "rbxasset://textures/face.png"
         })
-    elseif data.Class == "Body" and not isfile(_ConfigPath.."PlayerBody.json") then
+    elseif itemClass == "Body" and not isfile(_ConfigPath.."PlayerBody.json") then
         local bodyData
         if humanoid.RigType == Enum.HumanoidRigType.R15 then
             local description = humanoid:GetAppliedDescription()
@@ -206,7 +280,7 @@ function Logic.Apply(data, sandbox)
         SaveConfig("PlayerBody", bodyData)
     end
 
-    if data.Class == "Outfit" then
+    if itemClass == "Outfit" then
         local s = char:FindFirstChildOfClass("Shirt") or Instance.new("Shirt", char)
         s.ShirtTemplate = data.ShirtID
         local p = char:FindFirstChildOfClass("Pants") or Instance.new("Pants", char)
@@ -218,38 +292,45 @@ function Logic.Apply(data, sandbox)
         if h then
             if h:FindFirstChild("face") then h.face.Transparency = 1 end
             local m = h:FindFirstChildOfClass("SpecialMesh") or Instance.new("SpecialMesh", h)
-            m.Name = "G_Item_"..lowName; m.MeshId = data.MeshID; m.TextureId = textureId; m.Scale = data.Scale or Vector3.new(1, 1, 1)
+            m.Name = "Head"; m:SetAttribute("CMXItemName", lowName)
+            m.MeshId = data.MeshID; m.TextureId = textureId; m.Scale = data.Scale or Vector3.new(1, 1, 1)
         end
 
-    elseif data.Class == "Body" then
+    elseif itemClass == "Body" then
         Logic.DoClear("body")
         if humanoid.RigType == Enum.HumanoidRigType.R15 then
-            local ok, description = pcall(function()
-                return humanoid:GetAppliedDescription()
-            end)
-            if not ok or not description then
-                warn("CMX || Couldn't read the R15 humanoid description for '" .. data.Name .. "'")
-                return
-            end
-
-            for _, partName in ipairs({"Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}) do
-                if data[partName] then
-                    description[partName] = tostring(data[partName]):match("%d+") or "0"
+            if useIndividualR15Parts then
+                ApplyIndividualR15Parts(char, data)
+            else
+                local ok, description = pcall(function()
+                    return humanoid:GetAppliedDescription()
+                end)
+                if not ok or not description then
+                    warn("CMX || Couldn't read the R15 humanoid description for '" .. data.Name .. "'")
+                    return
                 end
+
+                for _, partName in ipairs({"Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}) do
+                    if data[partName] then
+                        description[partName] = tostring(data[partName]):match("%d+") or "0"
+                    end
+                end
+                local applied, err = pcall(function() humanoid:ApplyDescription(description) end)
+                if not applied then warn("CMX || Couldn't apply R15 body '" .. data.Name .. "': " .. tostring(err)) end
             end
-            local applied, err = pcall(function() humanoid:ApplyDescription(description) end)
-            if not applied then warn("CMX || Couldn't apply R15 body '" .. data.Name .. "': " .. tostring(err)) end
         else
             for _, pN in ipairs({"Torso","LeftArm","RightArm","LeftLeg","RightLeg"}) do
                 if data[pN] then
                     local m = Instance.new("CharacterMesh", char)
+                    m.Name = pN
+                    m:SetAttribute("CMXItemName", lowName)
                     m.BodyPart = Enum.BodyPart[pN]; m.MeshId = data[pN]:match("%d+")
                 end
             end
         end
 
 
-    elseif data.Class == "Accessory" then
+    elseif itemClass == "Accessory" then
      Logic.DoClear(lowName)
       local weldName   = data.Weld or "Head"
       local weldTarget = char:FindFirstChild(weldName)
@@ -261,7 +342,8 @@ function Logic.Apply(data, sandbox)
        
       if weldTarget then
           local part = Instance.new("Part")
-          part.Name        = "G_Item_"..lowName
+          part.Name        = lowName
+          part:SetAttribute("CMXItemName", lowName)
           part.Size        = Vector3.new(0.5, 0.5, 0.5)
           part.CanCollide  = false
           part.Massless    = true
@@ -289,7 +371,7 @@ function Logic.Apply(data, sandbox)
         warn("CMX || Critical: No weld target found for " .. data.Name)
     end
 
-    elseif data.Class == "Face" then
+    elseif itemClass == "Face" then
         local h = char:FindFirstChild("Head")
         if h and h:FindFirstChild("face") then h.face.Texture = data.ID end
 
@@ -362,15 +444,14 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
         table.insert(lines, "")
     end
 
-    if byClass["Body"] or byClass["Head"] then
+    if byClass["Character"] or byClass["Head"] then
         table.insert(lines, "  [ Character ]")
         if byClass["Head"] then
             table.insert(lines, "   [ Head ]")
             printWithSubClass(byClass["Head"], "    ")
         end
-        if byClass["Body"] then
-            table.insert(lines, "   [ Body ]")
-            printWithSubClass(byClass["Body"], "    ")
+        if byClass["Character"] then
+            printWithSubClass(byClass["Character"], "    ")
         end
         table.insert(lines, "")
     end
@@ -381,7 +462,7 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
         table.insert(lines, "")
     end
 
-    local printed = { Accessory=true, Body=true, Head=true, Outfit=true }
+    local printed = { Accessory=true, Character=true, Head=true, Outfit=true }
     for cls, items in pairs(byClass) do
         if not printed[cls] then
             table.insert(lines, "  [ " .. cls .. " ]")
@@ -558,7 +639,6 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         end
     end)
 
-    -- Expose
     getgenv().cx = function(...) return MainHandler(...) end
     setmetatable(_G, { __call = function(_, ...) return MainHandler(...) end })
 end
