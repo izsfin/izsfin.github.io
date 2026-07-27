@@ -357,7 +357,7 @@ R15 = {
             -- Right Leg
             RightUpperLeg = "rbxassetid://545982042",
         },
-    }
+    },
     {
         Class = "Character",
         SubClass = "Body",

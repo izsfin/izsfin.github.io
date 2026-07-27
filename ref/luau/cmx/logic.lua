@@ -174,6 +174,7 @@ function Logic.DoClear(target)
         for _, v in pairs(char:GetDescendants()) do
             if v:IsA("SpecialMesh") and (v:GetAttribute("CMXR15Body") or v.Name == "R15Mesh" or v.Name == "CMX_R15Mesh") then
                 v:Destroy()
+            end
         end
         local savedBody = LoadConfig("PlayerBody")
         if savedBody then
@@ -557,7 +558,7 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
         end
     end
 
-    local function SetAlias(s,t) Aliases[s:lower()]=t:lower(); print("CMX || Alias: '"..s.."' → '"..t.."'") end
+    local function SetAlias(s,t) Aliases[s:lower()]=t:lower(); print("CMX || Alias: '"..s.."' в†’ '"..t.."'") end
     local function ResolveAlias(n) return Aliases[n:lower()] or n end
     local function SetGroup(g,i) Groups[g:lower()]=i end
     local function ResolveGroup(n) return Groups[n:lower()] or nil end
@@ -643,4 +644,4 @@ function Logic.Start(Library, miXconf, ModuleSystem, UA, BASE)
     setmetatable(_G, { __call = function(_, ...) return MainHandler(...) end })
 end
 
-return Logic
+return Logic 
