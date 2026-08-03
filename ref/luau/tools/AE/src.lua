@@ -361,13 +361,48 @@ local function getWeldTarget(handle)
     end
 end
 
+local function getWeldLocalCFrame(handle, weld)
+    if not weld then return CFrame.new() end
+    if weld.Part0 == handle then
+        return weld.C1 * weld.C0:Inverse()
+    elseif weld.Part1 == handle then
+        return weld.C0 * weld.C1:Inverse()
+    end
+    return CFrame.new()
+end
+
+local function setWeldLocalCFrame(handle, weld, localCF)
+    if not weld then return end
+    if weld.Part0 == handle then
+        weld.C1 = localCF * weld.C0
+    elseif weld.Part1 == handle then
+        weld.C0 = localCF * weld.C1
+    end
+end
+
+local function convertWeldConstraint(handle, wc)
+    if not wc then return nil end
+    local target = (wc.Part0 ~= handle) and wc.Part0 or wc.Part1
+    if not target or target == handle then return nil end
+    local localCF = target.CFrame:ToObjectSpace(handle.CFrame)
+    local newWeld = Instance.new("Weld")
+    newWeld.Name = wc.Name
+    newWeld.Part0 = handle
+    newWeld.Part1 = target
+    newWeld.C0 = CFrame.new()
+    newWeld.C1 = localCF
+    newWeld.Parent = handle
+    wc:Destroy()
+    return newWeld
+end
+
 local function getHandleOffset(accessory)
     if not accessory then return Vector3.new(0,0,0) end
     local handle = accessory:FindFirstChild("Handle")
     if not handle then return Vector3.new(0,0,0) end
     local target, weld, wtype = getWeldTarget(handle)
     if weld and wtype == "Weld" then
-        return weld.C1.Position
+        return getWeldLocalCFrame(handle, weld).Position
     end
 
     if target then
@@ -383,7 +418,7 @@ local function getHandleRotation(accessory)
     local target, weld, wtype = getWeldTarget(handle)
     local localCF
     if weld and wtype == "Weld" then
-        localCF = weld.C1
+        localCF = getWeldLocalCFrame(handle, weld)
     elseif target then
         localCF = target.CFrame:ToObjectSpace(handle.CFrame)
     else
@@ -391,6 +426,18 @@ local function getHandleRotation(accessory)
     end
     local rx, ry, rz = localCF:ToEulerAnglesXYZ()
     return Vector3.new(math.deg(rx), math.deg(ry), math.deg(rz))
+end
+
+local function formatNumber(value, decimals)
+    decimals = decimals or 3
+    local s = string.format("%." .. decimals .. "f", value)
+    s = s:gsub("(%d)0+$", "%1")
+    s = s:gsub("%.$", "")
+    return s
+end
+
+local function formatVec3(vec, decimals)
+    return formatNumber(vec.X, decimals) .. ", " .. formatNumber(vec.Y, decimals) .. ", " .. formatNumber(vec.Z, decimals)
 end
 
 local explorerItems = {}
@@ -422,13 +469,13 @@ local function selectAccessory(accessory, itemFrame)
         local handle = accessory:FindFirstChild("Handle")
         if handle then
             local offset = getHandleOffset(accessory)
-            PositionBox.Text = string.format("%.2f, %.2f, %.2f", offset.X, offset.Y, offset.Z)
+            PositionBox.Text = formatVec3(offset, 3)
             local rot = getHandleRotation(accessory)
-            RotationBox.Text = string.format("%.1f, %.1f, %.1f", rot.X, rot.Y, rot.Z)
+            RotationBox.Text = formatVec3(rot, 1)
             ScaleBox.Text = "1, 1, 1"
             local mesh = handle:FindFirstChildOfClass("SpecialMesh")
             if mesh then
-                ScaleBox.Text = string.format("%.1f, %.1f, %.1f", mesh.Scale.X, mesh.Scale.Y, mesh.Scale.Z)
+                ScaleBox.Text = formatVec3(mesh.Scale, 1)
                 TextureBox.Text = mesh.TextureId ~= "" and mesh.TextureId or "—"
             end
         end
@@ -532,7 +579,7 @@ RunService.Heartbeat:Connect(function()
             local mesh = handle:FindFirstChildOfClass("SpecialMesh")
             if mesh then
                 if not ScaleBox:IsFocused() then
-                    ScaleBox.Text = string.format("%.2f, %.2f, %.2f", mesh.Scale.X, mesh.Scale.Y, mesh.Scale.Z)
+                    ScaleBox.Text = formatVec3(mesh.Scale, 1)
                 end
             end
         end
@@ -566,8 +613,16 @@ PositionBox.FocusLost:Connect(function()
     if #nums < 3 then return end
     local target, weld, wtype = getWeldTarget(handle)
     if weld and wtype == "Weld" then
-        local rotOnly = weld.C1 - weld.C1.Position
-        weld.C1 = CFrame.new(nums[1], nums[2], nums[3]) * rotOnly
+        local localCF = getWeldLocalCFrame(handle, weld)
+        local rotOnly = localCF - localCF.Position
+        setWeldLocalCFrame(handle, weld, CFrame.new(nums[1], nums[2], nums[3]) * rotOnly)
+        PositionBox.Text = formatVec3(getWeldLocalCFrame(handle, weld).Position, 3)
+    elseif weld and wtype == "WeldConstraint" and target then
+        local newWeld = convertWeldConstraint(handle, weld)
+        if newWeld then
+            setWeldLocalCFrame(handle, newWeld, CFrame.new(nums[1], nums[2], nums[3]) * CFrame.fromEulerAnglesXYZ(0, 0, 0))
+            PositionBox.Text = formatVec3(getWeldLocalCFrame(handle, newWeld).Position, 3)
+        end
     end
 end)
 
@@ -596,7 +651,18 @@ RotationBox.FocusLost:Connect(function()
     local rx, ry, rz = math.rad(nums[1]), math.rad(nums[2]), math.rad(nums[3])
     local target, weld, wtype = getWeldTarget(handle)
     if weld and wtype == "Weld" then
-        weld.C1 = CFrame.new(weld.C1.Position) * CFrame.fromEulerAnglesXYZ(rx, ry, rz)
+        local localCF = getWeldLocalCFrame(handle, weld)
+        local posOnly = localCF.Position
+        setWeldLocalCFrame(handle, weld, CFrame.new(posOnly) * CFrame.fromEulerAnglesXYZ(rx, ry, rz))
+        RotationBox.Text = formatVec3(getHandleRotation(selectedAccessory), 1)
+    elseif weld and wtype == "WeldConstraint" and target then
+        local newWeld = convertWeldConstraint(handle, weld)
+        if newWeld then
+            local localCF = target.CFrame:ToObjectSpace(handle.CFrame)
+            local posOnly = localCF.Position
+            setWeldLocalCFrame(handle, newWeld, CFrame.new(posOnly) * CFrame.fromEulerAnglesXYZ(rx, ry, rz))
+            RotationBox.Text = formatVec3(getHandleRotation(selectedAccessory), 1)
+        end
     end
 end)
 

@@ -60,10 +60,16 @@ end
 
 local function GetEffectiveClass(item)
     local class = item.Class or ""
-    local subClass = tostring(item.SubClass or ""):match("^%s*(.-)%s*$")
+    local subClass = tostring(item.SubClass or item.Subclass or ""):match("^%s*(.-)%s*$")
 
-    if class == "Character" and subClass == "Body" then
-        return "Body"
+    if class == "Character" then
+        if subClass == "Body" then
+            return "Body"
+        elseif subClass == "Head" then
+            return "Head"
+        elseif subClass == "Hair" then
+            return "Accessory"
+        end
     end
 
     return class
@@ -420,7 +426,7 @@ function Logic.BuildCMD(getVersion, catalog, discord, projectName)
         local subMap    = {}
         local subOrder  = {}
         for _, item in ipairs(items) do
-            local sub = item.SubClass
+            local sub = item.SubClass or item.Subclass
             if sub and sub:match("^%s*(.-)%s*$") ~= "" then
                 sub = sub:match("^%s*(.-)%s*$")
                 if not subMap[sub] then

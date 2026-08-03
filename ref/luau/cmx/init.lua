@@ -3,7 +3,7 @@ local Library = {
         Class = "Character",
 		Subclass = "Head",
         Name = "Anime Woman",
-        MeshID = "rbxassetid://76877570105127",
+          MeshID = "rbxassetid://76877570105127",
         TextureID = "rbxassetid://121827081031002",
         Scale = Vector3.new(1, 1, 1),
 		ReqPlaceID = 0
@@ -180,6 +180,47 @@ local Library = {
         MeshID = "rbxassetid://10550906266",
         TextureID = "rbxassetid://10523208372",
         CFrame = CFrame.new(0, -0.6, 0) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Accessory",
+        Subclass = "Head",
+        Name = "Holiday Crown",
+        Weld = "Head",
+        MeshID = "http://www.roblox.com/asset/?id=138937497",
+        TextureID = "http://www.roblox.com/asset/?id=138937524",
+        Scale = Vector3.new(0.75, 0.75, 0.75),
+        CFrame = CFrame.new(0, -0.4, 0) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Accessory",
+        Subclass = "Back",
+        Name = "Fem Cape",
+        MeshID = "rbxassetid://90762672237284",
+        TextureID = "rbxassetid://76094174532292",
+        Scale = Vector3.new(1.1, 1.1, 1.1),
+        CFrame = CFrame.new(0, 0.1, 0.67) * CFrame.fromEulerAnglesXYZ(math.rad(-180), math.rad(0), math.rad(-180)),
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Accessory",
+        Subclass = "Back",
+        Name = "Sleepy Cat Meme Cape",
+        MeshID = "rbxassetid://90762672237284",
+        TextureID = "rbxassetid://109849546064870",
+        Scale = Vector3.new(1.1, 1.1, 1.1),
+        CFrame = CFrame.new(0, 0.1, 0.67) * CFrame.fromEulerAnglesXYZ(math.rad(-180), math.rad(0), math.rad(-180)),
+        ReqPlaceID = 0
+    },
+    {
+        Class = "Accessory",
+        Subclass = "Back",
+        Name = "Black Cute Eyepatch",
+        MeshID = "rbxassetid://121243438814653",
+        TextureID = "rbxassetid://80296261614840",
+        Scale = Vector3.new(1,1,1),
+        CFrame = CFrame.new(0,-0.1,0) * CFrame.fromEulerAnglesXYZ(math.rad(0), math.rad(0), math.rad(0)),
         ReqPlaceID = 0
     },
     {
