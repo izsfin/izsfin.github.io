@@ -1,4 +1,5 @@
--- [ ref/luau/cmx/logic.lua ]
+-- [ ref/luau/cmx/logic.lua ] --
+-- [ Version   ||   1.2.0.0 ] --
 local HttpService = game:GetService("HttpService")
 local Players     = game:GetService("Players")
 local lp          = Players.LocalPlayer
